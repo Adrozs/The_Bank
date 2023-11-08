@@ -4,27 +4,40 @@
     {
         static void Main(string[] args)
         {
+            // Welcome phrase
             Console.WriteLine("Welcome to bank! \n");
-            Console.WriteLine("Login ");
-            Console.Write("Name: ");
-            string userName = Console.ReadLine();
-            Console.Write("PIN: ");
-            string pin = Console.ReadLine();
-
-            if (userName == "admin")
+            
+            // Loop forever TODO: Add command to exit program?
+            while (true)
             {
-                if (pin != "1234") 
+                // Login screen
+                Console.WriteLine("Login ");
+                Console.Write("Name: ");
+                string userName = Console.ReadLine();
+                Console.Write("PIN: ");
+                string pin = Console.ReadLine();
+
+                // Checks if username is admin and if pin is correct - if yes it calls the admin menu
+                // TODO: change so certain users are admin instead of a pre-determined admin? Discuss in group.
+                if (userName == "admin")
                 {
-                    Console.WriteLine("Wrong password");
-                    return;
+                    if (pin != "1234")
+                    {
+                        Console.WriteLine("Wrong password");
+                    }
+                    else
+                        AdminFunctions.DoAdminTasks();
                 }
+                // TODO: Check if user exists in db 
+                else if (userName == "user") // Need to change to check if username is in database and pin matches that users pin
+                {
+                    UserFunctions.UserMenu(userName);
+                }
+                else
+                    Console.WriteLine("Username or pin is invalid");
 
-                AdminFunctions.DoAdminTasks();
-            }
-            // TODO: Check if user exists in db 
-            else
-            {
-                UserFunctions.UserMenu(userName);
+                // Newline
+                Console.WriteLine();
             }
                 
 
