@@ -7,7 +7,8 @@
             // Welcome phrase
             Console.WriteLine("Welcome to bank! \n");
             
-            // Loop forever TODO: Add command to exit program?
+            // Loop until user chooses to exit program
+            // TODO: Add command to exit program
             while (true)
             {
                 // Login screen
@@ -33,6 +34,7 @@
                 {
                     UserFunctions.UserMenu(userName);
                 }
+                // TODO: If pin is invalid 3 times shut down the program
                 else
                     Console.WriteLine("Username or pin is invalid");
 
