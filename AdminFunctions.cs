@@ -12,6 +12,7 @@ namespace The_Bank
 {
     internal static class AdminFunctions
     {
+        // The admin menu
         public static void DoAdminTasks()
         {
             using (BankContext context = new BankContext())
@@ -52,22 +53,25 @@ namespace The_Bank
             }
         }
 
+        // Creates a new user with a chosen name and a random pin
         private static void CreateUser(BankContext context)
         {
             Console.WriteLine("Create user:");
             Console.Write("Enter username: ");
             string username = Console.ReadLine();
 
+            // TODO?: Should we let the user choose their own pin? Discuss in group.
             Random rnd = new Random();
             string pin = rnd.Next(1000, 10000).ToString();
 
+            // Creates new user object with the chosen name and a random pin-code
             User newUser = new User()
             {
                 Name = username,
                 Pin = pin,
             };
 
-
+            // Adds and saves user to db - if successful prints out confirmation message, if not prints out fail message
             bool success = DbHelpers.AddUser(context, newUser);
             if (success)
             {
