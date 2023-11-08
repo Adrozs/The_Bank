@@ -78,23 +78,25 @@ namespace The_Bank
                 // Check if string is valid and not empty
                 if (string.IsNullOrEmpty(newAccountName))
                 {
-                    Console.WriteLine("Name cannot be empty");
+                    Console.WriteLine("Error! Name cannot be empty \n");
                 }
-
-                // Break out of loop
-                break;
+                else
+                    // Break out of loop
+                    break;
             }
 
-            User user = 
+            // Creates new user object of the user that's logged in
+            User user = context.Users
+                .Where(u => u.Name == username)
+                .Single(); // TODO: Change to SingleOrDefault() and add exeption handling later
 
+            // Create new account type with UserId and Name of current user and starting balance of 0, until user insers funds
             Account account = new Account()
             {
-                Id = username.Id,
-                User = username,
-                Name = newAccountName,
+                UserId = user.Id,
+                Name = user.Name,
                 Balance = 0,
             };
-
 
             // Save account to database
             bool success = DbHelpers.AddAccount(context, account);
@@ -102,9 +104,11 @@ namespace The_Bank
             {
                 Console.WriteLine($"Created new account {newAccountName} for user {username}");
             }
+            // If wasn't possible to save account to database, print error
             else
             {
                 Console.WriteLine($"Failed to create account {newAccountName}");
+                Console.WriteLine("Returning to menu");
             }
 
             
