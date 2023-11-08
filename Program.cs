@@ -21,8 +21,12 @@
 
                 AdminFunctions.DoAdminTasks();
             }
+            // TODO: Check if user exists in db 
             else
-                UserFunctions.UserMenu();
+            {
+                UserFunctions.UserMenu(userName);
+            }
+                
 
 
 
