@@ -8,7 +8,7 @@
             Console.WriteLine("Login ");
             Console.Write("Name: ");
             string userName = Console.ReadLine();
-            Console.Write("PIN:");
+            Console.Write("PIN: ");
             string pin = Console.ReadLine();
 
             if (userName == "admin")
@@ -21,8 +21,13 @@
 
                 AdminFunctions.DoAdminTasks();
             }
+            else
+                UserFunctions.UserMenu();
 
-            // Code here for user login ****
+
+
+
+
         }
     }
 }
