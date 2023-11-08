@@ -30,5 +30,19 @@ namespace The_Bank.Utilities
             }
             return true;
         }
+
+        public static bool AddAccount(BankContext context, Account account)
+        {
+            context.Accounts.Add(account);
+            try
+            {
+                context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error adding account: {ex}");
+            }
+            return true;
+        }
     }
 }
