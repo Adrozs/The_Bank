@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using The_Bank.Data;
 
 namespace The_Bank
 {
@@ -54,8 +50,28 @@ namespace The_Bank
             }
         }
 
+        private static void DepositMoney()
+        {
+            using (BankContext context = new BankContext())
+            {
+                Console.WriteLine("How much do you wish to deposit?");
+                double deposit = int.Parse(Console.ReadLine());
 
+                var depositUser = context.Accounts
+                .Where(a => a.Balance > 0)
+                .Select(a => a.Name)
+                .ToList();
 
+                if (deposit > 0)
+                {
+                    Console.WriteLine($"Current balance: {depositUser.Balance}");
+                }
 
+                else
+                {
+                    Console.WriteLine("Invalid choice");
+                }
+            }
+        }
     }
 }

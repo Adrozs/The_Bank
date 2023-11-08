@@ -25,8 +25,6 @@ namespace The_Bank
                 }
 
                 Console.WriteLine($"Total number of users {users.Count()}");
-
-
                 Console.WriteLine("[C]: Create new user");
                 Console.WriteLine("[X]: Exit");
 
