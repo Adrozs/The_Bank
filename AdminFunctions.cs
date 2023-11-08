@@ -17,8 +17,9 @@ namespace The_Bank
             using (BankContext context = new BankContext())
             {
                 Console.WriteLine("Current users in system:");
-                List<User> users = DbHelpers.GetAllUsers(context);
+                List<User> users = DbHelpers.GetAllUsers(context); // Gets all users in the db
 
+                // Prints all users names currently in database
                 foreach (User user in users)
                 {
                     Console.WriteLine($"{user.Name}");
@@ -26,10 +27,11 @@ namespace The_Bank
 
                 Console.WriteLine($"Total number of users {users.Count()}");
 
-
+                // Gives users their options
                 Console.WriteLine("[C]: Create new user");
                 Console.WriteLine("[X]: Exit");
 
+                // Loop until user chooses to go back
                 while (true)
                 {
                     Console.Write("Enter command: ");
