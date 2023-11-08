@@ -68,7 +68,7 @@ namespace The_Bank
             // Declare new account variable outside of loop
             string newAccountName;
 
-            // Ensure that string isn't empty
+            // Loops until we ensure that string isn't empty
             while (true)
             {
                 // Enter account name
@@ -90,7 +90,7 @@ namespace The_Bank
                 .Where(u => u.Name == username)
                 .Single(); // TODO: Change to SingleOrDefault() and add exeption handling later
 
-            // Create new account type with UserId and Name of current user and starting balance of 0, until user insers funds
+            // Create new account type with UserId and Name of current user and starting balance of 0
             Account account = new Account()
             {
                 UserId = user.Id,
