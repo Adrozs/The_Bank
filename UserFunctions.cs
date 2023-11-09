@@ -58,6 +58,9 @@ namespace The_Bank
                             Console.WriteLine("Error! Please try again.");
                             break;
                     }
+
+                    // New line for text formatting
+                    Console.WriteLine();
                 }
             }  
         }
@@ -111,7 +114,17 @@ namespace The_Bank
                 Console.WriteLine("Returning to menu");
             }
 
+            // Checks if user pressed enter
+            Console.WriteLine("Press [Enter] to go main menu");
+            ConsoleKeyInfo key = Console.ReadKey(true); // True means it doesn't output the pressed key - looks better
             
+            // Loops until user presses Enter
+            while (key.Key != ConsoleKey.Enter)
+                key = Console.ReadKey(true); // True means it doesn't output the pressed key - looks better
+
+            // New line for text formatting
+            Console.WriteLine(); 
+
         }
 
 
