@@ -18,21 +18,18 @@ namespace The_Bank
             using (BankContext context = new BankContext())
             {
                 Console.WriteLine("Current users in system:");
-                List<User> users = DbHelpers.GetAllUsers(context); // Gets all users in the db
+                List<User> users = DbHelpers.GetAllUsers(context);
 
-                // Prints all users names currently in database
                 foreach (User user in users)
                 {
                     Console.WriteLine($"{user.Name}");
                 }
 
                 Console.WriteLine($"Total number of users {users.Count()}");
-
-                // Gives users their options
                 Console.WriteLine("[C]: Create new user");
+                Console.WriteLine("[U]: UserMenu");
                 Console.WriteLine("[X]: Exit");
 
-                // Loop until user chooses to go back
                 while (true)
                 {
                     Console.Write("Enter command: ");
@@ -43,6 +40,9 @@ namespace The_Bank
                         case "c":
                             CreateUser(context);
                             break;
+                        case "u":
+                            UserFunctions.UserMenu(context);
+                            break;
                         case "x":
                             return;
                         default:
@@ -52,6 +52,7 @@ namespace The_Bank
                 }
             }
         }
+
 
         // Creates a new user with a chosen name and a random pin
         private static void CreateUser(BankContext context)

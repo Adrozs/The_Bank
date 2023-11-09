@@ -33,16 +33,16 @@ namespace The_Bank
                     switch (choice)
                     {
                         case "1":
-                            //ViewAccountInfo();
+                            DisplayAccountBalances(context, userName);
                             break;
                         case "2":
-                            //TransferMoney();
+                            TransferMoney(context, userName);
                             break;
                         case "3":
-                            //WithdrawMoney();
+                            WithdrawMoney(context, userName);
                             break;
                         case "4":
-                            //DepositMoney();
+                            DepositMoney(context, userName);
                             break;
                         case "5":
                             OpenNewAccount(context, userName);
@@ -61,6 +61,64 @@ namespace The_Bank
                 }
             }  
         }
+        private static void DisplayAccountBalances(BankContext context, string userName)
+        {
+            Console.WriteLine("Your Accounts and Balances:");
+
+            // Retrieve user information and their accounts from the database
+            User user = context.Users
+                .Include(u => u.Accounts)
+                .Single(u => u.Name == userName);
+
+            // Display each account and its balance
+            foreach (var account in user.Accounts)
+            {
+                Console.WriteLine($"{account.Name}: {account.Balance:C}");
+            }
+
+            // Add a newline for better formatting
+            Console.WriteLine();
+        }
+
+
+        private static void TransferMoney(BankContext context, string userName)
+        {
+            // Your transfer logic goes here
+            // Prompt user for source account, destination account, and amount
+
+            // Check if source account has enough balance
+            // If not, inform the user and return
+
+            // Update balances of source and destination accounts
+
+            // Display updated balances
+            Console.WriteLine($"Transfer successful! Updated balances:");
+            // Display balances of source and destination accounts
+        }
+
+        private static void WithdrawMoney(BankContext context, string userName)
+        {
+            // withdraw
+            // Which account and how much?
+
+            // CONFIRM W/ PIN
+
+            // Balance - Amount = NewBalance (not the shoes)
+
+            // Show new balance
+            Console.WriteLine("You have successfully completed your withdrawal! New balance:");
+            // 
+        }
+
+        private static void DepositMoney(BankContext context, string userName)
+        {
+            // Deposit
+            // which account and how much?
+
+            // Display the updated balance
+            Console.WriteLine("You have successfully completed your deposit! New balance:");
+            // Display the balance of the selected account
+        }
 
         // Create a new account
         private static void OpenNewAccount(BankContext context, string username)
@@ -68,20 +126,18 @@ namespace The_Bank
             // Declare new account variable outside of loop
             string newAccountName;
 
-            // Loops until we ensure that string isn't empty
+            // loop until not true
             while (true)
             {
                 // Enter account name
                 Console.WriteLine("Enter new account name: ");
                 newAccountName = Console.ReadLine();
 
-                // Check if string is valid and not empty
                 if (string.IsNullOrEmpty(newAccountName))
                 {
                     Console.WriteLine("Error! Name cannot be empty \n");
                 }
                 else
-                    // Break out of loop
                     break;
             }
 
@@ -110,13 +166,6 @@ namespace The_Bank
                 Console.WriteLine($"Failed to create account {newAccountName}");
                 Console.WriteLine("Returning to menu");
             }
-
-            
         }
-
-
-
-
-
     }
 }
