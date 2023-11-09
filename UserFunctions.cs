@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using The_Bank.Data;
@@ -36,7 +37,7 @@ namespace The_Bank
                             //TransferMoney();
                             break;
                         case "3":
-                            //WithdrawMoney();
+                           // WithdrawMoney();
                             break;
                         case "4":
                             //DepositMoney();
@@ -61,7 +62,36 @@ namespace The_Bank
 
             
         }
+            public static void WithdrawMoney(BankContext context)
+        {
+            var balance = context.Accounts
+                .Where(b => b.Id == b.User.Id)
+                .Select(b => b.Balance).Single();
+               
+            Console.Write("How much would you like to withdraw? ");
+            double withdraw = Convert.ToDouble(Console.ReadLine());
+
+            double newBalance = (balance - withdraw);
+            if (newBalance < 0)
+            {
+                Console.WriteLine($"Cannot withdraw more than {balance}");
+                return;
+            }
+                if (withdraw == 0)
+            {
+
             
+
+                Console.WriteLine("Cannot withdraw 0");
+                return;
+            }
+
+                
+            Console.WriteLine($"You new balance is {newBalance}");
+            balance = newBalance;
+            context.SaveChanges();
+
+        }
 
 
 
