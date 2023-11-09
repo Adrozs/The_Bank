@@ -51,5 +51,17 @@ namespace The_Bank.Utilities
             }
             return true;
         }
+
+        // Checks if specified user exists in the database
+        public static bool VerifyLogin(string username, string pin)
+        {
+            using (BankContext context = new BankContext())
+            {
+                // Checks if any user with the specified combination of username and pin exists in the db
+                // Returns true if yes and false if no
+                return context.Users
+                    .Any(u => u.Name == username && u.Pin == pin);
+            };
+        }
     }
 }
