@@ -58,15 +58,17 @@ namespace The_Bank.Utilities
         }
 
         // Checks if specified user exists in the database
-        public static bool VerifyLogin(string username, string pin)
+        public static bool IsCustomer(BankContext context, string userName, string pin)
         {
-            using (BankContext context = new BankContext())
-            {
-                // Checks if any user with the specified combination of username and pin exists in the db
-                // Returns true if yes and false if no
-                return context.Users
-                    .Any(u => u.Name == username && u.Pin == pin);
-            };
+            // Has the user the correct credentials?
+            return context.Users.Any(u => u.Name == userName && u.Pin == pin);
+        }
+
+        // Checks if admin login is correct according to db
+        public static bool IsAdmin(string adminName, string adminPin)
+        {
+            // ADMIN LOGIN
+            return adminName == "admin" && adminPin == "1234";
         }
     }
 }
