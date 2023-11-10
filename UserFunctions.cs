@@ -308,7 +308,7 @@ namespace The_Bank
             Account account = new Account()
             {
                 UserId = user.Id,
-                Name = user.Name,
+                Name = newAccountName,
                 Balance = 0,
             };
 
