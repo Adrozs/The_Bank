@@ -3,6 +3,8 @@ using System;
 
 using The_Bank.Utilities;
 
+using The_Bank.Models;
+
 namespace The_Bank
 {
     internal class Program
@@ -11,7 +13,12 @@ namespace The_Bank
         {
 
             // Welcome phrase
-            Console.WriteLine("Welcome to the bank! \n");
+            MenuFunctions.header();
+            MenuFunctions.main_header();
+            MenuFunctions.footer();
+            Console.WriteLine();
+            Console.WriteLine();
+
 
             // Initalize counter to keep track of login attempts
             int loginAttempts = 2;
@@ -30,7 +37,7 @@ namespace The_Bank
                 Console.WriteLine("2. Employee");
                 Console.WriteLine("3. Exit");
                 Console.Write("Enter your choice (1, 2, or 3): ");
-
+                
                 string userTypeChoice = Console.ReadLine();
 
                 switch (userTypeChoice)
@@ -41,6 +48,14 @@ namespace The_Bank
                         string customerName = Console.ReadLine();
                         Console.Write("PIN: ");
                         string customerPin = Console.ReadLine();
+            
+
+            Console.WriteLine("Welcome to bank! \n");
+            Console.WriteLine("Login ");
+            Console.Write("Name: ");
+            string userName = Console.ReadLine();
+            Console.Write("PIN: ");
+            string pin = Console.ReadLine();
 
                         // Checks if account is NOT frozed 
                         // TODO OBS! Doesn't handle if an non existing username is put in - crashes 
