@@ -1,4 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using QRCoder;
+using System.Drawing;
+using System.Text;
 using The_Bank.Data;
 using The_Bank.Models;
 using The_Bank.Utilities;
@@ -13,8 +16,16 @@ namespace The_Bank
             {
                 while (true)
                 {
-                    Console.WriteLine("Choose one of the following options:");
+                    Console.ForegroundColor = ConsoleColor.Green;
 
+                    Console.WriteLine("\nChoose one of the following options:");
+                    Console.WriteLine("1. Display Account Balances");
+                    Console.WriteLine("2. Transfer Money");
+                    Console.WriteLine("3. Withdraw Money");
+                    Console.WriteLine("4. Deposit Money");
+                    Console.WriteLine("5. Open New Account");
+                    Console.WriteLine("7. Exit");
+                    Console.ResetColor();
                     string choice = Console.ReadLine();
 
                     switch (choice)

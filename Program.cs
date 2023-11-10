@@ -7,6 +7,7 @@ namespace The_Bank
     {
         static void Main(string[] args)
         {
+
             // Welcome phrase
             Console.WriteLine("Welcome to the bank! \n");
 
@@ -80,7 +81,9 @@ namespace The_Bank
                 // New line
                 Console.WriteLine();
             }
+
         }
+
 
         private static bool IsCustomer(BankContext context, string userName, string pin)
         {
