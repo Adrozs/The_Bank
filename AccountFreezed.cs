@@ -18,7 +18,7 @@ namespace The_Bank
             using (BankContext context = new BankContext())
             {
                 // Get user
-                var user = DbHelpers.GetUser(context, username);
+                var user = DbHelpers.GetUser(context, username); 
 
                 // Returns if user us frozen or not
                 if (user.IsFreezed)
