@@ -61,24 +61,32 @@ namespace The_Bank
 
             
         }
-            public static void WithdrawMoney(BankContext context)
+            public static void WithdrawMoney(BankContext context, string userName)
         {
+
             var balance = context.Accounts
                 .Where(b => b.Id == b.User.Id)
                 .Select(b => b.Balance).Single();
                
             Console.Write("How much would you like to withdraw? ");
-            double withdraw = Convert.ToDouble(Console.ReadLine());
+            decimal withdraw = Convert.ToDecimal(Console.ReadLine());
 
-            double newBalance = (balance - withdraw);
+            double newBalance = (double)(balance - withdraw);
             if (newBalance < 0)
             {
                 Console.WriteLine($"Cannot withdraw more than {balance}");
                 return;
             }
                 if (withdraw == 0)
-            {
+            {        
+                Console.WriteLine("Cannot withdraw 0");
+                return;
+            }
+                Console.WriteLine($"You new balance is {newBalance}");
+                balance = (decimal)newBalance;
+                context.SaveChanges();
 
+            }
         private static void DisplayAccountBalances(BankContext context, string userName)
         {
             Console.WriteLine("Your Accounts and Balances:");
@@ -97,19 +105,6 @@ namespace The_Bank
             // new line new possibilities
             Console.WriteLine();
         }
-            
-
-                Console.WriteLine("Cannot withdraw 0");
-                return;
-            }
-
-                
-            Console.WriteLine($"You new balance is {newBalance}");
-            balance = newBalance;
-            context.SaveChanges();
-
-        }
-
         private static void TransferMoney(BankContext context, string userName)
         {
             // Get user info from Database
@@ -198,68 +193,68 @@ namespace The_Bank
             }
         }
 
-        private static void WithdrawMoney(BankContext context, string userName)
-        {
-            // get info from database
-            User user = context.Users
-                .Include(u => u.Accounts)
-                .Single(u => u.Name == userName);
+        //private static void WithdrawMoney(BankContext context, string userName)
+        //{
+        //    // get info from database
+        //    User user = context.Users
+        //        .Include(u => u.Accounts)
+        //        .Single(u => u.Name == userName);
 
-            // X accounts Y numbers
-            Console.WriteLine("Select the account to withdraw money from:");
-            foreach (var account in user.Accounts)
-            {
-                Console.WriteLine($"{account.Id}. {account.Name}: {account.Balance:C}");
-            }
+        //    // X accounts Y numbers
+        //    Console.WriteLine("Select the account to withdraw money from:");
+        //    foreach (var account in user.Accounts)
+        //    {
+        //        Console.WriteLine($"{account.Id}. {account.Name}: {account.Balance:C}");
+        //    }
 
-            // CHOOSE AN ACCOUNT
-            Console.Write("Enter the account number: ");
-            if (int.TryParse(Console.ReadLine(), out int selectedAccountId))
-            {
-                // FIND account
-                Account selectedAccount = user.Accounts.SingleOrDefault(a => a.Id == selectedAccountId);
+        //    // CHOOSE AN ACCOUNT
+        //    Console.Write("Enter the account number: ");
+        //    if (int.TryParse(Console.ReadLine(), out int selectedAccountId))
+        //    {
+        //        // FIND account
+        //        Account selectedAccount = user.Accounts.SingleOrDefault(a => a.Id == selectedAccountId);
 
-                if (selectedAccount != null)
-                {
-                    // HOW MUCH DO U WANT TO WITHDRAW
-                    Console.Write("Enter the withdrawal amount: ");
-                    if (decimal.TryParse(Console.ReadLine(), out decimal withdrawalAmount) && withdrawalAmount > 0)
-                    {
-                        // U got enough cash? or you broke
-                        if (selectedAccount.Balance >= withdrawalAmount)
-                        {
-                            // Update account balance (or not if u broke
-                            selectedAccount.Balance -= withdrawalAmount;
+        //        if (selectedAccount != null)
+        //        {
+        //            // HOW MUCH DO U WANT TO WITHDRAW
+        //            Console.Write("Enter the withdrawal amount: ");
+        //            if (decimal.TryParse(Console.ReadLine(), out decimal withdrawalAmount) && withdrawalAmount > 0)
+        //            {
+        //                // U got enough cash? or you broke
+        //                if (selectedAccount.Balance >= withdrawalAmount)
+        //                {
+        //                    // Update account balance (or not if u broke
+        //                    selectedAccount.Balance -= withdrawalAmount;
 
-                            // SAVE IT
-                            context.SaveChanges();
+        //                    // SAVE IT
+        //                    context.SaveChanges();
 
-                            // Display balance
-                            Console.WriteLine($"Withdrawal successful! New balance for {selectedAccount.Name}: {selectedAccount.Balance:C}");
-                        }
-                        else
-                        {
-                            Console.WriteLine("Insufficient funds in the account. Withdrawal canceled.");
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("Invalid withdrawal amount. Please enter a valid positive number.");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Invalid account number. Please select a valid account.");
+        //                    // Display balance
+        //                    Console.WriteLine($"Withdrawal successful! New balance for {selectedAccount.Name}: {selectedAccount.Balance:C}");
+        //                }
+        //                else
+        //                {
+        //                    Console.WriteLine("Insufficient funds in the account. Withdrawal canceled.");
+        //                }
+        //            }
+        //            else
+        //            {
+        //                Console.WriteLine("Invalid withdrawal amount. Please enter a valid positive number.");
+        //            }
+        //        }
+        //        else
+        //        {
+        //            Console.WriteLine("Invalid account number. Please select a valid account.");
 
-                    // New line for text formatting
-                    Console.WriteLine();
-                }
-            }
-            else
-            {
-                Console.WriteLine("Invalid input. Please enter a valid account number.");
-            }
-        }
+        //            // New line for text formatting
+        //            Console.WriteLine();
+        //        }
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine("Invalid input. Please enter a valid account number.");
+        //    }
+        //}
 
         private static void DepositMoney(BankContext context, string userName)
         {
