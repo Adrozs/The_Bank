@@ -17,25 +17,21 @@ namespace The_Bank.Utilities
             return users;
         }
 
-        // Adds and saves user to database
+        // Adds and saves account to database
         public static bool AddUser(BankContext context, User user)
         {
-            // Tries to save changes to database
-            context.Users.Add(user);
             try
             {
+                context.Users.Add(user);
                 context.SaveChanges();
+                return true;
             }
-            // If wasn't possible to save, print error and return
             catch (Exception ex)
             {
-                Console.WriteLine($"Error adding user: {ex}");
+                Console.WriteLine($"Error adding user: {ex.Message}");
                 return false;
             }
-            return true;
         }
-
-        // Adds and saves account to database
         public static bool AddAccount(BankContext context, Account account)
         {
             try
@@ -49,6 +45,6 @@ namespace The_Bank.Utilities
                 Console.WriteLine($"Error adding account: {ex.Message}");
                 return false;
             }
-        }
+        }   
     }
 }

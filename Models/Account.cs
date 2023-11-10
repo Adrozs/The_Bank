@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace The_Bank.Models
 {
-    internal class Account
+    public class Account
     {
         public int Id { get; set; }
         public int UserId { get; set; }
@@ -14,6 +14,5 @@ namespace The_Bank.Models
         public decimal Balance { get; set; }
 
         public virtual User User { get; set; }
-
     }
 }

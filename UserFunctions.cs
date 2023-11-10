@@ -1,10 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading.Tasks;
 using The_Bank.Data;
 using The_Bank.Models;
 using The_Bank.Utilities;
@@ -13,112 +7,262 @@ namespace The_Bank
 {
     internal class UserFunctions
     {
-        internal static void UserMenu(string userName)
+        internal static void UserMenu(BankContext outerContext, string userName)
         {
             using (BankContext context = new BankContext())
-            {            
+            {
                 while (true)
                 {
                     Console.WriteLine("Choose one of the following options:");
-                    Console.WriteLine("1. View all of your acounts and balance");
-                    Console.WriteLine("2. Transfer Balance");
-                    Console.WriteLine("3. Withdrawal");
-                    Console.WriteLine("4. Deposit");
-                    Console.WriteLine("5. Open a new account");
-                    //Console.WriteLine("6. Currency Converter"); Do later if have extra time
-                    Console.WriteLine("7. Log out.");
 
                     string choice = Console.ReadLine();
 
                     switch (choice)
                     {
                         case "1":
-                            DisplayAccountBalances(context, userName);
+                            DisplayAccountBalances(outerContext, userName);
                             break;
                         case "2":
-                            TransferMoney(context, userName);
+                            TransferMoney(outerContext, userName);
                             break;
                         case "3":
-                            WithdrawMoney(context, userName);
+                            WithdrawMoney(outerContext, userName);
                             break;
                         case "4":
-                            DepositMoney(context, userName);
+                            DepositMoney(outerContext, userName);
                             break;
                         case "5":
-                            OpenNewAccount(context, userName);
+                            OpenNewAccount(outerContext, userName);
                             break;
-                        // If we have time over we can fix currency conversion
-                        //case "6":
-                        //    currentUser = null;
-                        //    return;
                         case "7":
                             return;
-                            break;
                         default:
                             Console.WriteLine("Error! Please try again.");
                             break;
                     }
                 }
-            }  
+            }
         }
+
         private static void DisplayAccountBalances(BankContext context, string userName)
         {
             Console.WriteLine("Your Accounts and Balances:");
 
-            // Retrieve user information and their accounts from the database
+            // Retrieve info from database
             User user = context.Users
                 .Include(u => u.Accounts)
                 .Single(u => u.Name == userName);
 
-            // Display each account and its balance
+            // SHOW BALANCE
             foreach (var account in user.Accounts)
             {
                 Console.WriteLine($"{account.Name}: {account.Balance:C}");
             }
 
-            // Add a newline for better formatting
+            // new line new possibilities
             Console.WriteLine();
         }
 
-
         private static void TransferMoney(BankContext context, string userName)
         {
-            // Your transfer logic goes here
-            // Prompt user for source account, destination account, and amount
+            // Get user info from Database
+            User user = context.Users
+                .Include(u => u.Accounts)
+                .Single(u => u.Name == userName);
 
-            // Check if source account has enough balance
-            // If not, inform the user and return
+            // Display user accounts
+            Console.WriteLine("Select the source account to transfer money from:");
+            foreach (var account in user.Accounts)
+            {
+                Console.WriteLine($"{account.Id}. {account.Name}: {account.Balance:C}");
+            }
 
-            // Update balances of source and destination accounts
+            // select source account number
+            Console.Write("Enter the source account number: ");
+            if (int.TryParse(Console.ReadLine(), out int sourceAccountId))
+            {
+                // SOURCE ACCOUNT
+                Account sourceAccount = user.Accounts.SingleOrDefault(a => a.Id == sourceAccountId);
 
-            // Display updated balances
-            Console.WriteLine($"Transfer successful! Updated balances:");
-            // Display balances of source and destination accounts
+                if (sourceAccount != null)
+                {
+                    // select destination account (no money laundering pls)
+                    Console.WriteLine("Select the destination account to transfer money to:");
+                    foreach (var account in user.Accounts.Where(a => a.Id != sourceAccountId))
+                    {
+                        Console.WriteLine($"{account.Id}. {account.Name}: {account.Balance:C}");
+                    }
+
+                    Console.Write("Enter the destination account number: ");
+                    if (int.TryParse(Console.ReadLine(), out int destinationAccountId))
+                    {
+                        // destination account find it
+                        Account destinationAccount = user.Accounts.SingleOrDefault(a => a.Id == destinationAccountId);
+
+                        if (destinationAccount != null)
+                        {
+                            // HOW MUCH
+                            Console.Write("Enter the transfer amount: ");
+                            if (decimal.TryParse(Console.ReadLine(), out decimal transferAmount) && transferAmount > 0)
+
+                            {
+                                // you got the cash or u broke?
+                                if (sourceAccount.Balance >= transferAmount)
+                                {
+                                    // update balance on both ends
+                                    sourceAccount.Balance -= transferAmount;
+                                    destinationAccount.Balance += transferAmount;
+
+                                    // SAVE
+                                    context.SaveChanges();
+
+                                    // DISPLAY UPDATED BALANCE PLS WORK
+                                    Console.WriteLine($"Transfer successful! New balance for {sourceAccount.Name}: {sourceAccount.Balance:C}");
+                                    Console.WriteLine($"New balance for {destinationAccount.Name}: {destinationAccount.Balance:C}");
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Insufficient funds in the source account. Transfer canceled.");
+                                }
+                            }//errorcode heaven
+                            else
+                            {
+                                Console.WriteLine("Invalid transfer amount. Please enter a valid positive number.");
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid destination account number. Please select a valid account.");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid input. Please enter a valid destination account number.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Invalid source account number. Please select a valid account.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid input. Please enter a valid source account number.");
+            }
         }
 
         private static void WithdrawMoney(BankContext context, string userName)
         {
-            // withdraw
-            // Which account and how much?
+            // get info from database
+            User user = context.Users
+                .Include(u => u.Accounts)
+                .Single(u => u.Name == userName);
 
-            // CONFIRM W/ PIN
+            // X accounts Y numbers
+            Console.WriteLine("Select the account to withdraw money from:");
+            foreach (var account in user.Accounts)
+            {
+                Console.WriteLine($"{account.Id}. {account.Name}: {account.Balance:C}");
+            }
 
-            // Balance - Amount = NewBalance (not the shoes)
+            // CHOOSE AN ACCOUNT
+            Console.Write("Enter the account number: ");
+            if (int.TryParse(Console.ReadLine(), out int selectedAccountId))
+            {
+                // FIND account
+                Account selectedAccount = user.Accounts.SingleOrDefault(a => a.Id == selectedAccountId);
 
-            // Show new balance
-            Console.WriteLine("You have successfully completed your withdrawal! New balance:");
-            // 
+                if (selectedAccount != null)
+                {
+                    // HOW MUCH DO U WANT TO WITHDRAW
+                    Console.Write("Enter the withdrawal amount: ");
+                    if (decimal.TryParse(Console.ReadLine(), out decimal withdrawalAmount) && withdrawalAmount > 0)
+                    {
+                        // U got enough cash? or you broke
+                        if (selectedAccount.Balance >= withdrawalAmount)
+                        {
+                            // Update account balance (or not if u broke
+                            selectedAccount.Balance -= withdrawalAmount;
+
+                            // SAVE IT
+                            context.SaveChanges();
+
+                            // Display balance
+                            Console.WriteLine($"Withdrawal successful! New balance for {selectedAccount.Name}: {selectedAccount.Balance:C}");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Insufficient funds in the account. Withdrawal canceled.");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid withdrawal amount. Please enter a valid positive number.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Invalid account number. Please select a valid account.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid input. Please enter a valid account number.");
+            }
         }
 
         private static void DepositMoney(BankContext context, string userName)
         {
-            // Deposit
-            // which account and how much?
+            // Get info from database
+            User user = context.Users
+                .Include(u => u.Accounts)
+                .Single(u => u.Name == userName);
 
-            // Display the updated balance
-            Console.WriteLine("You have successfully completed your deposit! New balance:");
-            // Display the balance of the selected account
+            // Display all accounts
+            Console.WriteLine("Select the account to deposit money into:");
+            foreach (var account in user.Accounts)
+            {
+                Console.WriteLine($"{account.Id}. {account.Name}: {account.Balance:C}");
+            }
+
+            // CHOOSE IT NOW
+            Console.Write("Enter the account number: ");
+            if (int.TryParse(Console.ReadLine(), out int selectedAccountId))
+            {
+                // Find selected account
+                Account selectedAccount = user.Accounts.SingleOrDefault(a => a.Id == selectedAccountId);
+
+                if (selectedAccount != null)
+                {
+                    // How much do you want to deposit?
+                    Console.Write("Enter the deposit amount: ");
+                    if (decimal.TryParse(Console.ReadLine(), out decimal depositAmount) && depositAmount > 0)
+                    {
+                        // Update the balance
+                        selectedAccount.Balance += depositAmount;
+
+                        // save it
+                        context.SaveChanges();
+
+                        // Display new balance (sadly not the shoes)
+                        Console.WriteLine($"Deposit successful! New balance for {selectedAccount.Name}: {selectedAccount.Balance:C}");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid deposit amount. Please enter a valid positive number.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Invalid account number. Please select a valid account.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid input. Please enter a valid account number.");
+            }
         }
+
 
         // Create a new account
         private static void OpenNewAccount(BankContext context, string username)

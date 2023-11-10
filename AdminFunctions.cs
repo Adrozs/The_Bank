@@ -1,10 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Diagnostics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using The_Bank.Data;
+﻿using The_Bank.Data;
 using The_Bank.Models;
 using The_Bank.Utilities;
 
@@ -13,11 +7,11 @@ namespace The_Bank
     internal static class AdminFunctions
     {
         // The admin menu
-        public static void DoAdminTasks()
+        internal static void DoAdminTasks()
         {
             using (BankContext context = new BankContext())
             {
-                Console.WriteLine("Current users in system:");
+                Console.WriteLine("Current users in the system:");
                 List<User> users = DbHelpers.GetAllUsers(context);
 
                 foreach (User user in users)
@@ -27,7 +21,7 @@ namespace The_Bank
 
                 Console.WriteLine($"Total number of users {users.Count()}");
                 Console.WriteLine("[C]: Create new user");
-                Console.WriteLine("[U]: UserMenu");
+                Console.WriteLine("[U]: User Menu");
                 Console.WriteLine("[X]: Exit");
 
                 while (true)
@@ -41,7 +35,10 @@ namespace The_Bank
                             CreateUser(context);
                             break;
                         case "u":
-                            UserFunctions.UserMenu(context);
+                            // Ask for the username to pass to UserMenu
+                            Console.Write("Enter username: ");
+                            string username = Console.ReadLine();
+                            UserFunctions.UserMenu(context, username);
                             break;
                         case "x":
                             return;
@@ -53,7 +50,6 @@ namespace The_Bank
             }
         }
 
-
         // Creates a new user with a chosen name and a random pin
         private static void CreateUser(BankContext context)
         {
@@ -61,28 +57,27 @@ namespace The_Bank
             Console.Write("Enter username: ");
             string username = Console.ReadLine();
 
-            // TODO?: Should we let the user choose their own pin? Discuss in group.
+            // TODO?: Should we let the user choose their own pin? Discuss in a group.
             Random rnd = new Random();
             string pin = rnd.Next(1000, 10000).ToString();
 
-            // Creates new user object with the chosen name and a random pin-code
+            // Creates a new user object with the chosen name and a random pin-code
             User newUser = new User()
             {
                 Name = username,
                 Pin = pin,
             };
 
-            // Adds and saves user to db - if successful prints out confirmation message, if not prints out fail message
+            // Adds and saves the user to the db - if successful prints out a confirmation message, if not prints out a fail message
             bool success = DbHelpers.AddUser(context, newUser);
             if (success)
             {
-                Console.WriteLine($"Created new user {username} with pin {pin}");
+                Console.WriteLine($"Created a new user {username} with pin {pin}");
             }
-            else 
+            else
             {
-                Console.WriteLine($"Failed to create user {username}");
+                Console.WriteLine($"Failed to create a user {username}");
             }
-
         }
     }
 }
