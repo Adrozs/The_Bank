@@ -214,6 +214,9 @@ namespace The_Bank
                 else
                 {
                     Console.WriteLine("Invalid account number. Please select a valid account.");
+
+                    // New line for text formatting
+                    Console.WriteLine();
                 }
             }
             else
@@ -321,6 +324,18 @@ namespace The_Bank
                 Console.WriteLine($"Failed to create account {newAccountName}");
                 Console.WriteLine("Returning to menu");
             }
+
+            // Checks if user pressed enter
+            Console.WriteLine("Press [Enter] to go main menu");
+            ConsoleKeyInfo key = Console.ReadKey(true); // True means it doesn't output the pressed key - looks better
+            
+            // Loops until user presses Enter
+            while (key.Key != ConsoleKey.Enter)
+                key = Console.ReadKey(true); // True means it doesn't output the pressed key - looks better
+
+            // New line for text formatting
+            Console.WriteLine(); 
+
         }
     }
 }

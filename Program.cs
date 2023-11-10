@@ -1,6 +1,8 @@
 ﻿using The_Bank.Data;
 using System;
 
+using The_Bank.Utilities;
+
 namespace The_Bank
 {
     internal class Program
@@ -11,8 +13,15 @@ namespace The_Bank
             // Welcome phrase
             Console.WriteLine("Welcome to the bank! \n");
 
-            // Loop until the user chooses to exit the program
-            // TODO: Add a command to exit the program
+            // Initalize counter to keep track of login attempts
+            int loginAttempts = 2;
+
+            // Declare date time variable to be used to keep track of when a user can be unfrozen if they've frozen their account
+            DateTime UnFreezeTime;
+
+
+            // Loop until user chooses to exit program
+            // TODO: Add command to exit program
             while (true)
             {
                 // User Type Selection
@@ -77,20 +86,60 @@ namespace The_Bank
                         Console.WriteLine("Invalid choice. Please enter 1, 2, or 3.");
                         break;
                 }
+                // ADMIN LOGIN
+                // Checks if username is admin and if pin is correct - if yes it calls the admin menu
+                // TODO?: change so certain users are admin instead of a pre-determined admin? Discuss in group.
+                if (userName == "admin")
+                {
+                    if (pin != "1234")
+                    {
+                        Console.WriteLine("Wrong admin password");
+                    }
+                    else
+                        AdminFunctions.DoAdminTasks();
+                }
 
-                // New line
-                Console.WriteLine();
-            }
+                // USER LOGIN
+                // Check if account is NOT freezed
+                if (!AccountFreezed.IsFreezed(userName))
+                {
+                    // Check if user login is correct 
+                    if (DbHelpers.VerifyLogin(userName, pin))
+                    {
+                        UserFunctions.UserMenu(userName);
+                    }
+                    else if (loginAttempts > 0)
+                    {
+                        Console.WriteLine($"Username or pin is invalid. {loginAttempts} tries left.");
+                        loginAttempts--;
+                    }
+                    // If too many invalid login attempts were made freeze account for x amount of time
+                    else
+                    {
+                        Console.WriteLine("Too many invalid attemtps. Please try again in a few minutes.");
 
-        }
+                        // Freeze account and set time that account is frozen for
+                        UnFreezeTime = DateTime.Now.AddMinutes(3);
+                        AccountFreezed.FreezeUser(userName, UnFreezeTime);
+                    }
+                }
+                // If account IS freezed
+                else
+                {
+                    Console.WriteLine("Too many invalid attemtps. Please try again in a few minutes.");
 
-
+                    // Checks if account can be unfrozen and unfreezes it if yes, does nothing if no
+                    AccountFreezed.UnFreezeUser(userName);
+                }
         private static bool IsCustomer(BankContext context, string userName, string pin)
         {
             // Has the user the correct credentials?
             return context.Users.Any(u => u.Name == userName && u.Pin == pin);
         }
 
+                // Newline for text formatting
+                Console.WriteLine();
+            }
         private static bool IsAdmin(string adminName, string adminPin)
         {
             // ADMIN LOGIN

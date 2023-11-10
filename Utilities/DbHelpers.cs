@@ -17,7 +17,16 @@ namespace The_Bank.Utilities
             return users;
         }
 
-        // Adds and saves account to database
+        // Get specific user
+        public static User GetUser(BankContext context, string username)
+        {
+            // Gets the user in the database that matches username
+            User user = context.Users.Where(u => u.Name == username).Single();
+
+            return user;
+        }
+
+        // Adds and saves user to database
         public static bool AddUser(BankContext context, User user)
         {
             try
@@ -45,6 +54,19 @@ namespace The_Bank.Utilities
                 Console.WriteLine($"Error adding account: {ex.Message}");
                 return false;
             }
-        }   
+            return true;
+        }
+
+        // Checks if specified user exists in the database
+        public static bool VerifyLogin(string username, string pin)
+        {
+            using (BankContext context = new BankContext())
+            {
+                // Checks if any user with the specified combination of username and pin exists in the db
+                // Returns true if yes and false if no
+                return context.Users
+                    .Any(u => u.Name == username && u.Pin == pin);
+            };
+        }
     }
 }
