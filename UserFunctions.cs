@@ -41,7 +41,7 @@ namespace The_Bank
                             TransferMoney(outerContext, userName);
                             break;
                         case "3":
-                            WithdrawMoney(outerContext, userName);
+                            WithdrawMoney(outerContext);
                             break;
                         case "4":
                             DepositMoney(outerContext, userName);
@@ -61,7 +61,7 @@ namespace The_Bank
 
             
         }
-            public static void WithdrawMoney(BankContext context, string userName)
+            public static void WithdrawMoney(BankContext context)
         {
 
             var balance = context.Accounts
