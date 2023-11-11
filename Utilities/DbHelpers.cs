@@ -26,6 +26,16 @@ namespace The_Bank.Utilities
             return user;
         }
 
+        public static User GetUserAccounts(BankContext context, string userName)
+        {
+            User user = context.Users
+               .Where(u => u.Name == userName)
+               .Include(u => u.Accounts)
+               .Single();
+            return user;        
+
+        }
+
         // Adds and saves user to database
         public static bool AddUser(BankContext context, User user)
         {

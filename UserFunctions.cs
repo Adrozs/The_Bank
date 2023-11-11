@@ -32,7 +32,7 @@ namespace The_Bank
                     switch (choice)
                     {
                         case "1":
-                            DisplayAccountBalances(outerContext, userName);
+                            ViewAccountInfo(outerContext, userName);
                             break;
                         case "2":
                             TransferMoney(outerContext, userName);
@@ -59,23 +59,29 @@ namespace The_Bank
             }
         }
 
-        private static void DisplayAccountBalances(BankContext context, string userName)
+        private static void ViewAccountInfo(BankContext context, string userName)
         {
-            Console.WriteLine("Your Accounts and Balances:");
 
-            // Retrieve info from database
             User user = context.Users
-                .Include(u => u.Accounts)
-                .Single(u => u.Name == userName);
+               .Where(u => u.Name == userName)
+               .Include(u => u.Accounts)
+               .Single();
 
-            // SHOW BALANCE
-            foreach (var account in user.Accounts)
+
+            if (user != null)
             {
-                Console.WriteLine($"{account.Name}: {account.Balance:C}");
-            }
+                Console.WriteLine($"User: {user.Name}\n");
+                Console.WriteLine("Your accounts and balance:");
 
-            // new line new possibilities
-            Console.WriteLine();
+                foreach (var account in user.Accounts)
+                {
+                    Console.WriteLine($"{account.Name}: {account.Balance:C}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("User not found");
+            }
         }
 
         // Transfer money between accounts
@@ -396,5 +402,6 @@ namespace The_Bank
                     Console.WriteLine("PIN codes doesn't match. Try again. \n");
             }
         }
+
     }
 }
