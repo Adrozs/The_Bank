@@ -24,6 +24,7 @@ namespace The_Bank
                     Console.WriteLine("3. Withdraw Money");
                     Console.WriteLine("4. Deposit Money");
                     Console.WriteLine("5. Open New Account");
+                    Console.WriteLine("6. Change PIN");
                     Console.WriteLine("7. Exit");
                     Console.ResetColor();
                     string choice = Console.ReadLine();
@@ -45,6 +46,9 @@ namespace The_Bank
                         case "5":
                             OpenNewAccount(outerContext, userName);
                             break;
+                        case "6":
+                            ChangePin(outerContext, userName);
+                                break;
                         case "7":
                             return;
                         default:
@@ -74,6 +78,7 @@ namespace The_Bank
             Console.WriteLine();
         }
 
+        // Transfer money between accounts
         private static void TransferMoney(BankContext context, string userName)
         {
             // Get user info from Database
@@ -162,6 +167,7 @@ namespace The_Bank
             }
         }
 
+        // Withdraw money from an account
         private static void WithdrawMoney(BankContext context, string userName)
         {
             // get info from database
@@ -225,6 +231,7 @@ namespace The_Bank
             }
         }
 
+        // Deposit money to account
         private static void DepositMoney(BankContext context, string userName)
         {
             // Get info from database
@@ -284,7 +291,7 @@ namespace The_Bank
             // Declare new account variable outside of loop
             string newAccountName;
 
-            // loop until not true
+            // Loop until not true
             while (true)
             {
                 // Enter account name
@@ -300,11 +307,9 @@ namespace The_Bank
             }
 
             // Creates new user object of the user that's logged in
-            User user = context.Users
-                .Where(u => u.Name == username)
-                .Single(); // TODO: Change to SingleOrDefault() and add exeption handling later
+            User user = DbHelpers.GetUser(context, username);
 
-            // Create new account type with UserId and Name of current user and starting balance of 0
+            // Create new account type with id and Name of current user and starting balance of 0
             Account account = new Account()
             {
                 UserId = user.Id,
@@ -325,7 +330,7 @@ namespace The_Bank
                 Console.WriteLine("Returning to menu");
             }
 
-            // Checks if user pressed enter
+            // Waits for user to press enter to continue
             Console.WriteLine("Press [Enter] to go main menu");
             ConsoleKeyInfo key = Console.ReadKey(true); // True means it doesn't output the pressed key - looks better
             
@@ -335,7 +340,61 @@ namespace The_Bank
 
             // New line for text formatting
             Console.WriteLine(); 
+        }
 
+        // Changes current pin to a new pin for a user
+        private static void ChangePin(BankContext context, string username)
+        {
+            User user = DbHelpers.GetUser(context, username);
+
+            // Asks user for pin and checks if it matches login
+            while (true)
+            {
+                Console.WriteLine("Enter current PIN: ");
+                string currentPin = Console.ReadLine();
+
+                // Re-promt user until string isn't empty
+                while (string.IsNullOrEmpty(currentPin))
+                {
+                    Console.WriteLine("Error! PIN can't be empty");
+                    currentPin = Console.ReadLine();
+                }
+
+                // If pin matches login info, break out of loop
+                if (DbHelpers.IsCustomer(context, username, currentPin))
+                    break;
+                else
+                    Console.WriteLine("Error! Wrong PIN. Try again. \n");
+            }
+
+            // Re-promt user for pins until 2 consecutive pins match
+            while(true)
+            {
+                Console.WriteLine("Enter new PIN: ");
+                string newPin = Console.ReadLine();
+
+                Console.WriteLine("Confirm new PIN: ");
+                string newPinConfirm = Console.ReadLine();
+
+                // If pins match save them to database and break out of loop - else write error message
+                if (newPin == newPinConfirm)
+                {
+                    bool success = DbHelpers.EditPin(context, user, newPin);
+                    if (success)
+                    {
+                        Console.WriteLine($"Changed PIN to {newPin} for user {username}");
+                    }
+                    // If wasn't possible to save account to database, print error
+                    else
+                    {
+                        Console.WriteLine($"Failed to update PIN to {newPin} for {username}");
+                        Console.WriteLine("Returning to menu");
+                    }
+                    break;
+                }
+                else
+                    Console.WriteLine("PIN codes doesn't match. Try again. \n");
+            }
         }
     }
 }
