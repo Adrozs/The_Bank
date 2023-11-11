@@ -41,6 +41,8 @@ namespace The_Bank.Utilities
                 return false;
             }
         }
+
+        // Adds and saves account to the database
         public static bool AddAccount(BankContext context, Account account)
         {
             try
@@ -54,13 +56,28 @@ namespace The_Bank.Utilities
                 Console.WriteLine($"Error adding account: {ex.Message}");
                 return false;
             }
-            return true;
+        }
+
+        // Saves a new user pin to the database
+        public static bool EditPin(BankContext context, User user, string pin)
+        {
+            try
+            {
+                user.Pin = pin;
+                context.SaveChanges();
+                return true;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"Error changing pin: {ex.Message}");
+                return false;
+            }
         }
 
         // Checks if specified user exists in the database
         public static bool IsCustomer(BankContext context, string userName, string pin)
         {
-            // Has the user the correct credentials?
+            // Has the user the correct credentials? Returns true if yes - false if not
             return context.Users.Any(u => u.Name == userName && u.Pin == pin);
         }
 
