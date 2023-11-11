@@ -48,14 +48,6 @@ namespace The_Bank
                         string customerName = Console.ReadLine();
                         Console.Write("PIN: ");
                         string customerPin = Console.ReadLine();
-            
-
-            Console.WriteLine("Welcome to bank! \n");
-            Console.WriteLine("Login ");
-            Console.Write("Name: ");
-            string userName = Console.ReadLine();
-            Console.Write("PIN: ");
-            string pin = Console.ReadLine();
 
                         // Checks if account is NOT frozed 
                         // TODO OBS! Doesn't handle if an non existing username is put in - crashes 
@@ -67,7 +59,8 @@ namespace The_Bank
                                 // Checks if user login is correct
                                 if (DbHelpers.IsCustomer(context, customerName, customerPin))
                                 {
-                                    // Go to UserMenu
+                                    // Reset login attempts and go to UserMenu
+                                    loginAttempts = 2; 
                                     UserFunctions.UserMenu(context, customerName);
                                 }
                                 else if (loginAttempts > 0)
