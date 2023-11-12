@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using QRCoder;
 using System.Drawing;
 using System.Text;
 using The_Bank.Data;
@@ -25,7 +24,8 @@ namespace The_Bank
                     Console.WriteLine("4. Deposit Money");
                     Console.WriteLine("5. Open New Account");
                     Console.WriteLine("6. Change PIN");
-                    Console.WriteLine("7. Exit");
+                    Console.WriteLine("7. Invest your Money");
+                    Console.WriteLine("8. Exit");
                     Console.ResetColor();
                     string choice = Console.ReadLine();
 
@@ -49,7 +49,10 @@ namespace The_Bank
                         case "6":
                             ChangePin(outerContext, userName);
                                 break;
-                        case "7":
+                        //case "7";
+                        //    InvestMoney(outerContext, userName);
+                        //    break
+                        case "8":
                             return;
                         default:
                             Console.WriteLine("Error! Please try again.");
@@ -61,28 +64,34 @@ namespace The_Bank
 
         private static void ViewAccountInfo(BankContext context, string userName)
         {
-
-            User user = context.Users
-               .Where(u => u.Name == userName)
-               .Include(u => u.Accounts)
-               .Single();
-
-
-            if (user != null)
+            try
             {
-                Console.WriteLine($"User: {user.Name}\n");
-                Console.WriteLine("Your accounts and balance:");
+                User user = context.Users
+                    .Where(u => u.Name == userName)
+                    .Include(u => u.Accounts)
+                    .SingleOrDefault();
 
-                foreach (var account in user.Accounts)
+                if (user != null)
                 {
-                    Console.WriteLine($"{account.Name}: {account.Balance:C}");
+                    Console.WriteLine($"User: {user.Name}\n");
+                    Console.WriteLine("Your accounts and balance:");
+
+                    foreach (var account in user.Accounts)
+                    {
+                        Console.WriteLine($"{account.Name}: {account.Balance:C}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("User not found");
                 }
             }
-            else
+            catch (Exception ex)
             {
-                Console.WriteLine("User not found");
+                Console.WriteLine($"An error occurred: {ex.Message}");
             }
         }
+
 
         // Transfer money between accounts
         private static void TransferMoney(BankContext context, string userName)
@@ -315,7 +324,7 @@ namespace The_Bank
             // Creates new user object of the user that's logged in
             User user = DbHelpers.GetUser(context, username);
 
-            // Create new account type with id and Name of current user and starting balance of 0
+            // Create new account type with id and Name of the current user and starting balance of 0
             Account account = new Account()
             {
                 UserId = user.Id,
@@ -328,24 +337,27 @@ namespace The_Bank
             if (success)
             {
                 Console.WriteLine($"Created new account {newAccountName} for user {username}");
+
+                // Save changes to the database
+                context.SaveChanges();
             }
-            // If wasn't possible to save account to database, print error
+            // If it wasn't possible to save the account to the database, print error
             else
             {
                 Console.WriteLine($"Failed to create account {newAccountName}");
-                Console.WriteLine("Returning to menu");
+                Console.WriteLine("Returning to the menu");
             }
 
-            // Waits for user to press enter to continue
-            Console.WriteLine("Press [Enter] to go main menu");
+            // Waits for the user to press enter to continue
+            Console.WriteLine("Press [Enter] to go to the main menu");
             ConsoleKeyInfo key = Console.ReadKey(true); // True means it doesn't output the pressed key - looks better
-            
-            // Loops until user presses Enter
+
+            // Loops until the user presses Enter
             while (key.Key != ConsoleKey.Enter)
                 key = Console.ReadKey(true); // True means it doesn't output the pressed key - looks better
 
             // New line for text formatting
-            Console.WriteLine(); 
+            Console.WriteLine();
         }
 
         // Changes current pin to a new pin for a user
@@ -401,6 +413,7 @@ namespace The_Bank
                 else
                     Console.WriteLine("PIN codes doesn't match. Try again. \n");
             }
+            //private static void InvestMoney(BankContext context, string username)
         }
 
     }
