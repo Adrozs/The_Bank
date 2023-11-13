@@ -365,14 +365,11 @@ namespace The_Bank
                         Console.WriteLine("Enter the initial deposit amount: ");
                         if (decimal.TryParse(Console.ReadLine(), out decimal initialDeposit))
                         {
-                            // Convert the initial deposit to Swedish Krona (SEK)
-                            decimal initialDepositInSEK = CurrencyConverter.ConvertCurrency(initialDeposit, selectedCurrency, CurrencyType.SwedishKrona);
-
-                            // Set the initial balance in SEK
-                            account.Balance = initialDepositInSEK;
+                            // Set the initial balance in the selected currency
+                            account.Balance = initialDeposit;
 
                             Console.WriteLine($"Vacation Account {newAccountName} is created with currency: {selectedCurrency}");
-                            Console.WriteLine($"Initial deposit: {initialDeposit} {selectedCurrency} (Converted to SEK: {initialDepositInSEK} SEK)");
+                            Console.WriteLine($"Initial deposit: {initialDeposit} {selectedCurrency}");
                         }
                         else
                         {
@@ -393,16 +390,16 @@ namespace The_Bank
 
                 // Save changes to the database
                 context.SaveChanges();
-            }
-            // If it wasn't possible to save the account to the database, print error
-            else
-            {
-                Console.WriteLine($"Failed to create account {newAccountName}");
-                Console.WriteLine("Returning to the menu");
-            }
 
-            // Waits for the user to press enter to continue
-            Console.WriteLine("Press [Enter] to go to the main menu");
+                // If it wasn't possible to save the account to the database, print error
+                if (!success)
+                {
+                    Console.WriteLine($"Failed to create account {newAccountName}");
+                    Console.WriteLine("Returning to the menu");
+                }
+
+                // Waits for the user to press enter to continue
+                Console.WriteLine("Press [Enter] to go to the main menu");
             ConsoleKeyInfo key = Console.ReadKey(true);
 
             // Loops until the user presses Enter
@@ -416,6 +413,7 @@ namespace The_Bank
             context.SaveChanges();
 
         }
+            }
         
 
         public static class CurrencyConverter
