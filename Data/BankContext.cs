@@ -1,9 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using The_Bank.Models;
 
 namespace The_Bank.Data
@@ -17,6 +12,20 @@ namespace The_Bank.Data
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer("Data Source=(localdb)\\.;Initial Catalog=Bank;Integrated Security=True;Pooling=False");
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // Define relationships here
+            modelBuilder.Entity<StockPrice>()
+                .HasOne(sp => sp.User)
+                .WithMany(u => u.StockPrices)
+                .HasForeignKey(sp => sp.Id)
+                .OnDelete(DeleteBehavior.Restrict); // Choose the appropriate delete behavior
+
+            // Add other configurations as needed
+
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

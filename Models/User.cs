@@ -16,5 +16,6 @@ namespace The_Bank.Models
 
 
         public virtual ICollection<Account> Accounts { get; set; }
+        public virtual ICollection<StockPrice> StockPrices { get; set; }
     }
 }

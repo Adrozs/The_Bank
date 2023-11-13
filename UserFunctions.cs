@@ -458,10 +458,21 @@ namespace The_Bank
 
         private static void ShowTrendingStocks(BankContext context)
         {
-            // Fetch and display the 10 most popular stocks
             Console.WriteLine("\nTrending Stocks:");
-            // Implementation to fetch and display trending stocks
-            // ...
+
+            var trendingStocks = context.StockPrices
+                .OrderByDescending(stock => stock.CurrentPrice)
+                .Take(10)
+                .ToList();
+
+            if (trendingStocks.Any())
+            {
+                DisplayStocks(trendingStocks);
+            }
+            else
+            {
+                Console.WriteLine("No trending stocks found.");
+            }
 
             // Display current date and time
             Console.WriteLine($"Current Date and Time: {DateTime.Now}");
@@ -471,22 +482,40 @@ namespace The_Bank
         {
             // Fetch and display the most advanced stocks
             Console.WriteLine("\nMost Advanced Stocks:");
-            // Implementation to fetch and display most advanced stocks
-            // ...
+
+            var mostAdvancedStocks = context.StockPrices
+                .OrderByDescending(stock => stock.CurrentPrice)
+                .Take(10)
+                .ToList();
+
+            DisplayStocks(mostAdvancedStocks);
 
             // Display current date and time
-            Console.WriteLine($"Current Date and Time: {DateTime.Now}");
+            Console.WriteLine($"Current Date and Time: {currentDateTime}");
         }
 
         private static void ShowMostDeclinedStocks(BankContext context)
         {
             // Fetch and display the most declined stocks
             Console.WriteLine("\nMost Declined Stocks:");
-            // Implementation to fetch and display most declined stocks
-            // ...
+
+            var mostDeclinedStocks = context.StockPrices
+                .OrderBy(stock => stock.CurrentPrice)
+                .Take(10)
+                .ToList();
+
+            DisplayStocks(mostDeclinedStocks);
 
             // Display current date and time
-            Console.WriteLine($"Current Date and Time: {DateTime.Now}");
+            Console.WriteLine($"Current Date and Time: {currentDateTime}");
+        }
+
+        private static void DisplayStocks(List<StockPrice> stocks)
+        {
+            foreach (var stock in stocks)
+            {
+                Console.WriteLine($"Company: {stock.CompanyName}, Stock: {stock.StockName}, Current Price: {stock.CurrentPrice:C}");
+            }
         }
 
         private static void SearchStocksByName(BankContext context)
