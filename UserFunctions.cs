@@ -55,16 +55,21 @@ namespace The_Bank
             using (BankContext context = new BankContext())
             {
                 Console.WriteLine("How much do you wish to deposit?");
-                double deposit = int.Parse(Console.ReadLine());
+                double deposit = double.Parse(Console.ReadLine());
 
-                var depositUser = context.Accounts
-                .Where(a => a.Balance > 0)
-                .Select(a => a.Name)
-                .ToList();
+                if (double.TryParse(Console.ReadLine(), out double depositAmount))
+                { 
+                    var account = context.Accounts
+                     .Where(a => a.Balance > 0)
+                     .FirstOrDefault();
 
-                if (deposit > 0)
-                {
-                    Console.WriteLine($"Current balance: {depositUser.Balance}");
+                    if (account != null)
+                    {
+                        account.Balance += depositAmount;
+                        context.SaveChanges();
+
+                        Console.WriteLine($"Deposit successful. New balance: {account.Balance}");
+                    }
                 }
 
                 else
