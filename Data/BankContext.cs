@@ -20,10 +20,20 @@ namespace The_Bank.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Define relationships here
+            modelBuilder.Entity<Account>()
+        .Property(a => a.Currency)
+        .IsRequired();
             modelBuilder.Entity<StockPrice>()
-                .HasOne(sp => sp.User)
-                .WithMany(u => u.StockPrices)
-                .HasForeignKey(sp => sp.Id)
+                .HasOne(sp => sp.Account)
+                .WithMany(a => a.StockPrices)
+                .HasForeignKey(sp => sp.Id)  // Use the correct property name
+                .OnDelete(DeleteBehavior.Restrict); // Choose the appropriate delete behavior
+
+            // Configure the relationship between User and Account
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.Accounts)
+                .WithOne(a => a.User)
+                .HasForeignKey(a => a.UserId)
                 .OnDelete(DeleteBehavior.Restrict); // Choose the appropriate delete behavior
 
             // Add other configurations as needed

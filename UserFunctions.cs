@@ -4,6 +4,7 @@ using System.Text;
 using The_Bank.Data;
 using The_Bank.Models;
 using The_Bank.Utilities;
+using The_Bank.CurrencyTypeEnum;
 
 namespace The_Bank
 {
@@ -319,13 +320,15 @@ namespace The_Bank
                     Console.WriteLine("Error! Name cannot be empty \n");
                 }
                 else
+                {
                     break;
+                }
             }
 
-            // Creates new user object of the user that's logged in
+            // Creates a new user object for the user that's logged in
             User user = DbHelpers.GetUser(context, username);
 
-            // Create new account type with id and Name of the current user and starting balance of 0
+            // Create a new account type with ID and Name of the current user and starting balance of 0
             Account account = new Account()
             {
                 UserId = user.Id,
@@ -333,11 +336,60 @@ namespace The_Bank
                 Balance = 0,
             };
 
-            // Save account to database
+            // Save account to the database
             bool success = DbHelpers.AddAccount(context, account);
+
             if (success)
             {
                 Console.WriteLine($"Created new account {newAccountName} for user {username}");
+
+                // Ask if it's a vacation account
+                Console.WriteLine("Is this a Vacation Account? (Yes/No): ");
+                string isVacationAccountInput = Console.ReadLine();
+
+                bool isVacationAccount = isVacationAccountInput.Equals("Yes", StringComparison.OrdinalIgnoreCase);
+
+                // If it's a vacation account, ask for the currency
+                if (isVacationAccount)
+                {
+                    Console.WriteLine("Select the currency for the Vacation Account:");
+                    DisplayCurrencyOptions();
+                    Console.Write("Enter the currency number: ");
+
+                    if (int.TryParse(Console.ReadLine(), out int currencyChoice) && currencyChoice >= 1 && currencyChoice <= 10)
+                    {
+                        CurrencyType selectedCurrency = (CurrencyType)currencyChoice;
+                        account.Currency = selectedCurrency;
+
+                        // Ask for the initial deposit amount
+                        Console.WriteLine("Enter the initial deposit amount: ");
+                        if (decimal.TryParse(Console.ReadLine(), out decimal initialDeposit))
+                        {
+                            // Convert the initial deposit to Swedish Krona (SEK)
+                            decimal initialDepositInSEK = CurrencyConverter.ConvertCurrency(initialDeposit, selectedCurrency, CurrencyType.SwedishKrona);
+
+                            // Set the initial balance in SEK
+                            account.Balance = initialDepositInSEK;
+
+                            Console.WriteLine($"Vacation Account {newAccountName} is created with currency: {selectedCurrency}");
+                            Console.WriteLine($"Initial deposit: {initialDeposit} {selectedCurrency} (Converted to SEK: {initialDepositInSEK} SEK)");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid initial deposit amount. Account created with 0 balance.");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid currency selection. Defaulting to Swedish Krona.");
+                        account.Currency = CurrencyType.SwedishKrona;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"Normal Account {newAccountName} is created with currency: Swedish Krona");
+                    account.Currency = CurrencyType.SwedishKrona;
+                }
 
                 // Save changes to the database
                 context.SaveChanges();
@@ -351,14 +403,66 @@ namespace The_Bank
 
             // Waits for the user to press enter to continue
             Console.WriteLine("Press [Enter] to go to the main menu");
-            ConsoleKeyInfo key = Console.ReadKey(true); // True means it doesn't output the pressed key - looks better
+            ConsoleKeyInfo key = Console.ReadKey(true);
 
             // Loops until the user presses Enter
             while (key.Key != ConsoleKey.Enter)
-                key = Console.ReadKey(true); // True means it doesn't output the pressed key - looks better
+                key = Console.ReadKey(true);
 
             // New line for text formatting
             Console.WriteLine();
+
+            // Save changes to the database
+            context.SaveChanges();
+
+        }
+        
+
+        public static class CurrencyConverter
+        {
+            // Conversion rates
+            private static readonly Dictionary<CurrencyType, decimal> ConversionRates = new Dictionary<CurrencyType, decimal>
+        {
+            { CurrencyType.US_Dollar, 10.83m },
+            { CurrencyType.Euro, 11.59m },
+            { CurrencyType.BritishPound, 13.30m },
+            { CurrencyType.SwissFranc, 12.02m },
+            { CurrencyType.TurkishLira, 0.38m },
+            { CurrencyType.RussianRouble, 0.12m },
+            { CurrencyType.ChineseYuan, 2.87m },
+            { CurrencyType.BrazilianReal, 2.21m },
+            { CurrencyType.ZimbabweanDollar, 0.033m },
+            { CurrencyType.CanadianDollar, 7.85m },
+        };
+
+            public static decimal ConvertCurrency(decimal amount, CurrencyType fromCurrency, CurrencyType toCurrency)
+            {
+                // Check if conversion rates are available for both currencies
+                if (ConversionRates.TryGetValue(fromCurrency, out decimal fromRate) && ConversionRates.TryGetValue(toCurrency, out decimal toRate))
+                {
+                    // Convert amount to SEK first, then to the target currency
+                    decimal amountInSEK = amount / fromRate;
+                    return amountInSEK * toRate;
+                }
+
+                // If conversion rates are not available, return the original amount
+                return amount;
+            }
+        }
+
+        private static void DisplayCurrencyOptions()
+        {
+            Console.WriteLine("Select the currency for the Vacation Account:");
+            Console.WriteLine("1. Euro");
+            Console.WriteLine("2. US Dollar");
+            Console.WriteLine("3. British Pound");
+            Console.WriteLine("4. Swiss Franc");
+            Console.WriteLine("5. Turkish Lira");
+            Console.WriteLine("6. Russian Rouble");
+            Console.WriteLine("7. Chinese Yuan");
+            Console.WriteLine("8. Brazilian Real");
+            Console.WriteLine("9. Zimbabwean Dollar");
+            Console.WriteLine("10. Canadian Dollar");
         }
 
         // Changes current pin to a new pin for a user
@@ -460,37 +564,37 @@ namespace The_Bank
             }
         }
 
-        private static void ViewStockPortfolio(BankContext context, string userName)
-        {
-            // Get user info from Database
-            User user = context.Users
-                .Include(u => u.Accounts)
-                .ThenInclude(a => a.StockPortfolio)
-                .Single(u => u.Name == userName);
-
-            Console.WriteLine($"Stock Portfolio for {userName}:");
-
-            foreach (var account in user.Accounts)
+            private static void ViewStockPortfolio(BankContext context, string userName)
             {
-                Console.WriteLine($"Account: {account.Name}");
+                // Get user info from Database
+                User user = context.Users
+                    .Include(u => u.Accounts)
+                    .ThenInclude(a => a.StockPortfolio)
+                    .Single(u => u.Name == userName);
 
-                if (account.StockPortfolio != null && account.StockPortfolio.Any())
+                Console.WriteLine($"Stock Portfolio for {userName}:");
+
+                foreach (var account in user.Accounts)
                 {
-                    Console.WriteLine("Stocks:");
+                    Console.WriteLine($"Account: {account.Name}");
 
-                    foreach (var stock in account.StockPortfolio)
+                    if (account.StockPortfolio != null && account.StockPortfolio.Any())
                     {
-                        Console.WriteLine($"Company: {stock.CompanyName}, Stock: {stock.StockName}, Quantity: {stock.Quantity}, Purchase Price: {stock.PurchasePrice:C}");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("No stocks in the portfolio.");
-                }
+                        Console.WriteLine("Stocks:");
 
-                Console.WriteLine(); // Add a newline for better formatting
+                        foreach (var stock in account.StockPortfolio)
+                        {
+                            Console.WriteLine($"Company: {stock.CompanyName}, Stock: {stock.StockName}, Quantity: {stock.Quantity}, Purchase Price: {stock.PurchasePrice:C}");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("No stocks in the portfolio.");
+                    }
+
+                    Console.WriteLine(); // Add a newline for better formatting
+                }
             }
-        }
 
         private static void ShowTrendingStocks(BankContext context)
         {

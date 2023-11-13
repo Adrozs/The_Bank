@@ -16,7 +16,7 @@ namespace The_Bank.Models
         public int Quantity { get; set; }
         public decimal PurchasePrice { get; set; }
 
-
         public virtual User User { get; set; }
+        public virtual Account Account { get; set; }
     }
 }
