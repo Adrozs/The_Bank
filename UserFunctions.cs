@@ -48,10 +48,10 @@ namespace The_Bank
                             break;
                         case "6":
                             ChangePin(outerContext, userName);
-                                break;
-                        //case "7";
-                        //    InvestMoney(outerContext, userName);
-                        //    break
+                            break;
+                        case "7":
+                            WiseInvestments(outerContext, userName);
+                            break;
                         case "8":
                             return;
                         default:
@@ -386,7 +386,7 @@ namespace The_Bank
             }
 
             // Re-promt user for pins until 2 consecutive pins match
-            while(true)
+            while (true)
             {
                 Console.WriteLine("Enter new PIN: ");
                 string newPin = Console.ReadLine();
@@ -413,8 +413,137 @@ namespace The_Bank
                 else
                     Console.WriteLine("PIN codes doesn't match. Try again. \n");
             }
-            //private static void InvestMoney(BankContext context, string username)
+        }
+        private static void InvestInStockExchange(BankContext context, string userName)
+        {
+            while (true)
+            {
+                Console.WriteLine("\nStock Exchange Menu:");
+                Console.WriteLine("1. Show Trending Stocks");
+                Console.WriteLine("2. Show Most Advanced Stocks");
+                Console.WriteLine("3. Show Most Declined Stocks");
+                Console.WriteLine("4. Exit Stock Exchange");
+
+                Console.Write("Enter your choice: ");
+                string choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        ShowTrendingStocks(context);
+                        break;
+                    case "2":
+                        ShowMostAdvancedStocks(context);
+                        break;
+                    case "3":
+                        ShowMostDeclinedStocks(context);
+                        break;
+                    case "4":
+                        SearchStocksByName(context);
+                        break;
+                    case "5":
+                        return; // Exit Stock Exchange menu
+                    default:
+                        Console.WriteLine("Invalid choice. Please enter a valid option.");
+                        break;
+                }
+            }
         }
 
+        private static void ShowTrendingStocks(BankContext context)
+        {
+            // Fetch and display the 10 most popular stocks
+            Console.WriteLine("\nTrending Stocks:");
+            // Implementation to fetch and display trending stocks
+            // ...
+
+            // Display current date and time
+            Console.WriteLine($"Current Date and Time: {DateTime.Now}");
+        }
+
+        private static void ShowMostAdvancedStocks(BankContext context)
+        {
+            // Fetch and display the most advanced stocks
+            Console.WriteLine("\nMost Advanced Stocks:");
+            // Implementation to fetch and display most advanced stocks
+            // ...
+
+            // Display current date and time
+            Console.WriteLine($"Current Date and Time: {DateTime.Now}");
+        }
+
+        private static void ShowMostDeclinedStocks(BankContext context)
+        {
+            // Fetch and display the most declined stocks
+            Console.WriteLine("\nMost Declined Stocks:");
+            // Implementation to fetch and display most declined stocks
+            // ...
+
+            // Display current date and time
+            Console.WriteLine($"Current Date and Time: {DateTime.Now}");
+        }
+        private static void SearchStocksByName(BankContext context)
+        {
+            Console.Write("Enter the name of the Company or Stock to search: ");
+            string searchTerm = Console.ReadLine();
+
+            // Search for stocks in the "StockPrices" database based on CompanyName or StockName
+            var matchingStocks = context.StockPrices
+                .Where(stock => stock.CompanyName.Contains(searchTerm) || stock.StockName.Contains(searchTerm))
+                .ToList();
+
+            // Display search results
+            if (matchingStocks.Any())
+            {
+                Console.WriteLine("Search Results:");
+                foreach (var stock in matchingStocks)
+                {
+                    Console.WriteLine($"Company: {stock.CompanyName}, Stock: {stock.StockName}, Current Price: {stock.CurrentPrice:C}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("No matching stocks found.");
+            }
+
+            // Display current date and time
+            Console.WriteLine($"Current Date and Time: {DateTime.Now}");
+        }
+
+        public static void InvestInCryptoExchange(BankContext context, string userName)
+        {
+            // Implement your logic for investing in the Crypto Exchange here
+            Console.WriteLine("You chose to invest in the Crypto Exchange. Implement your crypto investment logic here.");
+        }
+        public static void WiseInvestments(BankContext context, string userName)
+        {
+            {
+                while (true)
+                {
+                    Console.WriteLine("\nWise Investments Menu:");
+                    Console.WriteLine("1. Stock Exchange");
+                    Console.WriteLine("2. Crypto Exchange");
+                    Console.WriteLine("3. Exit Wise Investments");
+
+                    Console.Write("Enter your choice: ");
+                    string choice = Console.ReadLine();
+
+                    switch (choice)
+                    {
+                        case "1":
+                            InvestInStockExchange(context, userName);
+                            break;
+                        case "2":
+                            InvestInCryptoExchange(context, userName);
+                            break;
+                        case "3":
+                            return; // Exit Wise Investments menu
+                        default:
+                            Console.WriteLine("Invalid choice. Please enter 1, 2, or 3.");
+                            break;
+                    }
+                }
+            }
+        }
     }
 }
