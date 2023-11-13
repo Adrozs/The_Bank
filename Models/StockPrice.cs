@@ -13,6 +13,8 @@ namespace The_Bank.Models
         public string StockName { get; set; }
         public decimal CurrentPrice { get; set; }
         public decimal OpeningPrice { get; set; }
+        public int Quantity { get; set; }
+        public decimal PurchasePrice { get; set; }
 
 
         public virtual User User { get; set; }

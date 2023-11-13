@@ -415,17 +415,18 @@ namespace The_Bank
                     Console.WriteLine("PIN codes doesn't match. Try again. \n");
             }
         }
-        private static void InvestInStockExchange(BankContext context, string userName)
+        public static void InvestInStockExchange(BankContext context, string userName)
         {
             while (true)
             {
                 Console.WriteLine("\nStock Exchange Menu:");
-                Console.WriteLine("1. Show Trending Stocks");
-                Console.WriteLine("2. Show Most Advanced Stocks");
-                Console.WriteLine("3. Show Most Declined Stocks");
-                Console.WriteLine("4. Search Stocks by Name");
-                Console.WriteLine("5. Simulate Time");
-                Console.WriteLine("6. Exit Stock Exchange");
+                Console.WriteLine("1. View Stock Portfolio");
+                Console.WriteLine("2. Show Trending Stocks");
+                Console.WriteLine("3. Show Most Advanced Stocks");
+                Console.WriteLine("4. Show Most Declined Stocks");
+                Console.WriteLine("5. Search Stocks by Name");
+                Console.WriteLine("6. Simulate Time");
+                Console.WriteLine("7. Exit Stock Exchange");
 
                 Console.Write("Enter your choice: ");
                 string choice = Console.ReadLine();
@@ -433,26 +434,61 @@ namespace The_Bank
                 switch (choice)
                 {
                     case "1":
-                        ShowTrendingStocks(context);
+                        ViewStockPortfolio(context, userName);
                         break;
                     case "2":
-                        ShowMostAdvancedStocks(context);
+                        ShowTrendingStocks(context);
                         break;
                     case "3":
-                        ShowMostDeclinedStocks(context);
+                        ShowMostAdvancedStocks(context);
                         break;
                     case "4":
-                        SearchStocksByName(context);
+                        ShowMostDeclinedStocks(context);
                         break;
                     case "5":
-                        SimulateTime();
+                        SearchStocksByName(context);
                         break;
                     case "6":
+                        SimulateTime();
+                        break;
+                    case "7":
                         return; // Exit Stock Exchange menu
                     default:
                         Console.WriteLine("Invalid choice. Please enter a valid option.");
                         break;
                 }
+            }
+        }
+
+        private static void ViewStockPortfolio(BankContext context, string userName)
+        {
+            // Get user info from Database
+            User user = context.Users
+                .Include(u => u.Accounts)
+                .ThenInclude(a => a.StockPortfolio)
+                .Single(u => u.Name == userName);
+
+            Console.WriteLine($"Stock Portfolio for {userName}:");
+
+            foreach (var account in user.Accounts)
+            {
+                Console.WriteLine($"Account: {account.Name}");
+
+                if (account.StockPortfolio != null && account.StockPortfolio.Any())
+                {
+                    Console.WriteLine("Stocks:");
+
+                    foreach (var stock in account.StockPortfolio)
+                    {
+                        Console.WriteLine($"Company: {stock.CompanyName}, Stock: {stock.StockName}, Quantity: {stock.Quantity}, Purchase Price: {stock.PurchasePrice:C}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No stocks in the portfolio.");
+                }
+
+                Console.WriteLine(); // Add a newline for better formatting
             }
         }
 
@@ -585,10 +621,200 @@ namespace The_Bank
         }
 
 
-        public static void InvestInCryptoExchange(BankContext context, string userName)
+        private static void ViewCryptoInvestments(BankContext context, string userName)
         {
-            // Implement your logic for investing in the Crypto Exchange here
-            Console.WriteLine("You chose to invest in the Crypto Exchange. Implement your crypto investment logic here.");
+            // Get user info from Database
+            User user = context.Users
+                .Include(u => u.CryptoInvestments)
+                .Single(u => u.Name == userName);
+
+            Console.WriteLine($"Crypto Investments for {userName}:");
+
+            if (user.CryptoInvestments != null && user.CryptoInvestments.Any())
+            {
+                foreach (var crypto in user.CryptoInvestments)
+                {
+                    Console.WriteLine($"Currency: {crypto.CurrencyName} ({crypto.CurrencyCode}), Quantity: {crypto.Quantity}, Purchase Price: {crypto.PurchasePrice:C}, Purchase Date: {crypto.PurchaseDate}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("No crypto investments found.");
+            }
+
+            Console.WriteLine(); // Add a newline for better formatting
+        }
+
+        private static void InvestInCryptoExchange(BankContext context, string userName)
+        {
+            while (true)
+            {
+                Console.WriteLine("\nCrypto Exchange Menu:");
+                Console.WriteLine("1. View Crypto Investments");
+                Console.WriteLine("2. Buy Crypto");
+                Console.WriteLine("3. Sell Crypto");
+                Console.WriteLine("4. Exit Crypto Exchange");
+
+                Console.Write("Enter your choice: ");
+                string choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        ViewCryptoInvestments(context, userName);
+                        break;
+                    case "2":
+                        BuyCrypto(context, userName);
+                        break;
+                    case "3":
+                        SellCrypto(context, userName);
+                        break;
+                    case "4":
+                        return; // Exit Crypto Exchange menu
+                    default:
+                        Console.WriteLine("Invalid choice. Please enter a valid option.");
+                        break;
+                }
+            }
+        }
+
+        private static void BuyCrypto(BankContext context, string userName)
+        {
+            // Get user info from Database
+            User user = context.Users
+                .Include(u => u.Accounts)
+                .Include(u => u.CryptoInvestments)
+                .Single(u => u.Name == userName);
+
+            Console.WriteLine("Available Cryptocurrencies:");
+            Console.WriteLine("1. Bitcoin (BTC)");
+            Console.WriteLine("2. Ethereum (ETH)");
+            // Add more cryptocurrencies as needed
+
+            Console.Write("Enter the number of the cryptocurrency to buy: ");
+            if (int.TryParse(Console.ReadLine(), out int cryptoChoice) && cryptoChoice >= 1 && cryptoChoice <= 2) // Adjust the range based on the number of cryptocurrencies
+            {
+                // Mapping cryptoChoice to cryptocurrency details
+                string[] cryptoNames = { "Bitcoin", "Ethereum" }; // Add more names as needed
+                string[] cryptoCodes = { "BTC", "ETH" }; // Add more codes as needed
+                string selectedCryptoName = cryptoNames[cryptoChoice - 1];
+                string selectedCryptoCode = cryptoCodes[cryptoChoice - 1];
+
+                // Ask for quantity
+                Console.Write($"Enter the quantity of {selectedCryptoName} to buy: ");
+                if (decimal.TryParse(Console.ReadLine(), out decimal quantity) && quantity > 0)
+                {
+                    // Assume a static price for demonstration purposes, replace with actual pricing logic
+                    decimal currentPrice = GetCryptoCurrentPrice(selectedCryptoCode); // Replace with your actual pricing logic
+
+                    // Calculate total purchase price
+                    decimal purchasePrice = currentPrice * quantity;
+
+                    // Check if the user has enough balance in any account
+                    if (user.Accounts.Any(a => a.Balance >= purchasePrice))
+                    {
+                        // Deduct the purchase amount from the user's balance in the first account with sufficient funds
+                        Account sourceAccount = user.Accounts.First(a => a.Balance >= purchasePrice);
+                        sourceAccount.Balance -= purchasePrice;
+
+                        // Add the crypto investment to the user's portfolio
+                        CryptoInvestment cryptoInvestment = new CryptoInvestment
+                        {
+                            UserId = user.Id,
+                            CurrencyName = selectedCryptoName,
+                            CurrencyCode = selectedCryptoCode,
+                            Quantity = quantity,
+                            PurchasePrice = currentPrice,
+                            PurchaseDate = DateTime.Now,
+                        };
+
+                        user.CryptoInvestments.Add(cryptoInvestment);
+
+                        Console.WriteLine($"Successfully bought {quantity} {selectedCryptoName} ({selectedCryptoCode}) for {purchasePrice:C}. Remaining balance: {sourceAccount.Balance:C}");
+                        Console.WriteLine("TO THE MOON!");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Insufficient funds in any account to buy the selected cryptocurrency.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Invalid quantity. Please enter a valid positive number.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid choice. Please enter a valid number.");
+            }
+        }
+
+
+        private static void SellCrypto(BankContext context, string userName)
+        {
+            // Get user info from Database
+            User user = context.Users
+                .Include(u => u.Accounts)
+                .Include(u => u.CryptoInvestments)
+                .Single(u => u.Name == userName);
+
+            Console.WriteLine("Your Crypto Investments:");
+
+            if (user.CryptoInvestments != null && user.CryptoInvestments.Any())
+            {
+                int index = 1;
+                foreach (var crypto in user.CryptoInvestments)
+                {
+                    Console.WriteLine($"{index}. {crypto.CurrencyName} ({crypto.CurrencyCode}) - Quantity: {crypto.Quantity}");
+                    index++;
+                }
+
+                Console.Write("Enter the number of the cryptocurrency to sell: ");
+                if (int.TryParse(Console.ReadLine(), out int sellChoice) && sellChoice >= 1 && sellChoice <= user.CryptoInvestments.Count)
+                {
+                    // Get the selected crypto investment
+                    CryptoInvestment selectedCrypto = user.CryptoInvestments[sellChoice - 1];
+
+                    // Assume a static price for demonstration purposes, replace with actual pricing logic
+                    decimal currentPrice = GetCryptoCurrentPrice(selectedCrypto.CurrencyCode); // Replace with your actual pricing logic
+
+                    // Calculate total selling price
+                    decimal sellingPrice = currentPrice * selectedCrypto.Quantity;
+
+                    // Add the selling amount to the user's balance in the first account
+                    Account destinationAccount = user.Accounts.First();
+                    destinationAccount.Balance += sellingPrice;
+
+                    // Remove the crypto investment from the user's portfolio
+                    user.CryptoInvestments.Remove(selectedCrypto);
+
+                    Console.WriteLine($"Successfully sold {selectedCrypto.Quantity} {selectedCrypto.CurrencyName} ({selectedCrypto.CurrencyCode}) for {sellingPrice:C}. New balance: {destinationAccount.Balance:C}");
+                }
+                else
+                {
+                    Console.WriteLine("Invalid choice. Please enter a valid number.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("No crypto investments found.");
+            }
+
+            Console.WriteLine(); // Add a newline for better formatting
+        }
+
+
+        private static decimal GetCryptoCurrentPrice(string cryptoCode)
+        {
+            // Implement your logic to get the current price of the specified cryptocurrency
+            // Replace this with actual pricing logic or API calls to fetch real-time prices
+            // For simplicity, return a static price in this example
+            if (cryptoCode == "BTC")
+                return 399237.96m; // Replace with actual BTC price
+            else if (cryptoCode == "ETH")
+                return 22710.98m; // Replace with actual ETH price
+            else
+                return 0m; // Handle other cryptocurrencies as needed
         }
         public static void WiseInvestments(BankContext context, string userName)
         {

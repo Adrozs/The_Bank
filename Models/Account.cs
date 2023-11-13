@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace The_Bank.Models
 {
@@ -14,5 +15,7 @@ namespace The_Bank.Models
         public decimal Balance { get; set; }
 
         public virtual User User { get; set; }
+
+        public virtual ICollection<StockPrice> StockPortfolio { get; set; }
     }
 }

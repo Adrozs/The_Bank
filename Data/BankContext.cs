@@ -8,6 +8,9 @@ namespace The_Bank.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Account> Accounts { get; set; }
         public DbSet<StockPrice> StockPrices { get; set; }
+        public DbSet<CryptoPrice> CryptoPrices { get; set; }
+        public DbSet<CryptoTransaction> CryptoTransactions { get; set; }
+        public DbSet<CryptoInvestment> CryptoInvestments { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
