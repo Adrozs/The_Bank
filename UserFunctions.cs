@@ -9,6 +9,7 @@ namespace The_Bank
 {
     internal class UserFunctions
     {
+        private static DateTime currentDateTime = DateTime.Now;
         internal static void UserMenu(BankContext outerContext, string userName)
         {
             using (BankContext context = new BankContext())
@@ -422,7 +423,9 @@ namespace The_Bank
                 Console.WriteLine("1. Show Trending Stocks");
                 Console.WriteLine("2. Show Most Advanced Stocks");
                 Console.WriteLine("3. Show Most Declined Stocks");
-                Console.WriteLine("4. Exit Stock Exchange");
+                Console.WriteLine("4. Search Stocks by Name");
+                Console.WriteLine("5. Simulate Time");
+                Console.WriteLine("6. Exit Stock Exchange");
 
                 Console.Write("Enter your choice: ");
                 string choice = Console.ReadLine();
@@ -442,6 +445,9 @@ namespace The_Bank
                         SearchStocksByName(context);
                         break;
                     case "5":
+                        SimulateTime();
+                        break;
+                    case "6":
                         return; // Exit Stock Exchange menu
                     default:
                         Console.WriteLine("Invalid choice. Please enter a valid option.");
@@ -482,6 +488,7 @@ namespace The_Bank
             // Display current date and time
             Console.WriteLine($"Current Date and Time: {DateTime.Now}");
         }
+
         private static void SearchStocksByName(BankContext context)
         {
             Console.Write("Enter the name of the Company or Stock to search: ");
@@ -509,6 +516,45 @@ namespace The_Bank
             // Display current date and time
             Console.WriteLine($"Current Date and Time: {DateTime.Now}");
         }
+
+        private static void SimulateTime()
+        {
+            Console.WriteLine("\nSimulate Time Menu:");
+            Console.WriteLine("d. Simulate 24 hours ahead");
+            Console.WriteLine("w. Simulate 1 week ahead");
+            Console.WriteLine("m. Simulate 1 month ahead");
+            Console.WriteLine("y. Simulate 1 year ahead");
+            Console.WriteLine("r. Return to Real Time");
+
+            Console.Write("Enter your choice: ");
+            string timeChoice = Console.ReadLine();
+
+            switch (timeChoice.ToLower())
+            {
+                case "d":
+                    currentDateTime = currentDateTime.AddHours(24);
+                    break;
+                case "w":
+                    currentDateTime = currentDateTime.AddDays(7);
+                    break;
+                case "m":
+                    currentDateTime = currentDateTime.AddMonths(1);
+                    break;
+                case "y":
+                    currentDateTime = currentDateTime.AddYears(1);
+                    break;
+                case "r":
+                    currentDateTime = DateTime.Now;
+                    break;
+                default:
+                    Console.WriteLine("Invalid choice. Time simulation canceled.");
+                    break;
+            }
+
+            // Display updated current date and time
+            Console.WriteLine($"Current Date and Time: {currentDateTime}");
+        }
+
 
         public static void InvestInCryptoExchange(BankContext context, string userName)
         {

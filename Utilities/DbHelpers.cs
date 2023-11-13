@@ -18,6 +18,12 @@ namespace The_Bank.Utilities
             return users;
         }
 
+        public static List<StockPrice> GetStockPrices(BankContext context)
+        {
+            List<StockPrice> stockPrices = context.StockPrices.ToList();
+            return stockPrices;
+        }
+
         // Get specific user
         public static User GetUser(BankContext context, string username)
         {
