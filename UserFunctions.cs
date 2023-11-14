@@ -244,10 +244,13 @@ namespace The_Bank
                 Console.WriteLine("How much do you wish to deposit?");
                 double deposit = double.Parse(Console.ReadLine());
 
+                Console.WriteLine("Which bank?");
+                string bankChoice = Console.ReadLine();
+
                 if (double.TryParse(Console.ReadLine(), out double depositAmount))
                 {
                     var account = context.Accounts
-                     .Where(a => a.Balance > 0)
+                     .Where(a => a.Name == bankChoice)
                      .FirstOrDefault();
 
                     if (account != null)
@@ -255,7 +258,7 @@ namespace The_Bank
                         account.Balance += depositAmount;
                         context.SaveChanges();
 
-                        Console.WriteLine($"Deposit successful. New balance: {account.Balance}");
+                        Console.WriteLine($"Deposit successful. New balance: {account.Balance} in account: {bankChoice}");
                     }
                 }
 
@@ -264,6 +267,9 @@ namespace The_Bank
                     Console.WriteLine("Invalid choice");
                 }
             }
+
+            Console.WriteLine("Press enter to continue");
+            ConsoleKeyInfo key = Console.ReadKey(true);
         }
 
 
