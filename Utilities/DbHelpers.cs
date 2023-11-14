@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,6 +18,12 @@ namespace The_Bank.Utilities
             return users;
         }
 
+        public static List<StockPrice> GetStockPrices(BankContext context)
+        {
+            List<StockPrice> stockPrices = context.StockPrices.ToList();
+            return stockPrices;
+        }
+
         // Get specific user
         public static User GetUser(BankContext context, string username)
         {
@@ -25,6 +32,17 @@ namespace The_Bank.Utilities
 
             return user;
         }
+
+        // Tried to make mehod to get accounts to make code nicer but didn't work. Commenting out so we can fix it in the future if have time
+        //public static User GetUserAccounts(BankContext context, string userName)
+        //{
+        //    User user = context.Users
+        //       .Where(u => u.Name == userName)
+        //       .Include(u => u.Accounts)
+        //       .Single();
+        //    return user;        
+
+        //}
 
         // Adds and saves user to database
         public static bool AddUser(BankContext context, User user)
@@ -41,6 +59,8 @@ namespace The_Bank.Utilities
                 return false;
             }
         }
+
+        // Adds and saves account to the database
         public static bool AddAccount(BankContext context, Account account)
         {
             try
@@ -54,13 +74,28 @@ namespace The_Bank.Utilities
                 Console.WriteLine($"Error adding account: {ex.Message}");
                 return false;
             }
-            return true;
+        }
+
+        // Saves a new user pin to the database
+        public static bool EditPin(BankContext context, User user, string pin)
+        {
+            try
+            {
+                user.Pin = pin;
+                context.SaveChanges();
+                return true;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"Error changing pin: {ex.Message}");
+                return false;
+            }
         }
 
         // Checks if specified user exists in the database
         public static bool IsCustomer(BankContext context, string userName, string pin)
         {
-            // Has the user the correct credentials?
+            // Has the user the correct credentials? Returns true if yes - false if not
             return context.Users.Any(u => u.Name == userName && u.Pin == pin);
         }
 

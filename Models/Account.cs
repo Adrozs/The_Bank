@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using The_Bank.CurrencyTypeEnum;
 
 namespace The_Bank.Models
 {
@@ -12,7 +10,9 @@ namespace The_Bank.Models
         public int UserId { get; set; }
         public string Name { get; set; }
         public decimal Balance { get; set; }
-
+        public CurrencyType Currency { get; set; }
+        public List<StockTransaction> StockPortfolio { get; set; }
         public virtual User User { get; set; }
+        public virtual ICollection<StockPrice> StockPrices { get; set; }
     }
 }
