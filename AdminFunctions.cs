@@ -43,6 +43,9 @@ namespace The_Bank
                         //    string username = Console.ReadLine();
                         //    UserFunctions.UserMenu(context, username);
                         //    break;
+                        case "d":
+                            DeleteUser(context);
+                            return;
                         case "x":
                             return;
                         default:
@@ -80,6 +83,33 @@ namespace The_Bank
             else
             {
                 Console.WriteLine($"\t\t\tFailed to create a user {username}");
+            }
+        }
+        private static void DeleteUser(BankContext context)
+        {
+            Console.WriteLine("\t\t\tDelete user:");
+            Console.Write("\t\t\tEnter username to delete: ");
+            string usernameToDelete = Console.ReadLine();
+
+            // Get the user from the database
+            User userToDelete = DbHelpers.GetUserByUsername(context, usernameToDelete);
+
+            if (userToDelete != null)
+            {
+                // Delete the user
+                bool success = DbHelpers.DeleteUser(context, userToDelete);
+                if (success)
+                {
+                    Console.WriteLine($"\t\t\tUser {usernameToDelete} has been deleted.");
+                }
+                else
+                {
+                    Console.WriteLine($"\t\t\tFailed to delete user {usernameToDelete}.");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"\t\t\tUser {usernameToDelete} not found.");
             }
         }
     }
