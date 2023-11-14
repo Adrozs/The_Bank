@@ -244,13 +244,13 @@ namespace The_Bank
                 Console.WriteLine("How much do you wish to deposit?");
                 decimal deposit = decimal.Parse(Console.ReadLine());
 
-                Console.WriteLine("Which bank?");
-                string bankChoice = Console.ReadLine();
+                Console.WriteLine("Which account?");
+                string accountChoice = Console.ReadLine();
 
                 if (decimal.TryParse(Console.ReadLine(), out decimal depositAmount))
                 {
                     var account = context.Accounts
-                     .Where(a => a.Name == bankChoice)
+                     .Where(a => a.Name == accountChoice)
                      .FirstOrDefault();
 
                     if (account != null)
@@ -258,7 +258,7 @@ namespace The_Bank
                         account.Balance += depositAmount;
                         context.SaveChanges();
 
-                        Console.WriteLine($"Deposit successful. New balance: {account.Balance} in account: {bankChoice}");
+                        Console.WriteLine($"Deposit successful. New balance: {account.Balance} in account: {accountChoice}");
                     }
                 }
 
