@@ -242,12 +242,12 @@ namespace The_Bank
             using (BankContext context = new BankContext())
             {
                 Console.WriteLine("How much do you wish to deposit?");
-                double deposit = double.Parse(Console.ReadLine());
+                decimal deposit = decimal.Parse(Console.ReadLine());
 
                 Console.WriteLine("Which bank?");
                 string bankChoice = Console.ReadLine();
 
-                if (double.TryParse(Console.ReadLine(), out double depositAmount))
+                if (decimal.TryParse(Console.ReadLine(), out decimal depositAmount))
                 {
                     var account = context.Accounts
                      .Where(a => a.Name == bankChoice)
@@ -271,8 +271,6 @@ namespace The_Bank
             Console.WriteLine("Press enter to continue");
             ConsoleKeyInfo key = Console.ReadKey(true);
         }
-
-
 
         // Create a new account
         private static void OpenNewAccount(BankContext context, string username)
