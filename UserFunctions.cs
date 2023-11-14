@@ -378,9 +378,20 @@ namespace The_Bank
             {
                 Console.WriteLine("Enter new PIN: ");
                 string newPin = Console.ReadLine();
+        private static void DepositMoney()
+        {
+            using (BankContext context = new BankContext())
+            {
+                Console.WriteLine("How much do you wish to deposit?");
+                double deposit = double.Parse(Console.ReadLine());
 
                 Console.WriteLine("Confirm new PIN: ");
                 string newPinConfirm = Console.ReadLine();
+                if (double.TryParse(Console.ReadLine(), out double depositAmount))
+                { 
+                    var account = context.Accounts
+                     .Where(a => a.Balance > 0)
+                     .FirstOrDefault();
 
                 // If pins match save them to database and break out of loop - else write error message
                 if (newPin == newPinConfirm)
@@ -402,6 +413,20 @@ namespace The_Bank
                     Console.WriteLine("PIN codes doesn't match. Try again. \n");
             }
         }
+                    if (account != null)
+                    {
+                        account.Balance += depositAmount;
+                        context.SaveChanges();
 
+                        Console.WriteLine($"Deposit successful. New balance: {account.Balance}");
+                    }
+                }
+
+                else
+                {
+                    Console.WriteLine("Invalid choice");
+                }
+            }
+        }
     }
 }
