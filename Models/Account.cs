@@ -11,6 +11,7 @@ namespace The_Bank.Models
         public string Name { get; set; }
         public decimal Balance { get; set; }        
         public virtual User User { get; set; }
-        
+        public string Currency { get; set; }
+
     }
 }
