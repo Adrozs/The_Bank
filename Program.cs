@@ -123,7 +123,7 @@ namespace The_Bank
                                 Console.WriteLine("Too many invalid attemtps. Please try again in a few minutes.");
 
                                 // Checks if account can be unfrozen and unfreezes it if yes, does nothing if no
-                                AccountFreezed.UnFreezeUser(customerName);
+                                //AccountFreezed.UnFreezeUser(customerName);
                             }
                             break;
 
