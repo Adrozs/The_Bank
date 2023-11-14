@@ -147,97 +147,100 @@ namespace The_Bank
                 ConsoleKeyInfo key = Console.ReadKey(true);
         }
 
-            // Transfer money between accounts
-            static void TransferMoney(BankContext context, string userName)
+        // Transfer money between accounts
+        static void TransferMoney(BankContext context, string userName)
+        {
+            // Get user info from Database
+            User user = context.Users
+                .Include(u => u.Accounts)
+                .Single(u => u.Name == userName);
+
+            // Display user accounts
+            Console.WriteLine("Select the source account to transfer money from:");
+            foreach (var account in user.Accounts)
             {
-                // Get user info from Database
-                User user = context.Users
-                    .Include(u => u.Accounts)
-                    .Single(u => u.Name == userName);
+                Console.WriteLine($"{account.Id}. {account.Name}: {account.Balance:C}");
+            }
 
-                // Display user accounts
-                Console.WriteLine("Select the source account to transfer money from:");
-                foreach (var account in user.Accounts)
+            // Select source account number
+            Console.Write("Enter the source account number: ");
+            if (int.TryParse(Console.ReadLine(), out int sourceAccountId))
+            {
+                // SOURCE ACCOUNT
+                Account sourceAccount = user.Accounts.SingleOrDefault(a => a.Id == sourceAccountId);
+
+                if (sourceAccount != null)
                 {
-                    Console.WriteLine($"{account.Id}. {account.Name}: {account.Balance:C}");
-                }
-
-                // select source account number
-                Console.Write("Enter the source account number: ");
-                if (int.TryParse(Console.ReadLine(), out int sourceAccountId))
-                {
-                    // SOURCE ACCOUNT
-                    Account sourceAccount = user.Accounts.SingleOrDefault(a => a.Id == sourceAccountId);
-
-                    if (sourceAccount != null)
+                    // Select destination account (only user's own accounts)
+                    Console.WriteLine("Select the destination account to transfer money to:");
+                    foreach (var account in user.Accounts.Where(a => a.Id != sourceAccountId))
                     {
-                        // select destination account (no money laundering pls)
-                        Console.WriteLine("Select the destination account to transfer money to:");
-                        foreach (var account in user.Accounts.Where(a => a.Id != sourceAccountId))
-                        {
-                            Console.WriteLine($"{account.Id}. {account.Name}: {account.Balance:C}");
-                        }
+                        Console.WriteLine($"{account.Id}. {account.Name}: {account.Balance:C}");
+                    }
 
-                        Console.Write("Enter the destination account number: ");
-                        if (int.TryParse(Console.ReadLine(), out int destinationAccountId))
-                        {
-                            // destination account find it
-                            Account destinationAccount = user.Accounts.SingleOrDefault(a => a.Id == destinationAccountId);
+                    Console.Write("Enter the destination account number: ");
+                    if (int.TryParse(Console.ReadLine(), out int destinationAccountId))
+                    {
+                        // Destination account
+                        Account destinationAccount = user.Accounts.SingleOrDefault(a => a.Id == destinationAccountId);
 
-                            if (destinationAccount != null)
+                        if (destinationAccount != null)
+                        {
+                            // Transfer amount
+                            Console.Write("Enter the transfer amount: ");
+                            if (decimal.TryParse(Console.ReadLine(), out decimal transferAmount) && transferAmount > 0)
                             {
-                                // HOW MUCH
-                                Console.Write("Enter the transfer amount: ");
-                                if (decimal.TryParse(Console.ReadLine(), out decimal transferAmount) && transferAmount > 0)
-
+                                // Check if the source account has sufficient funds
+                                if (sourceAccount.Balance >= transferAmount)
                                 {
-                                    // you got the cash or u broke?
-                                    if (sourceAccount.Balance >= transferAmount)
-                                    {
-                                        // update balance on both ends
-                                        sourceAccount.Balance -= transferAmount;
-                                        destinationAccount.Balance += transferAmount;
+                                    // Update balances
+                                    sourceAccount.Balance -= transferAmount;
+                                    destinationAccount.Balance += transferAmount;
 
-                                        // SAVE
-                                        context.SaveChanges();
+                                    // Save changes
+                                    context.SaveChanges();
 
-                                        // DISPLAY UPDATED BALANCE PLS WORK
-                                        Console.WriteLine($"Transfer successful! New balance for {sourceAccount.Name}: {sourceAccount.Balance:C}");
-                                        Console.WriteLine($"New balance for {destinationAccount.Name}: {destinationAccount.Balance:C}");
-                                    }
-                                    else
-                                    {
-                                        Console.WriteLine("Insufficient funds in the source account. Transfer canceled.");
-                                    }
-                                }//errorcode heaven
+                                    // Display updated balances
+                                    Console.WriteLine($"Transfer successful! New balance for {sourceAccount.Name}: {sourceAccount.Balance:C}");
+                                    Console.WriteLine($"New balance for {destinationAccount.Name}: {destinationAccount.Balance:C}");
+                                }
                                 else
                                 {
-                                    Console.WriteLine("Invalid transfer amount. Please enter a valid positive number.");
+                                    Console.WriteLine("Insufficient funds in the source account. Transfer canceled.");
                                 }
                             }
                             else
                             {
-                                Console.WriteLine("Invalid destination account number. Please select a valid account.");
+                                Console.WriteLine("Invalid transfer amount. Please enter a valid positive number.");
                             }
                         }
                         else
                         {
-                            Console.WriteLine("Invalid input. Please enter a valid destination account number.");
+                            Console.WriteLine("Invalid destination account number. Please select a valid account.");
                         }
                     }
                     else
                     {
-                        Console.WriteLine("Invalid source account number. Please select a valid account.");
+                        Console.WriteLine("Invalid input. Please enter a valid destination account number.");
                     }
                 }
                 else
                 {
-                    Console.WriteLine("Invalid input. Please enter a valid source account number.");
+                    Console.WriteLine("Invalid source account number. Please select a valid account.");
                 }
             }
+            else
+            {
+                Console.WriteLine("Invalid input. Please enter a valid source account number.");
+            }
 
-            // Withdraw money from an account
-            static void WithdrawMoney(BankContext context, string userName)
+            // Display message and wait for Enter key press to return to the main menu
+            Console.WriteLine("Press [Enter] to return to the main menu");
+            Console.ReadLine();
+        }
+
+        // Withdraw money from an account
+        static void WithdrawMoney(BankContext context, string userName)
             {
                 // get info from database
                 User user = context.Users
