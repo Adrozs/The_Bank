@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using QRCoder;
 using System.Drawing;
 using System.Text;
 using The_Bank.Data;
 using The_Bank.Models;
 using The_Bank.Utilities;
+using The_Bank.CurrencyTypeEnum;
+using The_Bank.Migrations;
 
 namespace The_Bank
 {

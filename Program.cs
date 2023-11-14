@@ -1,8 +1,6 @@
 ﻿using The_Bank.Data;
 using System;
-
 using The_Bank.Utilities;
-
 using The_Bank.Models;
 
 namespace The_Bank
@@ -20,7 +18,7 @@ namespace The_Bank
             Console.WriteLine();
 
 
-            // Initalize counter to keep track of login attempts
+            // Initalize counter to keep track of login attempts - 2 as default
             int loginAttempts = 2;
 
             // Declare date time variable to be used to keep track of when a user can be unfrozen if they've frozen their account
@@ -30,7 +28,6 @@ namespace The_Bank
             int selectedOption = 0;
 
             // Loop until user chooses to exit program
-            // TODO: Add command to exit program
             while (true)
             {
                 Console.Clear();
