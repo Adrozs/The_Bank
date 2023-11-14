@@ -1,8 +1,6 @@
 ﻿using The_Bank.Data;
 using System;
-
 using The_Bank.Utilities;
-
 using The_Bank.Models;
 
 namespace The_Bank
