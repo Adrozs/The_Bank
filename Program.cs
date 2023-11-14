@@ -20,7 +20,7 @@ namespace The_Bank
             Console.WriteLine();
 
 
-            // Initalize counter to keep track of login attempts
+            // Initalize counter to keep track of login attempts - 2 as default
             int loginAttempts = 2;
 
             // Declare date time variable to be used to keep track of when a user can be unfrozen if they've frozen their account
@@ -28,13 +28,13 @@ namespace The_Bank
 
 
             // Loop until user chooses to exit program
-            // TODO: Add command to exit program
             while (true)
             {
+                // !!!REMOVE THIS MENU? Unecessary since admin login just is a set login. Can incorporate into normal login
                 // User Type Selection
                 Console.WriteLine("Are you a:");
                 Console.WriteLine("1. Customer");
-                Console.WriteLine("2. Employee");
+                Console.WriteLine("2. Admin");
                 Console.WriteLine("3. Exit");
                 Console.Write("Enter your choice (1, 2, or 3): ");
                 
@@ -89,7 +89,7 @@ namespace The_Bank
                         }
                         break;
                     case "2":
-                        // Employee OR ADMIN login portal
+                        // Admin login portal
                         Console.Write("Name: ");
                         string adminName = Console.ReadLine();
                         Console.Write("PIN: ");

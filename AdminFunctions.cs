@@ -21,7 +21,6 @@ namespace The_Bank
 
                 Console.WriteLine($"Total number of users {users.Count()}");
                 Console.WriteLine("[C]: Create new user");
-                Console.WriteLine("[U]: User Menu");
                 Console.WriteLine("[X]: Exit");
 
                 while (true)
@@ -33,12 +32,6 @@ namespace The_Bank
                     {
                         case "c":
                             CreateUser(context);
-                            break;
-                        case "u":
-                            // Ask for the username to pass to UserMenu
-                            Console.Write("Enter username: ");
-                            string username = Console.ReadLine();
-                            UserFunctions.UserMenu(context, username);
                             break;
                         case "x":
                             return;
