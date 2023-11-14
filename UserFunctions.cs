@@ -71,33 +71,49 @@ namespace The_Bank
 
             
         }
-            public static void WithdrawMoney(BankContext context)
+        public static void WithdrawMoney(BankContext context)
         {
-
-            var balance = context.Accounts
-                .Where(b => b.Id == b.User.Id)
-                .Select(b => b.Balance).Single();
-               
+            Console.WriteLine("From which account do you want to withdraw from?:");
+            string accountChoice = Console.ReadLine();
+            
             Console.Write("How much would you like to withdraw? ");
-            decimal withdraw = Convert.ToDecimal(Console.ReadLine());
-
-            double newBalance = (double)(balance - withdraw);
-            if (newBalance < 0)
+            if (decimal.TryParse(Console.ReadLine(), out decimal withdraw))
             {
-                Console.WriteLine($"Cannot withdraw more than {balance}");
-                return;
-            }
-                if (withdraw == 0)
-            {        
-                Console.WriteLine("Cannot withdraw 0");
-                return;
-            }
-                Console.WriteLine($"You new balance is {newBalance}");
-                balance = (decimal)newBalance;
-                context.SaveChanges();
+                var account = context.Accounts
+                 .Where(a => a.Name == accountChoice)
+                 .FirstOrDefault();
 
+                if (accountChoice != null)
+                {
+
+                    var balance = context.Accounts
+                  .Where(b => b.Id == b.User.Id)
+                  .Select(b => b.Balance).Single();
+
+                    decimal newBalance = balance - withdraw;
+
+                    //Errorchecks
+                    if (newBalance < 0)
+                    {
+                        Console.WriteLine($"Cannot withdraw more than {balance}");
+                        return;
+                    }
+                    if (withdraw == 0)
+                    {
+                        Console.WriteLine("Cannot withdraw 0");
+                        return;
+                    }
+                    
+                    Console.WriteLine($"You new balance is {newBalance}");
+                    
+                    account.Balance -= withdraw;
+                    context.SaveChanges();
+
+                }
             }
-        private static void DisplayAccountBalances(BankContext context, string userName)
+        }
+
+        //private static void DisplayAccountBalances(BankContext context, string userName)
         private static void ViewAccountInfo(BankContext context, string userName)
         {
             try
@@ -115,7 +131,7 @@ namespace The_Bank
 
             // new line new possibilities
             Console.WriteLine();
-        }
+        
                 if (user != null)
                 {
                     Console.WriteLine($"User: {user.Name}\n");
@@ -227,13 +243,7 @@ namespace The_Bank
             }
         }
 
-        //private static void WithdrawMoney(BankContext context, string userName)
-        //{
-        //    // get info from database
-        //    User user = context.Users
-        //        .Include(u => u.Accounts)
-        //        .Single(u => u.Name == userName);
-        // Withdraw money from an account
+   
         //private static void WithdrawMoney(BankContext context, string userName)
         //{
         //    //// get info from database
@@ -298,10 +308,8 @@ namespace The_Bank
         //}
 
         // Deposit money to account
-        private static void DepositMoney()
+        private static void DepositMoney(BankContext context, string userName)
         {
-            using (BankContext context = new BankContext())
-            {
                 Console.WriteLine("How much do you wish to deposit?");
                 decimal deposit = decimal.Parse(Console.ReadLine());
 
@@ -323,11 +331,10 @@ namespace The_Bank
                     }
                 }
 
-                else
-                {
-                    Console.WriteLine("Invalid choice");
-                }
-            }
+                else  Console.WriteLine("Invalid choice");
+                
+                   
+                
 
             Console.WriteLine("Press enter to continue");
             ConsoleKeyInfo key = Console.ReadKey(true);
