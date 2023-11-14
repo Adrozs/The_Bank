@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,12 @@ namespace The_Bank.Utilities
         {
             List<User> users = context.Users.ToList();
             return users;
+        }
+
+        public static List<StockPrice> GetStockPrices(BankContext context)
+        {
+            List<StockPrice> stockPrices = context.StockPrices.ToList();
+            return stockPrices;
         }
 
         // Get specific user
