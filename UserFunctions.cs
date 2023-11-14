@@ -1,10 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using QRCoder;
-using System.Drawing;
-using System.Text;
+//using QRCoder;
 using The_Bank.Data;
 using The_Bank.Models;
 using The_Bank.Utilities;
+using The_Bank.Migrations;
 
 namespace The_Bank
 {
@@ -238,57 +237,35 @@ namespace The_Bank
         }
 
         // Deposit money to account
-        private static void DepositMoney(BankContext context, string userName)
+        private static void DepositMoney()
         {
-            // Get info from database
-            User user = context.Users
-                .Include(u => u.Accounts)
-                .Single(u => u.Name == userName);
-
-            // Display all accounts
-            Console.WriteLine("Select the account to deposit money into:");
-            foreach (var account in user.Accounts)
+            using (BankContext context = new BankContext())
             {
-                Console.WriteLine($"{account.Id}. {account.Name}: {account.Balance:C}");
-            }
+                Console.WriteLine("How much do you wish to deposit?");
+                double deposit = double.Parse(Console.ReadLine());
 
-            // CHOOSE IT NOW
-            Console.Write("Enter the account number: ");
-            if (int.TryParse(Console.ReadLine(), out int selectedAccountId))
-            {
-                // Find selected account
-                Account selectedAccount = user.Accounts.SingleOrDefault(a => a.Id == selectedAccountId);
-
-                if (selectedAccount != null)
+                if (double.TryParse(Console.ReadLine(), out double depositAmount))
                 {
-                    // How much do you want to deposit?
-                    Console.Write("Enter the deposit amount: ");
-                    if (decimal.TryParse(Console.ReadLine(), out decimal depositAmount) && depositAmount > 0)
-                    {
-                        // Update the balance
-                        selectedAccount.Balance += depositAmount;
+                    var account = context.Accounts
+                     .Where(a => a.Balance > 0)
+                     .FirstOrDefault();
 
-                        // save it
+                    if (account != null)
+                    {
+                        account.Balance += depositAmount;
                         context.SaveChanges();
 
-                        // Display new balance (sadly not the shoes)
-                        Console.WriteLine($"Deposit successful! New balance for {selectedAccount.Name}: {selectedAccount.Balance:C}");
-                    }
-                    else
-                    {
-                        Console.WriteLine("Invalid deposit amount. Please enter a valid positive number.");
+                        Console.WriteLine($"Deposit successful. New balance: {account.Balance}");
                     }
                 }
+
                 else
                 {
-                    Console.WriteLine("Invalid account number. Please select a valid account.");
+                    Console.WriteLine("Invalid choice");
                 }
             }
-            else
-            {
-                Console.WriteLine("Invalid input. Please enter a valid account number.");
-            }
         }
+
 
 
         // Create a new account
@@ -378,20 +355,11 @@ namespace The_Bank
             {
                 Console.WriteLine("Enter new PIN: ");
                 string newPin = Console.ReadLine();
-        private static void DepositMoney()
-        {
-            using (BankContext context = new BankContext())
-            {
-                Console.WriteLine("How much do you wish to deposit?");
-                double deposit = double.Parse(Console.ReadLine());
+      
 
                 Console.WriteLine("Confirm new PIN: ");
                 string newPinConfirm = Console.ReadLine();
-                if (double.TryParse(Console.ReadLine(), out double depositAmount))
-                { 
-                    var account = context.Accounts
-                     .Where(a => a.Balance > 0)
-                     .FirstOrDefault();
+               
 
                 // If pins match save them to database and break out of loop - else write error message
                 if (newPin == newPinConfirm)
@@ -413,20 +381,7 @@ namespace The_Bank
                     Console.WriteLine("PIN codes doesn't match. Try again. \n");
             }
         }
-                    if (account != null)
-                    {
-                        account.Balance += depositAmount;
-                        context.SaveChanges();
-
-                        Console.WriteLine($"Deposit successful. New balance: {account.Balance}");
-                    }
-                }
-
-                else
-                {
-                    Console.WriteLine("Invalid choice");
-                }
-            }
-        }
     }
 }
+
+
