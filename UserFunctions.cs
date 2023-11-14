@@ -4,7 +4,6 @@ using System.Text;
 using The_Bank.Data;
 using The_Bank.Models;
 using The_Bank.Utilities;
-using The_Bank.CurrencyTypeEnum;
 using The_Bank.Migrations;
 
 namespace The_Bank
@@ -27,6 +26,7 @@ namespace The_Bank
                     //Option menu
                     MenuFunctions.header();
                     Console.WriteLine("\t\tChoose one of the following options:");
+                    MenuFunctions.divider();
 
                     for (int i = 1; i <= 7; i++) //Forloop to change color on the option the arrow "goes" to.
                     {
@@ -35,7 +35,7 @@ namespace The_Bank
                             Console.ForegroundColor = ConsoleColor.DarkGray; // Change to your preferred color
                         }
 
-                        Console.WriteLine($"\t\t{i}. {ColorOptionText(i)}{(menuSelection == i ? " <--" : "")}");
+                        Console.WriteLine($"\t\t{ColorOptionText(i)}{(menuSelection == i ? " <--" : "")}");
 
                         Console.ResetColor(); // Reset color to default
                     }

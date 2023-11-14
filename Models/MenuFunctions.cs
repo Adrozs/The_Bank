@@ -44,6 +44,11 @@ namespace The_Bank.Models
         {
             Console.WriteLine("\t\t===================================");
         }
+
+        public static void divider() 
+        {
+            Console.WriteLine("\t\t-----------------------------------");
+        }
     }
 }
 
