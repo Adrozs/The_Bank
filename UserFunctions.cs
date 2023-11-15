@@ -159,7 +159,7 @@ namespace The_Bank
             Console.WriteLine("Select the source account to transfer money from:");
             foreach (var account in user.Accounts)
             {
-                Console.WriteLine($"{account.Id}. {account.Name}: {account.Balance:C} ({account.Currency})");
+                Console.WriteLine($"{account.Id}. {account.Name}: {account.Balance} {account.Currency}");
             }
 
             // Select source account number
@@ -175,7 +175,7 @@ namespace The_Bank
                     Console.WriteLine("Select the destination account to transfer money to:");
                     foreach (var account in user.Accounts.Where(a => a.Id != sourceAccountId))
                     {
-                        Console.WriteLine($"{account.Id}. {account.Name}: {account.Balance:C} ({account.Currency})");
+                        Console.WriteLine($"{account.Id}. {account.Name}: {account.Balance:C} {account.Currency}");
                     }
 
                     Console.Write("Enter the destination account number: ");
