@@ -77,7 +77,7 @@ namespace The_Bank
                     WithdrawMoney(context, userName);
                     break;
                 case 4:
-                    DepositMoney(context, userName);
+                    DepositMoney();
                     break;
                 case 5:
                     OpenNewAccount(context, userName);
@@ -301,9 +301,8 @@ namespace The_Bank
             }
 
         // Deposit money to account
-        private static void DepositMoney(BankContext context)
+        private static void DepositMoney()
         {
-
             Console.WriteLine("How much do you wish to deposit?");
             decimal depositAmount;
 
@@ -312,9 +311,11 @@ namespace The_Bank
                 Console.WriteLine("Which account?");
                 string accountChoice = Console.ReadLine();
 
-                using (BankContext context = new BankContext())
+                using (BankContext context = new BankContext()) 
                 {
-                    var user = context.Users.Include(u => u.Accounts).FirstOrDefault(u => u.Name == accountChoice);
+                         var user = context.Users
+                        .Include(a => a.Accounts)
+                        .FirstOrDefault(a => a.Name == accountChoice);
 
                     if (user != null)
                     {
@@ -328,21 +329,31 @@ namespace The_Bank
                             context.SaveChanges();
                             Console.WriteLine($"New balance {account.Balance}");
                         }
-
                         else
                         {
-                            Console.WriteLine("You don't have enough money for a deposit!");
+                            Console.WriteLine("User doesn't have any accounts.");
                         }
                     }
+                    else
+                    {
+                        Console.WriteLine($"User with the name {accountChoice} not found.");
+                    }
                 }
-
-                Console.WriteLine("Press a key to continue");
-                ConsoleKeyInfo key = Console.ReadKey(true);
             }
-        }
+            else
+            {
+                Console.WriteLine("Invalid deposit amount entered.");
+            }
 
-            // Create a new account
-            static void OpenNewAccount(BankContext context, string username)
+            Console.WriteLine("Press any key to continue");
+            Console.ReadKey(true);
+        }
+    }
+}
+
+
+// Create a new account
+static void OpenNewAccount(BankContext context, string username)
             {
                 // Declare new account variable outside of loop
                 string newAccountName;
