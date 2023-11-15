@@ -348,12 +348,9 @@ namespace The_Bank
             Console.WriteLine("Press any key to continue");
             Console.ReadKey(true);
         }
-    }
-}
 
-
-// Create a new account
-static void OpenNewAccount(BankContext context, string username)
+            // Create a new account
+            static void OpenNewAccount(BankContext context, string userName)
             {
                 // Declare new account variable outside of loop
                 string newAccountName;
@@ -374,7 +371,7 @@ static void OpenNewAccount(BankContext context, string username)
                 }
 
                 // Creates new user object of the user that's logged in
-                User user = DbHelpers.GetUser(context, username);
+                User user = DbHelpers.GetUser(context, userName);
 
                 // Create new account type with id and Name of current user and starting balance of 0
                 Account account = new Account()
@@ -388,7 +385,7 @@ static void OpenNewAccount(BankContext context, string username)
                 bool success = DbHelpers.AddAccount(context, account);
                 if (success)
                 {
-                    Console.WriteLine($"Created new account {newAccountName} for user {username}");
+                    Console.WriteLine($"Created new account {newAccountName} for user {userName}");
                 }
                 // If wasn't possible to save account to database, print error
                 else
