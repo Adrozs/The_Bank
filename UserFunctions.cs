@@ -1,5 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Drawing;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using The_Bank.Data;
 using The_Bank.Models;
@@ -114,10 +118,51 @@ namespace The_Bank
                 default:
                     return "Unknown Option";
             }
+
+
+            
+        }
+        public static void WithdrawMoney(BankContext context)
+        {
+            Console.WriteLine("From which account do you want to withdraw from?:");
+            string accountChoice = Console.ReadLine();
+            
+            Console.Write("How much would you like to withdraw? ");
+            if (decimal.TryParse(Console.ReadLine(), out decimal withdraw))
+            {
+                var account = context.Accounts
+                 .Where(a => a.Name == accountChoice)
+                 .SingleOrDefault();
+
+                if (account != null)
+                {
+
+                    var balance = account.Balance;
+
+                    decimal newBalance = (decimal)balance - withdraw;
+
+                    //Errorchecks
+                    if (newBalance < 0)
+                    {
+                        Console.WriteLine($"Cannot withdraw more than {balance}");
+                        return;
+                    }
+                    if (withdraw == 0)
+                    {
+                        Console.WriteLine("Cannot withdraw 0");
+                        return;
+                    }
+                    
+                    account.Balance = (double)newBalance;
+                    context.SaveChanges();
+                    Console.WriteLine($"You new balance is {newBalance}");
+
+                }
+            }
         }
 
-        //View user account and balance
-        static void ViewAccountInfo(BankContext context, string userName)
+        //private static void DisplayAccountBalances(BankContext context, string userName)
+        private static void ViewAccountInfo(BankContext context, string userName)
         {
                 //Get info about user from database
                 User user = context.Users
