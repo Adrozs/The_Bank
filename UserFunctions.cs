@@ -102,7 +102,7 @@ namespace The_Bank
                         return;
                     }
                     
-                    account.Balance = (double)newBalance;
+                    account.Balance = newBalance;
                     context.SaveChanges();
                     Console.WriteLine($"You new balance is {newBalance}");
 
