@@ -135,7 +135,7 @@ namespace The_Bank
 
                     foreach (var account in user.Accounts)
                     {
-                        Console.WriteLine($"\t\t{account.Name}: {account.Balance:C}");
+                        Console.WriteLine($"\t\t{account.Name}: {account.Balance} {account.Currency}");
                     }
                 }
                 else
@@ -175,7 +175,7 @@ namespace The_Bank
                     Console.WriteLine("Select the destination account to transfer money to:");
                     foreach (var account in user.Accounts.Where(a => a.Id != sourceAccountId))
                     {
-                        Console.WriteLine($"{account.Id}. {account.Name}: {account.Balance:C} {account.Currency}");
+                        Console.WriteLine($"{account.Id}. {account.Name}: {account.Balance} {account.Currency}");
                     }
 
                     Console.Write("Enter the destination account number: ");
@@ -210,8 +210,8 @@ namespace The_Bank
                                         context.SaveChanges();
 
                                         // Display updated balances
-                                        Console.WriteLine($"Transfer successful! New balance for {sourceAccount.Name}: {sourceAccount.Balance:C} ({sourceAccount.Currency})");
-                                        Console.WriteLine($"New balance for {destinationAccount.Name}: {destinationAccount.Balance:C} ({destinationAccount.Currency})");
+                                        Console.WriteLine($"Transfer successful! New balance for {sourceAccount.Name}: {sourceAccount.Balance} ({sourceAccount.Currency})");
+                                        Console.WriteLine($"New balance for {destinationAccount.Name}: {destinationAccount.Balance} ({destinationAccount.Currency})");
                                     }
                                     else
                                     {
@@ -223,8 +223,8 @@ namespace The_Bank
                                         context.SaveChanges();
 
                                         // Display updated balances
-                                        Console.WriteLine($"Transfer successful! New balance for {sourceAccount.Name}: {sourceAccount.Balance:C} ({sourceAccount.Currency})");
-                                        Console.WriteLine($"New balance for {destinationAccount.Name}: {destinationAccount.Balance:C} ({destinationAccount.Currency})");
+                                        Console.WriteLine($"Transfer successful! New balance for {sourceAccount.Name}: {sourceAccount.Balance} ({sourceAccount.Currency})");
+                                        Console.WriteLine($"New balance for {destinationAccount.Name}: {destinationAccount.Balance} ({destinationAccount.Currency})");
                                     }
                                 }
                                 else
@@ -274,7 +274,7 @@ namespace The_Bank
                 Console.WriteLine("Select the account to withdraw money from:");
                 foreach (var account in user.Accounts)
                 {
-                    Console.WriteLine($"{account.Id}. {account.Name}: {account.Balance:C}");
+                    Console.WriteLine($"{account.Id}. {account.Name}: {account.Balance}");
                 }
 
                 // CHOOSE AN ACCOUNT
@@ -300,7 +300,7 @@ namespace The_Bank
                                 context.SaveChanges();
 
                                 // Display balance
-                                Console.WriteLine($"Withdrawal successful! New balance for {selectedAccount.Name}: {selectedAccount.Balance:C}");
+                                Console.WriteLine($"Withdrawal successful! New balance for {selectedAccount.Name}: {selectedAccount.Balance}");
                             }
                             else
                             {
@@ -361,7 +361,7 @@ namespace The_Bank
                             context.SaveChanges();
 
                             // Display new balance (sadly not the shoes)
-                            Console.WriteLine($"Deposit successful! New balance for {selectedAccount.Name}: {selectedAccount.Balance:C}");
+                            Console.WriteLine($"Deposit successful! New balance for {selectedAccount.Name}: {selectedAccount.Balance}");
                         }
                         else
                         {

@@ -21,8 +21,9 @@ namespace The_Bank
                 }
 
                 Console.WriteLine($"\t\t\tTotal number of users {users.Count()}");
-                MenuFunctions.footer();                         
+                MenuFunctions.footer();
                 Console.WriteLine("\t\t\t[C]: Create new user");
+                Console.WriteLine("\t\t\t[D]: Delete an existing user");
                 //Console.WriteLine("[U]: User Menu");
                 Console.WriteLine("\t\t\t[X]: Exit");
 

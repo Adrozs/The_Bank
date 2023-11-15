@@ -19,14 +19,13 @@ namespace The_Bank
                 { "GBP", 0.076M},
                 { "CHF", 0.084M},
                 { "CAD", 0.13M },
-                { "ZWD", 45.18M},
+                { "ZWD", 225.18M},
             };
 
             decimal convertedAmount = amount * exchangeRates[destinationCurrency];
             return convertedAmount;
 
-            return convertedAmount;
+           
     }
 }
 }
-//British Sterling (£) 4.Swiss Franc(CHF) 4.Canadian Dollar(CAD) 5.Zimbabwean Dollar(ZWD)
