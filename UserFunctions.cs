@@ -44,7 +44,7 @@ namespace The_Bank
                             WithdrawMoney(outerContext, userName);
                             break;
                         case "4":
-                            DepositMoney(outerContext, userName);
+                            DepositMoney();
                             break;
                         case "5":
                             OpenNewAccount(outerContext, userName);
@@ -250,39 +250,44 @@ namespace The_Bank
         }
 
         // Deposit money to account
-        private static void DepositMoney()
+        private static void DepositMoney(BankContext context)
         {
-            using (BankContext context = new BankContext())
-            {
-                Console.WriteLine("How much do you wish to deposit?");
-                decimal deposit = decimal.Parse(Console.ReadLine());
 
+            Console.WriteLine("How much do you wish to deposit?");
+            decimal depositAmount;
+
+            if (decimal.TryParse(Console.ReadLine(), out depositAmount))
+            {
                 Console.WriteLine("Which account?");
                 string accountChoice = Console.ReadLine();
 
-                if (decimal.TryParse(Console.ReadLine(), out decimal depositAmount))
+                using (BankContext context = new BankContext())
                 {
-                    var account = context.Accounts
-                     .Where(a => a.Name == accountChoice)
-                     .FirstOrDefault();
+                    var user = context.Users.Include(u => u.Accounts).FirstOrDefault(u => u.Name == accountChoice);
 
-                    if (account != null)
+                    if (user != null)
                     {
-                        account.Balance += depositAmount;
-                        context.SaveChanges();
+                        Console.WriteLine($"Depositing {depositAmount} into {accountChoice}");
 
-                        Console.WriteLine($"Deposit successful. New balance: {account.Balance} in account: {accountChoice}");
+                        var account = user.Accounts.FirstOrDefault();
+
+                        if (account != null)
+                        {
+                            account.Balance += depositAmount;
+                            context.SaveChanges();
+                            Console.WriteLine($"New balance {account.Balance}");
+                        }
+
+                        else
+                        {
+                            Console.WriteLine("You don't have enough money for a deposit!");
+                        }
                     }
                 }
 
-                else
-                {
-                    Console.WriteLine("Invalid choice");
-                }
+                Console.WriteLine("Press a key to continue");
+                ConsoleKeyInfo key = Console.ReadKey(true);
             }
-
-            Console.WriteLine("Press enter to continue");
-            ConsoleKeyInfo key = Console.ReadKey(true);
         }
 
         // Create a new account
