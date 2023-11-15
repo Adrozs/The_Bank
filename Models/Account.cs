@@ -9,7 +9,7 @@ namespace The_Bank.Models
         public int Id { get; set; }
         public int UserId { get; set; }
         public string Name { get; set; }
-        public decimal Balance { get; set; }        
+        public double Balance { get; set; }        
         public virtual User User { get; set; }
         
     }

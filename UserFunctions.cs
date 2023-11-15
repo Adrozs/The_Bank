@@ -128,7 +128,7 @@ namespace The_Bank
             string accountChoice = Console.ReadLine();
             
             Console.Write("How much would you like to withdraw? ");
-            if (decimal.TryParse(Console.ReadLine(), out decimal withdraw))
+            if (double.TryParse(Console.ReadLine(), out double withdraw))
             {
                 var account = context.Accounts
                  .Where(a => a.Name == accountChoice)
@@ -139,7 +139,7 @@ namespace The_Bank
 
                     var balance = account.Balance;
 
-                    decimal newBalance = (decimal)balance - withdraw;
+                    double newBalance = balance - withdraw;
 
                     //Errorchecks
                     if (newBalance < 0)
@@ -153,7 +153,7 @@ namespace The_Bank
                         return;
                     }
                     
-                    account.Balance = (double)newBalance;
+                    account.Balance = newBalance;
                     context.SaveChanges();
                     Console.WriteLine($"You new balance is {newBalance}");
 
@@ -233,7 +233,7 @@ namespace The_Bank
                             {
                                 // HOW MUCH
                                 Console.Write("Enter the transfer amount: ");
-                                if (decimal.TryParse(Console.ReadLine(), out decimal transferAmount) && transferAmount > 0)
+                                if (double.TryParse(Console.ReadLine(), out double transferAmount) && transferAmount > 0)
 
                                 {
                                     // you got the cash or u broke?
@@ -307,7 +307,7 @@ namespace The_Bank
                     {
                         // HOW MUCH DO U WANT TO WITHDRAW
                         Console.Write("Enter the withdrawal amount: ");
-                        if (decimal.TryParse(Console.ReadLine(), out decimal withdrawalAmount) && withdrawalAmount > 0)
+                        if (double.TryParse(Console.ReadLine(), out double withdrawalAmount) && withdrawalAmount > 0)
                         {
                             // U got enough cash? or you broke
                             if (selectedAccount.Balance >= withdrawalAmount)
@@ -349,9 +349,9 @@ namespace The_Bank
         private static void DepositMoney()
         {
             Console.WriteLine("How much do you wish to deposit?");
-            decimal depositAmount;
+            double depositAmount;
 
-            if (decimal.TryParse(Console.ReadLine(), out depositAmount))
+            if (double.TryParse(Console.ReadLine(), out depositAmount))
             {
                 Console.WriteLine("Which account?");
                 string accountChoice = Console.ReadLine();
