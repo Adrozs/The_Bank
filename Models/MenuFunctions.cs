@@ -8,9 +8,20 @@ namespace The_Bank.Models
 {
     internal class MenuFunctions
     {
+        //if you take \t\t, the text will end up on the left (This is better to use when you add more then one console.WriteLine)
+        //If you instead \t\t\t, the text will end up in the middle. (This is better to use if you only add one Console.WriteLine)
+        //But you will probably have to experiment a few times to get it to work
+
         public static void header()
         {
             Console.Clear();
+            Console.WriteLine("\n\n\n\n\t\t====================================");
+            Console.WriteLine("\t\t\t  Bank of Dreams");
+            Console.WriteLine("\t\t====================================");
+        }
+
+        public static void headerNoClear() 
+        {
             Console.WriteLine("\n\n\n\n\t\t====================================");
             Console.WriteLine("\t\t\t  Bank of Dreams");
             Console.WriteLine("\t\t====================================");
@@ -31,7 +42,12 @@ namespace The_Bank.Models
 
         public static void footer()
         {
-            Console.WriteLine("\t\t==================================");
+            Console.WriteLine("\t\t===================================");
+        }
+
+        public static void divider() 
+        {
+            Console.WriteLine("\t\t-----------------------------------");
         }
     }
 }

@@ -12,11 +12,8 @@ namespace The_Bank.Models
         public string Name { get; set; }
         public string Pin { get; set; }
         public bool IsFreezed { get; set; }
-        public DateTime UnfreezeTime { get; set; }
-        public List<CryptoInvestment> CryptoInvestments { get; set; }
-
-
+        public DateTime UnfreezeTime { get; set; }       
         public virtual ICollection<Account> Accounts { get; set; }
-        public virtual ICollection<StockPrice> StockPrices { get; set; }
+       
     }
 }
