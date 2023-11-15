@@ -24,97 +24,88 @@ namespace The_Bank
             // Declare date time variable to be used to keep track of when a user can be unfrozen if they've frozen their account
             DateTime UnFreezeTime;
 
-
-            // Loop until user chooses to exit program
-            while (true)
+            using (BankContext context = new BankContext())
             {
-                // !!!REMOVE THIS MENU? Unecessary since admin login just is a set login. Can incorporate into normal login
-                // User Type Selection
-                Console.WriteLine("Are you a:");
-                Console.WriteLine("1. Customer");
-                Console.WriteLine("2. Admin");
-                Console.WriteLine("3. Exit");
-                Console.Write("Enter your choice (1, 2, or 3): ");
-                
-                string userTypeChoice = Console.ReadLine();
-
-                switch (userTypeChoice)
+                while (true)
                 {
-                    case "1":
-                        // Customer Login
-                        Console.Write("Name: ");
-                        string customerName = Console.ReadLine();
-                        Console.Write("PIN: ");
-                        string customerPin = Console.ReadLine();
 
-                        // Checks if account is NOT frozed 
-                        // TODO OBS! Doesn't handle if an non existing username is put in - crashes 
-                        if (!AccountFreezed.IsFreezed(customerName))
+                    MenuFunctions.header();
+                    Console.WriteLine("\t\t\tLog in to your account:");
+                    Console.Write("\t\t\tName: ");
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    string customerName = Console.ReadLine();
+                    Console.ResetColor();
+                    Console.Write("\t\t\tPIN: ");
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    string customerPin = Console.ReadLine();
+                    Console.ResetColor();
+                    MenuFunctions.footer();
+
+
+                    // Check if login is admin login  
+                    if (DbHelpers.IsAdmin(customerName, customerPin))
+                    {
+                        // Goes to the admin menu
+                        AdminFunctions.DoAdminTasks(context);
+
+
+                    }
+
+                    // If not admin continue with the rest of the code
+
+
+                    // Checks if account is NOT frozen
+                    // TODO OBS! Doesn't handle if an non existing username is put in - crashes 
+                    if (!AccountFreezed.IsFreezed(customerName))
+                    {
+
+                        // Checks if user login is correct
+                        if (DbHelpers.IsCustomer(context, customerName, customerPin))
                         {
-                            // BankContext Object
-                            using (BankContext context = new BankContext())
-                            {
-                                // Checks if user login is correct
-                                if (DbHelpers.IsCustomer(context, customerName, customerPin))
-                                {
-                                    // Reset login attempts and go to UserMenu
-                                    loginAttempts = 2; 
-                                    UserFunctions.UserMenu(context, customerName);
-                                }
-                                else if (loginAttempts > 0)
-                                {
-                                    Console.WriteLine($"Username or pin is invalid. {loginAttempts} tries left.");
-                                    loginAttempts--;
-                                }
-                                // If too many invalid login attempts were made freeze account for x amount of time
-                                else
-                                {
-                                    Console.WriteLine("Too many invalid attemtps. Please try again in a few minutes.");
-
-                                    // Freeze account and set time that account is frozen for
-                                    UnFreezeTime = DateTime.Now.AddMinutes(3);
-                                    AccountFreezed.FreezeUser(customerName, UnFreezeTime);
-                                }
-                            }
+                            // Reset login attempts and go to UserMenu
+                            loginAttempts = 2;
+                            UserFunctions.UserMenu(context, customerName);
                         }
-                        // If account IS freezed
+                        else if (loginAttempts > 0)
+                        {
+                            Console.WriteLine($"Username or pin is invalid. {loginAttempts} tries left.");
+                            loginAttempts--;
+
+                            // Waits to allow text to be shown before proceeding
+                            Thread.Sleep(2000);
+                        }
+                        // If too many invalid login attempts were made freeze account for x amount of time
                         else
                         {
+                            // Waits to allow text to be shown before proceeding
                             Console.WriteLine("Too many invalid attemtps. Please try again in a few minutes.");
 
-                            // Checks if account can be unfrozen and unfreezes it if yes, does nothing if no
-                            AccountFreezed.UnFreezeUser(customerName);
-                        }
-                        break;
-                    case "2":
-                        // Admin login portal
-                        Console.Write("Name: ");
-                        string adminName = Console.ReadLine();
-                        Console.Write("PIN: ");
-                        string adminPin = Console.ReadLine();
+                            Thread.Sleep(2000);
 
-                        // Check if they are an admin or an imposter (sus)
-                        if (DbHelpers.IsAdmin(adminName, adminPin))
-                        {
-                            // Goes to the admin menu
-                            using (BankContext context = new BankContext())
-                            {
-                                AdminFunctions.DoAdminTasks();
-                            }
+                            // Freeze account and set time that account is frozen for
+                            UnFreezeTime = DateTime.Now.AddMinutes(3);
+                            AccountFreezed.FreezeUser(customerName, UnFreezeTime);
                         }
-                        else
-                        {
-                            Console.WriteLine("Invalid admin credentials");
-                        }
-                        break;
-                    default:
-                        Console.WriteLine("Invalid choice. Please enter 1, 2, or 3.");
-                        break;
+
+                    }
+                    // If account IS frozen
+                    else
+                    {
+                        Console.WriteLine("Too many invalid attemtps. Please try again in a few minutes.");
+
+                        // Waits to allow text to be shown before proceeding
+                        Thread.Sleep(2000);
+
+                        // Checks if account can be unfrozen and unfreezes it if yes, does nothing if no
+                        AccountFreezed.UnFreezeUser(customerName);
+                    }
+
+
+                    // Newline for text formatting
+                    Console.WriteLine();
                 }
-
-                // Newline for text formatting
-                Console.WriteLine();
             }
+
         }          
     }
 }

@@ -18,12 +18,6 @@ namespace The_Bank.Utilities
             return users;
         }
 
-        public static List<StockPrice> GetStockPrices(BankContext context)
-        {
-            List<StockPrice> stockPrices = context.StockPrices.ToList();
-            return stockPrices;
-        }
-
         // Get specific user
         public static User GetUser(BankContext context, string username)
         {
@@ -33,7 +27,6 @@ namespace The_Bank.Utilities
             return user;
         }
 
-        // Tried to make mehod to get accounts to make code nicer but didn't work. Commenting out so we can fix it in the future if have time
         //public static User GetUserAccounts(BankContext context, string userName)
         //{
         //    User user = context.Users
@@ -41,7 +34,6 @@ namespace The_Bank.Utilities
         //       .Include(u => u.Accounts)
         //       .Single();
         //    return user;        
-
         //}
 
         // Adds and saves user to database

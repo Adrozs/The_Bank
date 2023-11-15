@@ -7,47 +7,55 @@ namespace The_Bank
     internal static class AdminFunctions
     {
         // The admin menu
-        internal static void DoAdminTasks()
+        internal static void DoAdminTasks(BankContext context)
         {
-            using (BankContext context = new BankContext())
+            MenuFunctions.header();
+            Console.WriteLine("\t\tCurrent users in the system:");
+            List<User> users = DbHelpers.GetAllUsers(context);
+
+            foreach (User user in users)
             {
-                Console.WriteLine("Current users in the system:");
-                List<User> users = DbHelpers.GetAllUsers(context);
+                Console.WriteLine($"\t\t\t{user.Name}");
+            }
 
-                foreach (User user in users)
+            Console.WriteLine($"\t\t\tTotal number of users {users.Count()}");
+            MenuFunctions.footer();                         
+            Console.WriteLine("\t\t\t[C]: Create new user");
+            //Console.WriteLine("[U]: User Menu");
+            Console.WriteLine("\t\t\t[X]: Exit");
+
+            while (true)
+            {
+                Console.Write("\t\t\tEnter command: ");
+                string command = Console.ReadLine();
+                MenuFunctions.footer();
+
+                switch (command.ToLower())
                 {
-                    Console.WriteLine($"{user.Name}");
-                }
-
-                Console.WriteLine($"Total number of users {users.Count()}");
-                Console.WriteLine("[C]: Create new user");
-                Console.WriteLine("[X]: Exit");
-
-                while (true)
-                {
-                    Console.Write("Enter command: ");
-                    string command = Console.ReadLine();
-
-                    switch (command.ToLower())
-                    {
-                        case "c":
-                            CreateUser(context);
-                            break;
-                        case "x":
-                            return;
-                        default:
-                            Console.WriteLine($"Unknown command: {command} ");
-                            break;
-                    }
+                    case "c":
+                        CreateUser(context);
+                        break;
+                    //case "u":
+                    //    // Ask for the username to pass to UserMenu
+                    //    Console.Write("Enter username: ");
+                    //    string username = Console.ReadLine();
+                    //    UserFunctions.UserMenu(context, username);
+                    //    break;
+                    case "x":
+                        return;
+                    default:
+                        Console.WriteLine($"Unknown command: {command} ");
+                        break;
                 }
             }
+            
         }
 
         // Creates a new user with a chosen name and a random pin
         private static void CreateUser(BankContext context)
         {
-            Console.WriteLine("Create user:");
-            Console.Write("Enter username: ");
+            Console.WriteLine("\t\t\tCreate user:");
+            Console.Write("\t\t\tEnter username: ");
             string username = Console.ReadLine();
 
             // TODO?: Should we let the user choose their own pin? Discuss in a group.
@@ -65,11 +73,11 @@ namespace The_Bank
             bool success = DbHelpers.AddUser(context, newUser);
             if (success)
             {
-                Console.WriteLine($"Created a new user {username} with pin {pin}");
+                Console.WriteLine($"\t\t\tCreated a new user {username} with pin {pin}");
             }
             else
             {
-                Console.WriteLine($"Failed to create a user {username}");
+                Console.WriteLine($"\t\t\tFailed to create a user {username}");
             }
         }
     }
