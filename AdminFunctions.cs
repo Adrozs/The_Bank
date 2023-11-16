@@ -27,7 +27,7 @@ namespace The_Bank
             while (true)
             {
                 Console.Write("\t\t\tEnter command: ");
-                string command = Console.ReadLine();
+                string command = MenuFunctions.CursorReadLine();
                 MenuFunctions.footer();
 
                 switch (command.ToLower())
@@ -53,7 +53,7 @@ namespace The_Bank
         {
             Console.WriteLine("\t\t\tCreate user:");
             Console.Write("\t\t\tEnter username: ");
-            string username = Console.ReadLine();
+            string username = MenuFunctions.CursorReadLine();
 
             // TODO?: Should we let the user choose their own pin? Discuss in a group.
             Random rnd = new Random();
@@ -81,7 +81,7 @@ namespace The_Bank
         {
             Console.WriteLine("\t\t\tDelete user:");
             Console.Write("\t\t\tEnter username to delete: ");
-            string usernameToDelete = Console.ReadLine();
+            string usernameToDelete = MenuFunctions.CursorReadLine();
 
             // Get the user from the database
             User userToDelete = DbHelpers.GetUserByUsername(context, usernameToDelete);
