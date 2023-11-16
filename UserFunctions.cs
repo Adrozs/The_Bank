@@ -16,8 +16,6 @@ namespace The_Bank
 {
     public class UserFunctions
     {
-
-
         public static void UserMenu(BankContext outerContext, string userName)
         {
             int menuSelection = 1; // Start from the first option
@@ -47,6 +45,8 @@ namespace The_Bank
                     }
 
                     MenuFunctions.footer();
+                    
+                    
                     //"Listen" to keystrokes from the user
                     ConsoleKeyInfo key = Console.ReadKey(true);
 
@@ -73,7 +73,7 @@ namespace The_Bank
             }
         }
 
-        static void HandleMenuSelection(BankContext context, int selection, string userName)
+        public static void HandleMenuSelection(BankContext context, int selection, string userName)
         {
             switch (selection)
             {
@@ -418,43 +418,29 @@ namespace The_Bank
             string selectedCurrency = "SEK";
 
 
-            // TODO make a menu option of yes and no like our other menus instead of a Y/N option
+            // Declare array navOptions as yes or no
+            string[] navOptions = { "Yes", "No" };
 
-            // Ask if the user wants to create a foreign currency account
-            Console.Write("Will this account be in a foreign currency? (Y/N): ");
-            bool isForeignAccount = Console.ReadLine().Trim().ToUpper() == "Y";
-
-            if (isForeignAccount)
+            // Passes along the options yes and no as well as the phrase to the nav method
+            // Checks if it returns 0 (which translates to yes in this case) and runs the code, otherwise skips.
+            if (MenuFunctions.OptionsNavigation(navOptions, "Will this account be in a foreign currency?") == 0)
             {
-                while (true)
-                {
-                    Console.WriteLine("Available foreign currencies:");
-                    Console.WriteLine("1. US Dollar (USD)");
-                    Console.WriteLine("2. Euro (EUR)");
-                    Console.WriteLine("3. UK Sterling (GBP)");
-                    Console.WriteLine("4. Swiss Franc (CHF)");
-                    Console.WriteLine("5. Canadian Dollar (CAD)");
-                    Console.WriteLine("6. Zimbabwean Dollar (ZWD)");
-                    // ADD MORE CURRENCIES HERE
+                // Create array of all the currenies to choose from
+                string[] currencyOptions = {
+                "US Dollar (USD)", "Euro (EUR)", "UK Sterling (GBP)", "Swiss Franc (CHF)", 
+                "Canadian Dollar (CAD)", "Zimbabwean Dollar (ZWD)" 
+                // ADD MORE CURRENCIES HERE
+                };
 
-                    // Create array of available currencies
-                    string[] currencies = { "SEK", "USD", "EUR", "GBP", "CHF", "CAD", "ZWD" };
+                // Create array of available currency shortname
+                string[] currencies = { "USD", "EUR", "GBP", "CHF", "CAD", "ZWD" };
 
-                    // Prompts user to choose currency and checks if input is a number
-                    Console.Write("Select which currency: ");
 
-                    // Takes input from user and checks if it's a number between 0 and the amount of currencies in the currencies array - this is scalable if we add more currencies in the future
-                    if (int.TryParse(Console.ReadLine(), out int currencyChoice) && (currencyChoice > 0 && currencyChoice <= currencies.Length))
-                    {
-                        // Changes currency from the default SEK to the chosen one and breaks out of the loop to continue with the rest of the code
-                        selectedCurrency = currencies[currencyChoice];
-                        break;
-                    }
-                    else
-                    {
-                        Console.WriteLine("Invalid input. Please enter a valid currency number.");
-                    }
-                }
+                // Prompts user to choose one of the foreign 
+                int chosenOption = MenuFunctions.OptionsNavigation(currencyOptions, "Available foreign currencies: ");
+
+                // Sets selectedCurrency to the chopsen one from the aboce OptionsNavigation 
+                selectedCurrency = currencies[chosenOption];
             }
 
             // Creates new user object of the user that's logged in
@@ -469,17 +455,13 @@ namespace The_Bank
                 Currency = selectedCurrency
             };
 
-
-            // TODO make a menu option of yes and no like our other menus instead of a Y/N option
-
-            // Ask if the user wants to make an initial deposit
-            Console.Write($"Do you wish make a deposit to {newAccountName}? (Y/N): ");
-            if(Console.ReadLine().Trim().ToUpper() == "Y")
+            // Passes along the options yes and no as well as the phrase to the nav method
+            // Checks if it returns 0 (which translates to yes in this case) and runs the code, otherwise skips.
+            if (MenuFunctions.OptionsNavigation(navOptions, $"Do you wish make a deposit to {newAccountName}?") == 0)
             {
-                // Prompts user intil a correct value is entered
+                // Re-promts user until correct input is made
                 while (true)
                 {
-
                     // Asks user for deposit amount and checks if value is correct. If yes changes account balance to chosen amount and breaks out of the loop to continue with the rest of the code.
                     Console.Write($"Enter deposit amount in {selectedCurrency}: ");
                     if (double.TryParse(Console.ReadLine(), out double initialDeposit) && initialDeposit >= 0)
@@ -513,8 +495,8 @@ namespace The_Bank
 
         // Changes current pin to a new pin for a user
         static void ChangePin(BankContext context, string username)
-            {
-                User user = DbHelpers.GetUser(context, username);
+        {
+            User user = DbHelpers.GetUser(context, username);
 
             // Asks user for pin and checks if it matches login
             while (true)
