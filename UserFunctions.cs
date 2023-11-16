@@ -61,6 +61,11 @@ namespace The_Bank
                     {
                         // Method that calls a method to perform the action based on the selected option
                         HandleMenuSelection(context, menuSelection, userName);
+
+                        MenuFunctions.footer();
+
+                        // Promts user to press enter key to go back to menu - doesn't accept any other input
+                        MenuFunctions.PressEnter("\t\tPress [Enter] to go to main menu");
                     }
                 }
             }
@@ -187,9 +192,6 @@ namespace The_Bank
                 {
                     Console.WriteLine("\t\tUser not found");
                 }
-
-            Console.WriteLine("\t\tPress [Enter] to go main menu");
-            ConsoleKeyInfo key = Console.ReadKey(true);
         }
 
         // Transfer money between accounts
@@ -299,10 +301,6 @@ namespace The_Bank
             {
                 Console.WriteLine("Invalid input. Please enter a valid source account number.");
             }
-
-            // Display message and wait for Enter key press to return to the main menu
-            Console.WriteLine("Press [Enter] to return to the main menu");
-            Console.ReadLine();
         }
 
 
@@ -412,12 +410,9 @@ namespace The_Bank
             {
                 Console.WriteLine("Invalid deposit amount entered.");
             }
-
-            Console.WriteLine("Press any key to continue");
-            Console.ReadKey(true);
         }
 
-        // Create a new account
+        // Create a new account for logged in user
         static void OpenNewAccount(BankContext context, string userName)
         {
             // Clear window
@@ -537,10 +532,6 @@ namespace The_Bank
                 Console.WriteLine("Returning to menu");
                 return;
             }
-
-            // Promts user to press enter key to go back to menu - doesn't accept any other input
-            MenuFunctions.PressEnter("Press [Enter] to go back to the menu");
-
             Console.WriteLine(); // New line for text formatting
         }
 
