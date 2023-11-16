@@ -542,7 +542,7 @@ namespace The_Bank
                 }
 
                 // If pin matches login info, break out of loop
-                if (DbHelpers.IsCustomer(context, username, currentPin))
+                if (DbHelpers.VerifyUserLogin(context, username, currentPin))
                     break;
                 else
                     Console.WriteLine("Error! Wrong PIN. Try again. \n");
