@@ -129,6 +129,7 @@ namespace The_Bank
             Console.Write("\t\t\tPIN: ");
             Console.ForegroundColor = ConsoleColor.DarkGray;
             string customerPin = Console.ReadLine();
+            Console.ResetColor();
             Console.WriteLine();
             if (DbHelpers.IsCustomer(context, userName, customerPin))
             {
