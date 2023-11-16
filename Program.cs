@@ -44,12 +44,12 @@ namespace The_Bank
                         Console.WriteLine("\t\t\tLog in to your account:");
                         Console.Write("\t\t\tName: ");
                         Console.ForegroundColor = ConsoleColor.DarkGray;
-                        customerName = Console.ReadLine();
+                        customerName = MenuFunctions.CursorReadLine();
                         Console.ResetColor();
                         
                         Console.Write("\t\t\tPIN: ");
                         Console.ForegroundColor = ConsoleColor.DarkGray;
-                        customerPin = Console.ReadLine();
+                        customerPin = MenuFunctions.CursorReadLine();
                         Console.ResetColor();
                        
                         MenuFunctions.footer();
