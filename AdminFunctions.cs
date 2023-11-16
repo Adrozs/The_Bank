@@ -37,7 +37,7 @@ namespace The_Bank
                         break;
                     case "d":
                         DeleteUser(context);
-                        return;
+                        break;
                     case "x":
                         return;
                     default:
