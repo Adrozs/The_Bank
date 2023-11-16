@@ -97,6 +97,7 @@ namespace The_Bank
                     ChangePin(context, userName);
                     break;
                 case 7:
+                    LogOut();
                     return;
                 default:
                     Console.WriteLine("Error! Please try again.");
@@ -549,5 +550,10 @@ namespace The_Bank
                     Console.WriteLine("PIN codes doesn't match. Try again. \n");
             }
         }
+         static void LogOut()
+        {
+            System.Environment.Exit(0);
+        }
+
     }
 }
