@@ -143,7 +143,7 @@ namespace The_Bank
             {
 
 
-                if (DbHelpers.IsCustomer(context, userName, customerPin))
+                if (DbHelpers.VerifyUserLogin(context, userName, customerPin))
                 {
                     ViewAccountInfo(context, userName);
                     Console.WriteLine("\t\t==================================");
