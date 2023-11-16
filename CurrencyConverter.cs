@@ -23,7 +23,6 @@ namespace The_Bank
             };
 
             // Check if source and destination currencies are the same
-            // Check if source and destination currencies are the same
             if (sourceCurrency == destinationCurrency)
             {
                 return amount; // No conversion needed
