@@ -133,14 +133,18 @@ namespace The_Bank
         {   
             Console.Write("\t\t\tPIN: ");
             Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.CursorVisible = true;
             string customerPin = Console.ReadLine();
+            Console.CursorVisible = false;
             Console.ResetColor();
             Console.WriteLine();
             if (DbHelpers.IsCustomer(context, userName, customerPin))
             {
                 ViewAccountInfo(context, userName);
                 Console.Write("\t\tChoose account to withdraw: ");
+                Console.CursorVisible = true;
                 string accountChoice = Console.ReadLine();
+                Console.CursorVisible = false;
                 Console.SetCursorPosition(0, Console.CursorTop - 1);
                 MenuFunctions.ClearCurrentConsoleLine();
                 if (string.IsNullOrEmpty(accountChoice)) //Checks that user have written anything
@@ -152,8 +156,10 @@ namespace The_Bank
                 if (DbHelpers.AccountAlreadyExist(context, userName, accountChoice)) //Checks that the user input matches existing account.
                 {
                     Console.Write("\t\tHow much would you like to withdraw? ");
+                    Console.CursorVisible = true;
                     if (double.TryParse(Console.ReadLine(), out double withdraw))
                     {
+                        Console.CursorVisible = false;
                         Console.SetCursorPosition(0, Console.CursorTop - 1);
                         MenuFunctions.ClearCurrentConsoleLine();
                         var account = context.Accounts
