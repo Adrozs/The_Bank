@@ -130,14 +130,14 @@ namespace The_Bank
         {   
             Console.Write("\t\t\tPIN: ");
             Console.ForegroundColor = ConsoleColor.DarkGray;
-            string customerPin = Console.ReadLine();
+            string customerPin = MenuFunctions.CursorReadLine();
             Console.ResetColor();
             Console.WriteLine();
             if (DbHelpers.IsCustomer(context, userName, customerPin))
             {
                 ViewAccountInfo(context, userName);
                 Console.Write("\t\tChoose account to withdraw: ");
-                string accountChoice = Console.ReadLine();
+                string accountChoice = MenuFunctions.CursorReadLine();
                 Console.SetCursorPosition(0, Console.CursorTop - 1);
                 MenuFunctions.ClearCurrentConsoleLine();
                 if (string.IsNullOrEmpty(accountChoice)) //Checks that user have written anything
@@ -149,8 +149,10 @@ namespace The_Bank
                 if (DbHelpers.AccountAlreadyExist(context, userName, accountChoice)) //Checks that the user input matches existing account.
                 {
                     Console.Write("\t\tHow much would you like to withdraw? ");
+                    Console.CursorVisible = true;
                     if (double.TryParse(Console.ReadLine(), out double withdraw))
                     {
+                        Console.CursorVisible = false;
                         Console.SetCursorPosition(0, Console.CursorTop - 1);
                         MenuFunctions.ClearCurrentConsoleLine();
                         var account = context.Accounts
@@ -234,7 +236,7 @@ namespace The_Bank
             {
                 Console.WriteLine("User not found. Transfer canceled.");
                 Console.WriteLine("Press [Enter] to return to the main menu");
-                Console.ReadLine();
+                MenuFunctions.CursorReadLine();
                 return;
             }
 
@@ -257,7 +259,7 @@ namespace The_Bank
                 {
                     Console.WriteLine("Invalid source account number. Please select a valid account.");
                     Console.WriteLine("Press [Enter] to return to the main menu");
-                    Console.ReadLine();
+                    MenuFunctions.CursorReadLine();
                     return;
                 }
 
@@ -279,7 +281,7 @@ namespace The_Bank
                     {
                         Console.WriteLine("Invalid destination account number. Please select a valid account.");
                         Console.WriteLine("Press [Enter] to return to the main menu");
-                        Console.ReadLine();
+                        MenuFunctions.CursorReadLine();
                         return;
                     }
 
@@ -354,7 +356,7 @@ namespace The_Bank
             if (double.TryParse(Console.ReadLine(), out depositAmount))
             {
                 Console.WriteLine("Which account?");
-                string accountChoice = Console.ReadLine();
+                string accountChoice = MenuFunctions.CursorReadLine();
 
                 var account = context.Accounts
                     .FirstOrDefault(a => a.Name == accountChoice);
@@ -399,7 +401,7 @@ namespace The_Bank
             while (true)
             {
                 Console.WriteLine("Enter new account name: ");
-                newAccountName = Console.ReadLine();
+                newAccountName = MenuFunctions.CursorReadLine();
 
                 // Checks if string is null or empty or if an account with that name already exist for current user
                 if (string.IsNullOrEmpty(newAccountName))
@@ -520,13 +522,13 @@ namespace The_Bank
             while (true)
             {
                 Console.WriteLine("Enter current PIN: ");
-                string currentPin = Console.ReadLine();
+                string currentPin = MenuFunctions.CursorReadLine();
 
                 // Re-promt user until string isn't empty
                 while (string.IsNullOrEmpty(currentPin))
                 {
                     Console.WriteLine("Error! PIN can't be empty");
-                    currentPin = Console.ReadLine();
+                    currentPin = MenuFunctions.CursorReadLine();
                 }
 
                 // If pin matches login info, break out of loop
@@ -540,10 +542,10 @@ namespace The_Bank
             while (true)
             {
                 Console.WriteLine("Enter new PIN: ");
-                string newPin = Console.ReadLine();
+                string newPin = MenuFunctions.CursorReadLine();
 
                 Console.WriteLine("Confirm new PIN: ");
-                string newPinConfirm = Console.ReadLine();
+                string newPinConfirm = MenuFunctions.CursorReadLine();
 
                 // If pins match save them to database and break out of loop - else write error message
                 if (newPin == newPinConfirm)

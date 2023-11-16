@@ -9,7 +9,7 @@ namespace The_Bank
     {
         static void Main(string[] args)
         {
-
+            Console.CursorVisible = false;
             // Welcome phrase
             MenuFunctions.header();
             MenuFunctions.main_header();

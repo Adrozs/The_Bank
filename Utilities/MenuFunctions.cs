@@ -79,9 +79,15 @@ namespace The_Bank.Models
             Console.Write(new string(' ', Console.WindowWidth));
             Console.SetCursorPosition(0, currentLineCursor);
         }
+        public static string CursorReadLine()
+        {
+            string input;   
+            Console.CursorVisible = true;
+            input = Console.ReadLine();
+            Console.CursorVisible = false;
+            return input;
 
-
-
+        }
     }
 }
 
