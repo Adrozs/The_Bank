@@ -72,7 +72,7 @@ namespace The_Bank
             {
                 case 1:
                     Console.Clear();
-                    ViewAccountInfo(context, userName);                
+                    ViewAccountInfo(context, userName);
                     break;
                 case 2:
                     TransferMoney(context, userName);
@@ -81,7 +81,7 @@ namespace The_Bank
                     WithdrawMoney(context, userName);
                     break;
                 case 4:
-                    DepositMoney();
+                    DepositMoney(context, userName);
                     break;
                 case 5:
                     OpenNewAccount(context, userName);
@@ -164,19 +164,19 @@ namespace The_Bank
         //private static void DisplayAccountBalances(BankContext context, string userName)
         private static void ViewAccountInfo(BankContext context, string userName)
         {
-                //Get info about user from database
-                User user = context.Users
-                    .Include(u => u.Accounts)
-                    .Single(u => u.Name == userName);
+            //Get info about user from database
+            User user = context.Users
+                .Include(u => u.Accounts)
+                .Single(u => u.Name == userName);
 
-                //Display user accounts and balance
-                if (user != null)
-                {
-                    
-                    MenuFunctions.header();
-                    Console.WriteLine($"\t\tUser: {user.Name}\n");
-                    Console.WriteLine("\t\tYour accounts and balance:");
-                    MenuFunctions.footer();
+            //Display user accounts and balance
+            if (user != null)
+            {
+
+                MenuFunctions.header();
+                Console.WriteLine($"\t\tUser: {user.Name}\n");
+                Console.WriteLine("\t\tYour accounts and balance:");
+                MenuFunctions.footer();
 
                     foreach (var account in user.Accounts)
                     {
@@ -188,8 +188,8 @@ namespace The_Bank
                     Console.WriteLine("\t\tUser not found");
                 }
 
-                Console.WriteLine("\t\tPress [Enter] to go main menu");
-                ConsoleKeyInfo key = Console.ReadKey(true);
+            Console.WriteLine("\t\tPress [Enter] to go main menu");
+            ConsoleKeyInfo key = Console.ReadKey(true);
         }
 
         // Transfer money between accounts
@@ -321,12 +321,12 @@ namespace The_Bank
                     Console.WriteLine($"{account.Id}. {account.Name}: {account.Balance}");
                 }
 
-                // CHOOSE AN ACCOUNT
-                Console.Write("Enter the account number: ");
-                if (int.TryParse(Console.ReadLine(), out int selectedAccountId))
-                {
-                    // FIND account
-                    Account selectedAccount = user.Accounts.SingleOrDefault(a => a.Id == selectedAccountId);
+            // CHOOSE AN ACCOUNT
+            Console.Write("Enter the account number: ");
+            if (int.TryParse(Console.ReadLine(), out int selectedAccountId))
+            {
+                // FIND account
+                Account selectedAccount = user.Accounts.SingleOrDefault(a => a.Id == selectedAccountId);
 
                     if (selectedAccount != null)
                     {
@@ -340,8 +340,8 @@ namespace The_Bank
                                 // Update account balance (or not if u broke
                                 selectedAccount.Balance -= withdrawalAmount;
 
-                                // SAVE IT
-                                context.SaveChanges();
+                            // SAVE IT
+                            context.SaveChanges();
 
                                 // Display balance
                                 Console.WriteLine($"Withdrawal successful! New balance for {selectedAccount.Name}: {selectedAccount.Balance}");
@@ -360,19 +360,21 @@ namespace The_Bank
                     {
                         Console.WriteLine("Invalid account number. Please select a valid account.");
 
-                        // New line for text formatting
-                        Console.WriteLine();
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Invalid input. Please enter a valid account number.");
+                    // New line for text formatting
+                    Console.WriteLine();
                 }
             }
+            else
+            {
+                Console.WriteLine("Invalid input. Please enter a valid account number.");
+            }
+        }
 
         // Deposit money to account
-        private static void DepositMoney()
+        private static void DepositMoney(BankContext context, string username)
         {
+            ViewAccountInfo(context, username);
+
             Console.WriteLine("How much do you wish to deposit?");
             double depositAmount;
 
@@ -381,32 +383,28 @@ namespace The_Bank
                 Console.WriteLine("Which account?");
                 string accountChoice = Console.ReadLine();
 
-                using (BankContext context = new BankContext()) 
+                var account = context.Accounts
+                    .FirstOrDefault(a => a.Name == accountChoice);
+
+                if (account != null)
                 {
-                         var user = context.Users
-                        .Include(a => a.Accounts)
-                        .FirstOrDefault(a => a.Name == accountChoice);
+                    Console.WriteLine($"Depositing {depositAmount} into {accountChoice}");
 
-                    if (user != null)
+                    account.Balance += depositAmount;
+                    context.SaveChanges();
+                    Console.WriteLine($"New balance {account.Balance}");
+                }
+                else
+                {
+                    Console.WriteLine("Account not found. Do you want to open a new account? (Y/N)");
+
+                    if (Console.ReadKey(true).Key == ConsoleKey.Y)
                     {
-                        Console.WriteLine($"Depositing {depositAmount} into {accountChoice}");
-
-                        var account = user.Accounts.FirstOrDefault();
-
-                        if (account != null)
-                        {
-                            account.Balance += depositAmount;
-                            context.SaveChanges();
-                            Console.WriteLine($"New balance {account.Balance}");
-                        }
-                        else
-                        {
-                            Console.WriteLine("User doesn't have any accounts.");
-                        }
+                        OpenNewAccount(context, username);
                     }
                     else
                     {
-                        Console.WriteLine($"User with the name {accountChoice} not found.");
+                        Console.WriteLine("Deposit operation cancelled.");
                     }
                 }
             }
@@ -419,11 +417,11 @@ namespace The_Bank
             Console.ReadKey(true);
         }
 
-            // Create a new account
-            static void OpenNewAccount(BankContext context, string userName)
-            {
-                // Declare new account variable outside of loop
-                string newAccountName;
+        // Create a new account
+        static void OpenNewAccount(BankContext context, string userName)
+        {
+            // Declare new account variable outside of loop
+            string newAccountName;
 
             while (true)
             {
@@ -440,8 +438,8 @@ namespace The_Bank
                 }
             }
 
-                // Creates new user object of the user that's logged in
-                User user = DbHelpers.GetUser(context, userName);
+            // Creates new user object of the user that's logged in
+            User user = DbHelpers.GetUser(context, userName);
 
             // Ask if the user wants to create a "Vacation" account
             Console.Write("Do you want to create a 'Vacation' account? (Y/N): ");
@@ -516,55 +514,54 @@ namespace The_Bank
             {
                 User user = DbHelpers.GetUser(context, username);
 
-                // Asks user for pin and checks if it matches login
-                while (true)
+            // Asks user for pin and checks if it matches login
+            while (true)
+            {
+                Console.WriteLine("Enter current PIN: ");
+                string currentPin = Console.ReadLine();
+
+                // Re-promt user until string isn't empty
+                while (string.IsNullOrEmpty(currentPin))
                 {
-                    Console.WriteLine("Enter current PIN: ");
-                    string currentPin = Console.ReadLine();
-
-                    // Re-promt user until string isn't empty
-                    while (string.IsNullOrEmpty(currentPin))
-                    {
-                        Console.WriteLine("Error! PIN can't be empty");
-                        currentPin = Console.ReadLine();
-                    }
-
-                    // If pin matches login info, break out of loop
-                    if (DbHelpers.IsCustomer(context, username, currentPin))
-                        break;
-                    else
-                        Console.WriteLine("Error! Wrong PIN. Try again. \n");
+                    Console.WriteLine("Error! PIN can't be empty");
+                    currentPin = Console.ReadLine();
                 }
 
-                // Re-promt user for pins until 2 consecutive pins match
-                while (true)
-                {
-                    Console.WriteLine("Enter new PIN: ");
-                    string newPin = Console.ReadLine();
-
-                    Console.WriteLine("Confirm new PIN: ");
-                    string newPinConfirm = Console.ReadLine();
-
-                    // If pins match save them to database and break out of loop - else write error message
-                    if (newPin == newPinConfirm)
-                    {
-                        bool success = DbHelpers.EditPin(context, user, newPin);
-                        if (success)
-                        {
-                            Console.WriteLine($"Changed PIN to {newPin} for user {username}");
-                        }
-                        // If wasn't possible to save account to database, print error
-                        else
-                        {
-                            Console.WriteLine($"Failed to update PIN to {newPin} for {username}");
-                            Console.WriteLine("Returning to menu");
-                        }
-                        break;
-                    }
-                    else
-                        Console.WriteLine("PIN codes doesn't match. Try again. \n");
-                }
-
+                // If pin matches login info, break out of loop
+                if (DbHelpers.IsCustomer(context, username, currentPin))
+                    break;
+                else
+                    Console.WriteLine("Error! Wrong PIN. Try again. \n");
             }
+
+            // Re-promt user for pins until 2 consecutive pins match
+            while (true)
+            {
+                Console.WriteLine("Enter new PIN: ");
+                string newPin = Console.ReadLine();
+
+                Console.WriteLine("Confirm new PIN: ");
+                string newPinConfirm = Console.ReadLine();
+
+                // If pins match save them to database and break out of loop - else write error message
+                if (newPin == newPinConfirm)
+                {
+                    bool success = DbHelpers.EditPin(context, user, newPin);
+                    if (success)
+                    {
+                        Console.WriteLine($"Changed PIN to {newPin} for user {username}");
+                    }
+                    // If wasn't possible to save account to database, print error
+                    else
+                    {
+                        Console.WriteLine($"Failed to update PIN to {newPin} for {username}");
+                        Console.WriteLine("Returning to menu");
+                    }
+                    break;
+                }
+                else
+                    Console.WriteLine("PIN codes doesn't match. Try again. \n");
+            }
+        }
     }
 }
