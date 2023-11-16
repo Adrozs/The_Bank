@@ -49,6 +49,32 @@ namespace The_Bank.Models
         {
             Console.WriteLine("\t\t-----------------------------------");
         }
+
+
+        // Promts user to press enter key doesn't accept any other input
+        public static void PressEnter()
+        {
+            ConsoleKeyInfo keyPressed = Console.ReadKey(true);
+            while (keyPressed.Key != ConsoleKey.Enter)
+            {
+                keyPressed = Console.ReadKey(true);
+            }
+        }
+
+        // Promts user to press enter key doesn't accept any other input
+        // Same as PressEnter() however if you send in a string it'll print that before
+        public static void PressEnter(string phrase)
+        {
+            Console.WriteLine(phrase);
+            ConsoleKeyInfo keyPressed = Console.ReadKey(true);
+            while (keyPressed.Key != ConsoleKey.Enter)
+            {
+                keyPressed = Console.ReadKey(true);
+            }
+        }
+
+
+
     }
 }
 
