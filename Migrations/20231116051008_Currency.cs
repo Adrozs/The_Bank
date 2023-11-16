@@ -17,18 +17,10 @@ namespace The_Bank.Migrations
                 name: "UnfreezeTime",
                 table: "Users");
 
-            migrationBuilder.RenameColumn(
-                name: "Color",
-                table: "Accounts",
-                newName: "Currency");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn(
-                name: "Currency",
-                table: "Accounts",
-                newName: "Color");
 
             migrationBuilder.AddColumn<bool>(
                 name: "IsFreezed",

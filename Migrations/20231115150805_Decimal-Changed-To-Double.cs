@@ -8,9 +8,6 @@ namespace The_Bank.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Color",
-                table: "Accounts");
 
             migrationBuilder.AlterColumn<double>(
                 name: "Balance",
@@ -31,12 +28,6 @@ namespace The_Bank.Migrations
                 oldClrType: typeof(double),
                 oldType: "float");
 
-            migrationBuilder.AddColumn<string>(
-                name: "Color",
-                table: "Accounts",
-                type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "");
         }
     }
 }
