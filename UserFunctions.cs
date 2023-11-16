@@ -9,6 +9,8 @@ using The_Bank.Data;
 using The_Bank.Models;
 using The_Bank.Utilities;
 using The_Bank.Migrations;
+using System.Security.Principal;
+using System.Runtime.CompilerServices;
 
 namespace The_Bank
 {
@@ -61,6 +63,11 @@ namespace The_Bank
                     {
                         // Method that calls a method to perform the action based on the selected option
                         HandleMenuSelection(context, menuSelection, userName);
+
+                        MenuFunctions.footer();
+
+                        // Promts user to press enter key to go back to menu - doesn't accept any other input
+                        MenuFunctions.PressEnter("\t\tPress [Enter] to go to main menu");
                     }
                 }
             }
@@ -119,42 +126,67 @@ namespace The_Bank
                     return "Unknown Option";
             }          
         }
-        public static void WithdrawMoney(BankContext context)
-        {
-            Console.WriteLine("From which account do you want to withdraw from?:");
-            string accountChoice = Console.ReadLine();
-            
-            Console.Write("How much would you like to withdraw? ");
-            if (double.TryParse(Console.ReadLine(), out double withdraw))
+        public static void WithdrawMoney(BankContext context, string userName)
+        {   
+            Console.Write("\t\t\tPIN: ");
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            string customerPin = Console.ReadLine();
+            Console.ResetColor();
+            Console.WriteLine();
+            if (DbHelpers.IsCustomer(context, userName, customerPin))
             {
-                var account = context.Accounts
-                 .Where(a => a.Name == accountChoice)
-                 .SingleOrDefault();
-
-                if (account != null)
+                ViewAccountInfo(context, userName);
+                Console.WriteLine("\t\tFrom which account do you want to withdraw from?:");
+                Console.Write("\t\t");
+                string accountChoice = Console.ReadLine();
+                if (string.IsNullOrEmpty(accountChoice)) //Checks that user have written anything
                 {
-
-                    var balance = account.Balance;
-
-                    double newBalance = balance - withdraw;
-
-                    //Errorchecks
-                    if (newBalance < 0)
-                    {
-                        Console.WriteLine($"Cannot withdraw more than {balance}");
-                        return;
-                    }
-                    if (withdraw == 0)
-                    {
-                        Console.WriteLine("Cannot withdraw 0");
-                        return;
-                    }
-                    
-                    account.Balance = newBalance;
-                    context.SaveChanges();
-                    Console.WriteLine($"You new balance is {newBalance}");
-
+                    Console.WriteLine("\t\tYou have to put in a valid account name.");
+                    Console.ReadKey();
+                    return;
                 }
+                if (DbHelpers.AccountAlreadyExist(context, userName, accountChoice)) //Checks that the user input matches existing account.
+                {
+                    Console.Write("\t\tHow much would you like to withdraw? ");
+                    if (double.TryParse(Console.ReadLine(), out double withdraw))
+                    {
+                        var account = context.Accounts
+                         .Include(a => a.User)
+                         .SingleOrDefault(a => a.Name == accountChoice && a.User.Name == userName);
+
+                        if (account != null) 
+                        {
+                            double balance = account.Balance;
+                            //Errorchecks
+                            if (withdraw > balance)
+                            {
+                                Console.WriteLine($"\t\tCannot withdraw more than: {balance}");
+                                Console.ReadKey(true);
+                                return;
+                            }
+                            if (withdraw <= 0)
+                            {
+                                Console.WriteLine("\t\tCannot withdraw 0 or less");
+                                Console.ReadKey(true);
+                                return;
+                            } 
+                            // Counts the new balance after withdrawal then saves it in DB
+                            double newBalance = balance - withdraw;
+                            account.Balance = newBalance;
+                            context.SaveChanges();
+                            Console.WriteLine($"\t\tYou new balance is: {newBalance}");
+                            Console.ReadKey(true);
+                        }
+                    }
+                    else { Console.WriteLine("\t\tPlease write a valid number."); Console.ReadKey(true); return; }
+                }
+                else { Console.WriteLine("\t\tThis account name does not exist. Please write an existing account name."); Console.ReadKey(true); return;}
+            }
+            else
+            {
+                Console.WriteLine("\t\tInvalid PIN. Try again.");
+                Console.ReadKey(true);
+                return;
             }
         }
 
@@ -184,19 +216,24 @@ namespace The_Bank
                 {
                     Console.WriteLine("\t\tUser not found");
                 }
-
-            Console.WriteLine("\t\tPress [Enter] to go main menu");
-            ConsoleKeyInfo key = Console.ReadKey(true);
         }
 
-        // Transfer money between accounts
         // Transfer money between accounts
         static void TransferMoney(BankContext context, string userName)
         {
             // Get user info from Database
             User user = context.Users
                 .Include(u => u.Accounts)
-                .Single(u => u.Name == userName);
+                .SingleOrDefault(u => u.Name == userName);
+
+            // Check if user is null
+            if (user == null)
+            {
+                Console.WriteLine("User not found. Transfer canceled.");
+                Console.WriteLine("Press [Enter] to return to the main menu");
+                Console.ReadLine();
+                return;
+            }
 
             // Display user accounts
             Console.WriteLine("Select the source account to transfer money from:");
@@ -210,162 +247,98 @@ namespace The_Bank
             if (int.TryParse(Console.ReadLine(), out int sourceAccountId))
             {
                 // SOURCE ACCOUNT
-                Account sourceAccount = user.Accounts.SingleOrDefault(a => a.Id == sourceAccountId);
+                Account sourceAccount = user.Accounts?.SingleOrDefault(a => a.Id == sourceAccountId);
 
-                if (sourceAccount != null)
+                // Check if sourceAccount is null
+                if (sourceAccount == null)
                 {
-                    // Select destination account (only user's own accounts)
-                    Console.WriteLine("Select the destination account to transfer money to:");
-                    foreach (var account in user.Accounts.Where(a => a.Id != sourceAccountId))
+                    Console.WriteLine("Invalid source account number. Please select a valid account.");
+                    Console.WriteLine("Press [Enter] to return to the main menu");
+                    Console.ReadLine();
+                    return;
+                }
+
+                // Select destination account (only user's own accounts)
+                Console.WriteLine("Select the destination account to transfer money to:");
+                foreach (var account in user.Accounts.Where(a => a.Id != sourceAccountId))
+                {
+                    Console.WriteLine($"{account.Id}. {account.Name}: {account.Balance} {account.Currency}");
+                }
+
+                Console.Write("Enter the destination account number: ");
+                if (int.TryParse(Console.ReadLine(), out int destinationAccountId))
+                {
+                    // Destination account
+                    Account destinationAccount = user.Accounts?.SingleOrDefault(a => a.Id == destinationAccountId);
+
+                    // Check if destinationAccount is null
+                    if (destinationAccount == null)
                     {
-                        Console.WriteLine($"{account.Id}. {account.Name}: {account.Balance} {account.Currency}");
+                        Console.WriteLine("Invalid destination account number. Please select a valid account.");
+                        Console.WriteLine("Press [Enter] to return to the main menu");
+                        Console.ReadLine();
+                        return;
                     }
 
-                    Console.Write("Enter the destination account number: ");
-                    if (int.TryParse(Console.ReadLine(), out int destinationAccountId))
+                    // Transfer amount
+                    Console.Write("Enter the transfer amount: ");
+                    if (double.TryParse(Console.ReadLine(), out double transferAmount) && transferAmount > 0)
                     {
-                        // Destination account
-                        Account destinationAccount = user.Accounts.SingleOrDefault(a => a.Id == destinationAccountId);
-
-                        if (destinationAccount != null)
+                        // Check if the source account has sufficient funds
+                        if (sourceAccount.Balance >= transferAmount)
                         {
-                            // Transfer amount
-                            Console.Write("Enter the transfer amount: ");
-                            if (double.TryParse(Console.ReadLine(), out double transferAmount) && transferAmount > 0)
+                            // If source and destination accounts have different currencies, perform currency conversion
+                            if (sourceAccount.Currency != destinationAccount.Currency)
                             {
-                                // Check if the source account has sufficient funds
-                                if (sourceAccount.Balance >= transferAmount)
-                                {
-                                    // If source and destination accounts have different currencies, perform currency conversion
-                                    if (sourceAccount.Currency != destinationAccount.Currency)
-                                    {
-                                        // Use the CurrencyConverter to convert the amount to the destination currency
-                                        double convertedAmount = CurrencyConverter.Convert(sourceAccount.Currency, destinationAccount.Currency, transferAmount);
+                                // Use the CurrencyConverter to convert the amount to the destination currency
+                                double convertedAmount = CurrencyConverter.Convert(sourceAccount.Currency, destinationAccount.Currency, transferAmount);
 
-                                        // Update balances
-                                        sourceAccount.Balance -= transferAmount;
-                                        destinationAccount.Balance += convertedAmount;
+                                // Update balances
+                                sourceAccount.Balance -= transferAmount;
+                                destinationAccount.Balance += convertedAmount;
 
-                                        // Save changes
-                                        context.SaveChanges();
+                                // Save changes
+                                context.SaveChanges();
 
-                                        // Display updated balances
-                                        Console.WriteLine($"Transfer successful! New balance for {sourceAccount.Name}: {sourceAccount.Balance} ({sourceAccount.Currency})");
-                                        Console.WriteLine($"New balance for {destinationAccount.Name}: {destinationAccount.Balance} ({destinationAccount.Currency})");
-                                    }
-                                    else
-                                    {
-                                        // Same currency, no conversion needed
-                                        sourceAccount.Balance -= transferAmount;
-                                        destinationAccount.Balance += transferAmount;
-
-                                        // Save changes
-                                        context.SaveChanges();
-
-                                        // Display updated balances
-                                        Console.WriteLine($"Transfer successful! New balance for {sourceAccount.Name}: {sourceAccount.Balance} ({sourceAccount.Currency})");
-                                        Console.WriteLine($"New balance for {destinationAccount.Name}: {destinationAccount.Balance} ({destinationAccount.Currency})");
-                                    }
-                                }
-                                else
-                                {
-                                    Console.WriteLine("Insufficient funds in the source account. Transfer canceled.");
-                                }
+                                // Display updated balances
+                                Console.WriteLine($"Transfer successful! New balance for {sourceAccount.Name}: {sourceAccount.Balance} ({sourceAccount.Currency})");
+                                Console.WriteLine($"New balance for {destinationAccount.Name}: {destinationAccount.Balance} ({destinationAccount.Currency})");
                             }
                             else
                             {
-                                Console.WriteLine("Invalid transfer amount. Please enter a valid positive number.");
+                                // Same currency, no conversion needed
+                                sourceAccount.Balance -= transferAmount;
+                                destinationAccount.Balance += transferAmount;
+
+                                // Save changes
+                                context.SaveChanges();
+
+                                // Display updated balances
+                                Console.WriteLine($"Transfer successful! New balance for {sourceAccount.Name}: {sourceAccount.Balance} ({sourceAccount.Currency})");
+                                Console.WriteLine($"New balance for {destinationAccount.Name}: {destinationAccount.Balance} ({destinationAccount.Currency})");
                             }
                         }
                         else
                         {
-                            Console.WriteLine("Invalid destination account number. Please select a valid account.");
+                            Console.WriteLine("Insufficient funds in the source account. Transfer canceled.");
                         }
                     }
                     else
                     {
-                        Console.WriteLine("Invalid input. Please enter a valid destination account number.");
+                        Console.WriteLine("Invalid transfer amount. Please enter a valid positive number.");
                     }
                 }
                 else
                 {
-                    Console.WriteLine("Invalid source account number. Please select a valid account.");
+                    Console.WriteLine("Invalid input. Please enter a valid destination account number.");
                 }
             }
             else
             {
                 Console.WriteLine("Invalid input. Please enter a valid source account number.");
             }
-
-            // Display message and wait for Enter key press to return to the main menu
-            Console.WriteLine("Press [Enter] to return to the main menu");
-            Console.ReadLine();
         }
 
-
-        // Withdraw money from an account
-        static void WithdrawMoney(BankContext context, string userName)
-            {
-                // get info from database
-                User user = context.Users
-                    .Include(u => u.Accounts)
-                    .Single(u => u.Name == userName);
-
-                // X accounts Y numbers
-                Console.WriteLine("Select the account to withdraw money from:");
-                foreach (var account in user.Accounts)
-                {
-                    Console.WriteLine($"{account.Id}. {account.Name}: {account.Balance}");
-                }
-
-            // CHOOSE AN ACCOUNT
-            Console.Write("Enter the account number: ");
-            if (int.TryParse(Console.ReadLine(), out int selectedAccountId))
-            {
-                // FIND account
-                Account selectedAccount = user.Accounts.SingleOrDefault(a => a.Id == selectedAccountId);
-
-                    if (selectedAccount != null)
-                    {
-                        // HOW MUCH DO U WANT TO WITHDRAW
-                        Console.Write("Enter the withdrawal amount: ");
-                        if (double.TryParse(Console.ReadLine(), out double withdrawalAmount) && withdrawalAmount > 0)
-                        {
-                            // U got enough cash? or you broke
-                            if (selectedAccount.Balance >= withdrawalAmount)
-                            {
-                                // Update account balance (or not if u broke
-                                selectedAccount.Balance -= withdrawalAmount;
-
-                            // SAVE IT
-                            context.SaveChanges();
-
-                                // Display balance
-                                Console.WriteLine($"Withdrawal successful! New balance for {selectedAccount.Name}: {selectedAccount.Balance}");
-                            }
-                            else
-                            {
-                                Console.WriteLine("Insufficient funds in the account. Withdrawal canceled.");
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine("Invalid withdrawal amount. Please enter a valid positive number.");
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("Invalid account number. Please select a valid account.");
-
-                    // New line for text formatting
-                    Console.WriteLine();
-                }
-            }
-            else
-            {
-                Console.WriteLine("Invalid input. Please enter a valid account number.");
-            }
-        }
 
         // Deposit money to account
         private static void DepositMoney(BankContext context, string username)
@@ -409,14 +382,14 @@ namespace The_Bank
             {
                 Console.WriteLine("Invalid deposit amount entered.");
             }
-
-            Console.WriteLine("Press any key to continue");
-            Console.ReadKey(true);
         }
 
-        // Create a new account
+        // Create a new account for logged in user
         static void OpenNewAccount(BankContext context, string userName)
         {
+            // Clear window
+            Console.Clear();
+
             // Declare new account variable outside of loop
             string newAccountName;
 
@@ -425,67 +398,100 @@ namespace The_Bank
                 Console.WriteLine("Enter new account name: ");
                 newAccountName = Console.ReadLine();
 
+                // Checks if string is null or empty or if an account with that name already exist for current user
                 if (string.IsNullOrEmpty(newAccountName))
                 {
-                    Console.WriteLine("Error! Name cannot be empty \n");
+                    Console.WriteLine("Error! Name cannot be empty. \n");
+                }
+                else if (DbHelpers.AccountAlreadyExist(context, userName, newAccountName))
+                {
+                    Console.WriteLine("Error! You already have an account with that name. \n");
                 }
                 else
-                {
                     break;
+            }
+
+            // Set Swedish Krona (SEK) as the default currency
+            string selectedCurrency = "SEK";
+
+
+            // TODO make a menu option of yes and no like our other menus instead of a Y/N option
+
+            // Ask if the user wants to create a foreign currency account
+            Console.Write("Will this account be in a foreign currency? (Y/N): ");
+            bool isForeignAccount = Console.ReadLine().Trim().ToUpper() == "Y";
+
+            if (isForeignAccount)
+            {
+                while (true)
+                {
+                    Console.WriteLine("Available foreign currencies:");
+                    Console.WriteLine("1. US Dollar (USD)");
+                    Console.WriteLine("2. Euro (EUR)");
+                    Console.WriteLine("3. UK Sterling (GBP)");
+                    Console.WriteLine("4. Swiss Franc (CHF)");
+                    Console.WriteLine("5. Canadian Dollar (CAD)");
+                    Console.WriteLine("6. Zimbabwean Dollar (ZWD)");
+                    // ADD MORE CURRENCIES HERE
+
+                    // Create array of available currencies
+                    string[] currencies = { "SEK", "USD", "EUR", "GBP", "CHF", "CAD", "ZWD" };
+
+                    // Prompts user to choose currency and checks if input is a number
+                    Console.Write("Select which currency: ");
+
+                    // Takes input from user and checks if it's a number between 0 and the amount of currencies in the currencies array - this is scalable if we add more currencies in the future
+                    if (int.TryParse(Console.ReadLine(), out int currencyChoice) && (currencyChoice > 0 && currencyChoice <= currencies.Length))
+                    {
+                        // Changes currency from the default SEK to the chosen one and breaks out of the loop to continue with the rest of the code
+                        selectedCurrency = currencies[currencyChoice];
+                        break;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid input. Please enter a valid currency number.");
+                    }
                 }
             }
 
             // Creates new user object of the user that's logged in
             User user = DbHelpers.GetUser(context, userName);
 
-            // Ask if the user wants to create a "Vacation" account
-            Console.Write("Do you want to create a 'Vacation' account? (Y/N): ");
-            bool isVacationAccount = Console.ReadLine().Trim().ToUpper() == "Y";
-
+            // Creates a new account object on the logged in user with the chosen name and currency (SEK unless it's foreign account) with a starting balance of 0
             Account account = new Account()
             {
                 UserId = user.Id,
                 Name = newAccountName,
                 Balance = 0,
-                Currency = "SEK", // Default currency is Swedish Krona (SEK)
+                Currency = selectedCurrency
             };
 
-            if (isVacationAccount)
+
+            // TODO make a menu option of yes and no like our other menus instead of a Y/N option
+
+            // Ask if the user wants to make an initial deposit
+            Console.Write($"Do you wish make a deposit to {newAccountName}? (Y/N): ");
+            if(Console.ReadLine().Trim().ToUpper() == "Y")
             {
-                Console.WriteLine("Select the currency for the 'Vacation' account:");
-                Console.WriteLine("1. US Dollar (USD)");
-                Console.WriteLine("2. Euro (EUR)");
-                Console.WriteLine("3. UK Sterling (GBP)");
-                Console.WriteLine("4. Swiss Franc (CHF)");
-                Console.WriteLine("5. Canadian Dollar (CAD)");
-                Console.WriteLine("6. Zimbabwean Dollar (ZWD)");
-                // ADD MORE CURRENCIES HERE
-
-                Console.Write("Enter the currency number: ");
-                if (int.TryParse(Console.ReadLine(), out int currencyChoice))
+                // Prompts user intil a correct value is entered
+                while (true)
                 {
-                    string[] currencies = { "SEK", "USD", "EUR", "GBP", "CHF", "CAD", "ZWD" };
-                    string selectedCurrency = currencies[currencyChoice];
 
-                    Console.Write($"Enter the initial deposit in {selectedCurrency}: ");
+                    // Asks user for deposit amount and checks if value is correct. If yes changes account balance to chosen amount and breaks out of the loop to continue with the rest of the code.
+                    Console.Write($"Enter deposit amount in {selectedCurrency}: ");
                     if (double.TryParse(Console.ReadLine(), out double initialDeposit) && initialDeposit >= 0)
                     {
-                        account.Currency = selectedCurrency;
                         account.Balance = initialDeposit;
+                        break;
                     }
                     else
                     {
                         Console.WriteLine("Invalid deposit amount. Please enter a valid positive number.");
-                        return;
                     }
-                }
-                else
-                {
-                    Console.WriteLine("Invalid input. Please enter a valid currency number.");
-                    return;
                 }
             }
 
+            // Attempts to add account to database. Returns true or false if successful or not
             bool success = DbHelpers.AddAccount(context, account);
 
             if (success)
@@ -498,10 +504,6 @@ namespace The_Bank
                 Console.WriteLine("Returning to menu");
                 return;
             }
-
-            Console.WriteLine("Press [Enter] to go to the main menu");
-            Console.ReadLine(); // This waits for Enter Key
-
             Console.WriteLine(); // New line for text formatting
         }
 

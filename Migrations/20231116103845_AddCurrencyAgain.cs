@@ -5,23 +5,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace The_Bank.Migrations
 {
-    public partial class Currency : Migration
+    public partial class AddCurrencyAgain : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "IsFreezed",
-                table: "Users");
-
-            migrationBuilder.DropColumn(
-                name: "UnfreezeTime",
-                table: "Users");
-
-        }
-
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-
             migrationBuilder.AddColumn<bool>(
                 name: "IsFreezed",
                 table: "Users",
@@ -35,6 +22,28 @@ namespace The_Bank.Migrations
                 type: "datetime2",
                 nullable: false,
                 defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
+
+            migrationBuilder.AddColumn<string>(
+                name: "Currency",
+                table: "Accounts",
+                type: "nvarchar(max)",
+                nullable: false,
+                defaultValue: "");
+        }
+
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropColumn(
+                name: "IsFreezed",
+                table: "Users");
+
+            migrationBuilder.DropColumn(
+                name: "UnfreezeTime",
+                table: "Users");
+
+            migrationBuilder.DropColumn(
+                name: "Currency",
+                table: "Accounts");
         }
     }
 }
