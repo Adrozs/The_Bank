@@ -133,7 +133,7 @@ namespace The_Bank
             string customerPin = MenuFunctions.CursorReadLine();
             Console.ResetColor();
             Console.WriteLine();
-            if (DbHelpers.IsCustomer(context, userName, customerPin))
+            if (DbHelpers.VerifyUserLogin(context, userName, customerPin))
             {
                 ViewAccountInfo(context, userName);
                 Console.Write("\t\tChoose account to withdraw: ");
@@ -514,7 +514,7 @@ namespace The_Bank
                 }
 
                 // If pin matches login info, break out of loop
-                if (DbHelpers.IsCustomer(context, username, currentPin))
+                if (DbHelpers.VerifyUserLogin(context, username, currentPin))
                     break;
                 else
                     Console.WriteLine("Error! Wrong PIN. Try again. \n");
