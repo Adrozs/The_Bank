@@ -65,7 +65,7 @@ namespace The_Bank.Models
         // Same as PressEnter() however if you send in a string it'll print that before
         public static void PressEnter(string phrase)
         {
-            Console.WriteLine(phrase);
+            Console.Write(phrase);
             ConsoleKeyInfo keyPressed = Console.ReadKey(true);
             while (keyPressed.Key != ConsoleKey.Enter)
             {
