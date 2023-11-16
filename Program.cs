@@ -9,27 +9,35 @@ namespace The_Bank
     {
         static void Main(string[] args)
         {
+            // Removes so the blinking cursor isn't visible
             Console.CursorVisible = false;
-            // Welcome phrase
-            MenuFunctions.header();
-            MenuFunctions.main_header();
-            MenuFunctions.footer();
-            Console.WriteLine();
-            Console.WriteLine();
-
-
-            // Initalize counter to keep track of login attempts - 2 as default
-            int loginAttempts = 2;
-
-            // Declare date time variable to be used to keep track of when a user can be unfrozen if they've frozen their account
-            DateTime UnFreezeTime;
-
-            // Delcare username and user pin to be used for the login
-            string customerName;
-            string customerPin;
 
             using (BankContext context = new BankContext())
             {
+
+                // Check if an admin exists in the system upon first launch.
+                // If none exists, create one. (We assume the first person to start the program is an admin).
+                if (!DbHelpers.IsAdminCreated(context))
+                {
+                    DbHelpers.CreateAdmin(context);
+                }
+
+                // Welcome phrase
+                MenuFunctions.header();
+                MenuFunctions.main_header();
+                MenuFunctions.footer();
+                Console.WriteLine();
+                Console.WriteLine();
+
+                // Initalize counter to keep track of login attempts - 2 as default
+                int loginAttempts = 2;
+
+                // Declare date time variable to be used to keep track of when a user can be unfrozen if they've frozen their account
+                DateTime UnFreezeTime;
+
+                // Delcare username and user pin to be used for the login
+                string customerName;
+                string customerPin;
 
                 // Re-promts the login screen until program is closed and while not in a method
                 while (true)
@@ -40,18 +48,18 @@ namespace The_Bank
                     {
                         // Login screen
                         MenuFunctions.header();
-                       
+
                         Console.WriteLine("\t\t\tLog in to your account:");
                         Console.Write("\t\t\tName: ");
                         Console.ForegroundColor = ConsoleColor.DarkGray;
                         customerName = MenuFunctions.CursorReadLine();
                         Console.ResetColor();
-                        
+
                         Console.Write("\t\t\tPIN: ");
                         Console.ForegroundColor = ConsoleColor.DarkGray;
                         customerPin = MenuFunctions.CursorReadLine();
                         Console.ResetColor();
-                       
+
                         MenuFunctions.footer();
 
                         // Checks if either name or pin is null or empty
@@ -66,7 +74,7 @@ namespace The_Bank
 
 
                     // Check if login is admin login  
-                    if (DbHelpers.IsAdmin(customerName, customerPin))
+                    if (DbHelpers.VerifyAdminLogin(context, customerName, customerPin))
                     {
                         // Goes to the admin menu
                         AdminFunctions.DoAdminTasks(context);
@@ -81,7 +89,7 @@ namespace The_Bank
                         {
 
                             // Checks if user login is correct
-                            if (DbHelpers.IsCustomer(context, customerName, customerPin))
+                            if (DbHelpers.VerifyUserLogin(context, customerName, customerPin))
                             {
                                 // Reset login attempts and go to UserMenu
                                 loginAttempts = 2;
@@ -133,8 +141,9 @@ namespace The_Bank
                     // Newline for text formatting
                     Console.WriteLine();
                 }
-            }
+                
 
-        }          
+            }
+        }      
     }
 }
