@@ -136,6 +136,7 @@ namespace The_Bank
             if (DbHelpers.IsCustomer(context, userName, customerPin))
             {
                 ViewAccountInfo(context, userName);
+                Console.WriteLine("\t\t==================================");
                 Console.Write("\t\tChoose account to withdraw: ");
                 string accountChoice = MenuFunctions.CursorReadLine();
                 Console.SetCursorPosition(0, Console.CursorTop - 1);
@@ -152,7 +153,6 @@ namespace The_Bank
                     Console.CursorVisible = true;
                     if (double.TryParse(Console.ReadLine(), out double withdraw))
                     {
-                        Console.CursorVisible = false;
                         Console.SetCursorPosition(0, Console.CursorTop - 1);
                         MenuFunctions.ClearCurrentConsoleLine();
                         var account = context.Accounts
@@ -165,6 +165,7 @@ namespace The_Bank
                             //Errorchecks
                             if (withdraw > balance)
                             {
+                                
                                 Console.WriteLine($"\t\tCannot withdraw more than: {balance}");
                                 Console.ReadKey(true);
                                 return;
