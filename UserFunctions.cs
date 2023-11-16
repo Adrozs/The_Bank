@@ -331,7 +331,7 @@ namespace The_Bank
         }
 
         //// Deposit money to account
-        private static void DepositMoney()
+        private static void DepositMoney(BankContext context, string username)
         {
             ViewAccountInfo(context, username);
 
