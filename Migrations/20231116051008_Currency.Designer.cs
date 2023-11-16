@@ -31,8 +31,8 @@ namespace The_Bank.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<decimal>("Balance")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Balance")
+                        .HasColumnType("double(18,2)");
 
                     b.Property<string>("Currency")
                         .IsRequired()

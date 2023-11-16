@@ -12,8 +12,8 @@ using The_Bank.Data;
 namespace The_Bank.Migrations
 {
     [DbContext(typeof(BankContext))]
-    [Migration("20231115150805_Decimal-Changed-To-Double")]
-    partial class DecimalChangedToDouble
+    [Migration("20231115150805_double-Changed-To-Double")]
+    partial class doubleChangedToDouble
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
