@@ -24,22 +24,45 @@ namespace The_Bank
             // Declare date time variable to be used to keep track of when a user can be unfrozen if they've frozen their account
             DateTime UnFreezeTime;
 
+            // Delcare username and user pin to be used for the login
+            string customerName;
+            string customerPin;
+
             using (BankContext context = new BankContext())
             {
+
+                // Re-promts the login screen until program is closed and while not in a method
                 while (true)
                 {
 
-                    MenuFunctions.header();
-                    Console.WriteLine("\t\t\tLog in to your account:");
-                    Console.Write("\t\t\tName: ");
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
-                    string customerName = Console.ReadLine();
-                    Console.ResetColor();
-                    Console.Write("\t\t\tPIN: ");
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
-                    string customerPin = Console.ReadLine();
-                    Console.ResetColor();
-                    MenuFunctions.footer();
+                    // Re-promts until login information is not null or empty
+                    while (true)
+                    {
+                        // Login screen
+                        MenuFunctions.header();
+                       
+                        Console.WriteLine("\t\t\tLog in to your account:");
+                        Console.Write("\t\t\tName: ");
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                        customerName = Console.ReadLine();
+                        Console.ResetColor();
+                        
+                        Console.Write("\t\t\tPIN: ");
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                        customerPin = Console.ReadLine();
+                        Console.ResetColor();
+                       
+                        MenuFunctions.footer();
+
+                        // Checks if either name or pin is null or empty
+                        if (string.IsNullOrEmpty(customerName) || string.IsNullOrEmpty(customerPin))
+                        {
+                            Console.WriteLine("\t\tName and/or PIN can't be empty");
+                            MenuFunctions.PressEnter("\t\tPress [Enter] to try again");
+                        }
+                        else
+                            break;
+                    }
 
 
                     // Check if login is admin login  
@@ -47,59 +70,65 @@ namespace The_Bank
                     {
                         // Goes to the admin menu
                         AdminFunctions.DoAdminTasks(context);
-
-
                     }
 
                     // If not admin continue with the rest of the code
 
-
-                    // Checks if account is NOT frozen
-                    // TODO OBS! Doesn't handle if an non existing username is put in - crashes 
-                    if (!AccountFreezed.IsFreezed(customerName))
+                    if (DbHelpers.DoesUserExist(context, customerName))
                     {
-
-                        // Checks if user login is correct
-                        if (DbHelpers.IsCustomer(context, customerName, customerPin))
+                        // Checks if account is NOT frozen
+                        if (!AccountFreezed.IsFreezed(customerName))
                         {
-                            // Reset login attempts and go to UserMenu
-                            loginAttempts = 2;
-                            UserFunctions.UserMenu(context, customerName);
-                        }
-                        else if (loginAttempts > 0)
-                        {
-                            Console.WriteLine($"Username or pin is invalid. {loginAttempts} tries left.");
-                            loginAttempts--;
 
-                            // Waits to allow text to be shown before proceeding
-                            Thread.Sleep(2000);
+                            // Checks if user login is correct
+                            if (DbHelpers.IsCustomer(context, customerName, customerPin))
+                            {
+                                // Reset login attempts and go to UserMenu
+                                loginAttempts = 2;
+                                UserFunctions.UserMenu(context, customerName);
+                            }
+                            // Checks if there are any login attempts left
+                            else if (loginAttempts > 0)
+                            {
+                                Console.WriteLine($"\t\tUsername or pin is invalid. {loginAttempts} tries left.");
+                                loginAttempts--;
+
+                                // Waits to allow text to be shown before proceeding
+                                MenuFunctions.PressEnter("\t\tPress [Enter] to try again");
+                            }
+                            // If too many invalid login attempts were made freeze account for x amount of time
+                            else
+                            {
+                                // Waits to allow text to be shown before proceeding
+                                Console.WriteLine("\t\tToo many invalid attemtps. \nPlease try again in a few minutes.");
+
+                                MenuFunctions.PressEnter("\t\tPress [Enter] to try again");
+
+                                // Freeze account and set time that account is frozen for
+                                UnFreezeTime = DateTime.Now.AddMinutes(3);
+                                AccountFreezed.FreezeUser(customerName, UnFreezeTime);
+                            }
                         }
-                        // If too many invalid login attempts were made freeze account for x amount of time
+                        // If account IS frozen
                         else
                         {
-                            // Waits to allow text to be shown before proceeding
                             Console.WriteLine("Too many invalid attemtps. Please try again in a few minutes.");
 
-                            Thread.Sleep(2000);
+                            // Checks if account can be unfrozen and unfreezes it if yes, does nothing if no
+                            AccountFreezed.UnFreezeUser(customerName);
 
-                            // Freeze account and set time that account is frozen for
-                            UnFreezeTime = DateTime.Now.AddMinutes(3);
-                            AccountFreezed.FreezeUser(customerName, UnFreezeTime);
+                            MenuFunctions.PressEnter("\t\tPress [Enter] to try again");
                         }
 
                     }
-                    // If account IS frozen
+                    // If account doesn't already exist
                     else
                     {
-                        Console.WriteLine("Too many invalid attemtps. Please try again in a few minutes.");
+                        Console.WriteLine($"\t\tNo user with the name \"{customerName}\" exists.");
+                        Console.WriteLine($"\t\tContact the admin to create a new user. ");
 
-                        // Waits to allow text to be shown before proceeding
-                        Thread.Sleep(2000);
-
-                        // Checks if account can be unfrozen and unfreezes it if yes, does nothing if no
-                        //AccountFreezed.UnFreezeUser(customerName);
+                        MenuFunctions.PressEnter("\t\tPress [Enter] to try again");
                     }
-
 
                     // Newline for text formatting
                     Console.WriteLine();

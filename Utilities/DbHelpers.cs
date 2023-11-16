@@ -42,6 +42,11 @@ namespace The_Bank.Utilities
             return context.Accounts.Any(a => a.Name == accountName && a.User.Name == username);  
         }
 
+        public static bool DoesUserExist(BankContext context, string username)
+        {
+            return context.Users.Any(u => u.Name == username);
+        }
+
 
         //public static List<User> GetUserAccounts(BankContext context, string userName)
         //{
