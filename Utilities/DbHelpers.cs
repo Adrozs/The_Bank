@@ -27,6 +27,14 @@ namespace The_Bank.Utilities
             return user;
         }
 
+        public static User GetUserByUsername(BankContext context, string username)
+        {
+            // Gets the user in the database that matches the username
+            User user = context.Users.FirstOrDefault(u => u.Name == username);
+
+            return user;
+        }
+
         //public static User GetUserAccounts(BankContext context, string userName)
         //{
         //    User user = context.Users
@@ -77,9 +85,25 @@ namespace The_Bank.Utilities
                 context.SaveChanges();
                 return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine($"Error changing pin: {ex.Message}");
+                return false;
+            }
+        }
+
+        // Deletes a user from the database
+        public static bool DeleteUser(BankContext context, User user)
+        {
+            try
+            {
+                context.Users.Remove(user);
+                context.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting user: {ex.Message}");
                 return false;
             }
         }

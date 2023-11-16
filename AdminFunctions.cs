@@ -19,9 +19,9 @@ namespace The_Bank
             }
 
             Console.WriteLine($"\t\t\tTotal number of users {users.Count()}");
-            MenuFunctions.footer();                         
+            MenuFunctions.footer();
             Console.WriteLine("\t\t\t[C]: Create new user");
-            //Console.WriteLine("[U]: User Menu");
+            Console.WriteLine("\t\t\t[D]: Delete an existing user");
             Console.WriteLine("\t\t\t[X]: Exit");
 
             while (true)
@@ -35,12 +35,9 @@ namespace The_Bank
                     case "c":
                         CreateUser(context);
                         break;
-                    //case "u":
-                    //    // Ask for the username to pass to UserMenu
-                    //    Console.Write("Enter username: ");
-                    //    string username = Console.ReadLine();
-                    //    UserFunctions.UserMenu(context, username);
-                    //    break;
+                    case "d":
+                        DeleteUser(context);
+                        return;
                     case "x":
                         return;
                     default:
@@ -48,8 +45,8 @@ namespace The_Bank
                         break;
                 }
             }
-            
         }
+
 
         // Creates a new user with a chosen name and a random pin
         private static void CreateUser(BankContext context)
@@ -78,6 +75,33 @@ namespace The_Bank
             else
             {
                 Console.WriteLine($"\t\t\tFailed to create a user {username}");
+            }
+        }
+        private static void DeleteUser(BankContext context)
+        {
+            Console.WriteLine("\t\t\tDelete user:");
+            Console.Write("\t\t\tEnter username to delete: ");
+            string usernameToDelete = Console.ReadLine();
+
+            // Get the user from the database
+            User userToDelete = DbHelpers.GetUserByUsername(context, usernameToDelete);
+
+            if (userToDelete != null)
+            {
+                // Delete the user
+                bool success = DbHelpers.DeleteUser(context, userToDelete);
+                if (success)
+                {
+                    Console.WriteLine($"\t\t\tUser {usernameToDelete} has been deleted.");
+                }
+                else
+                {
+                    Console.WriteLine($"\t\t\tFailed to delete user {usernameToDelete}.");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"\t\t\tUser {usernameToDelete} not found.");
             }
         }
     }
