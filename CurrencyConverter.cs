@@ -14,8 +14,8 @@ namespace The_Bank
             Dictionary<string, decimal> exchangeRates = new Dictionary<string, decimal>
             {
                 { "SEK", 1 },
-                { "USD", 0.94M },  //M betyder att värdet är literal (Typ bokstavligen, utan detta blir det errors. THANKS GOOGLE
-                { "EUR", 0.87M },
+                { "USD", 0.094M },  //M betyder att värdet är literal (Typ bokstavligen, utan detta blir det errors. THANKS GOOGLE
+                { "EUR", 0.087M },
                 { "GBP", 0.076M},
                 { "CHF", 0.084M},
                 { "CAD", 0.13M },

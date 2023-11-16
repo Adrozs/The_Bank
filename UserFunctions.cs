@@ -148,6 +148,7 @@ namespace The_Bank
         }
 
         // Transfer money between accounts
+        // Transfer money between accounts
         static void TransferMoney(BankContext context, string userName)
         {
             // Get user info from Database
@@ -196,11 +197,8 @@ namespace The_Bank
                                     // If source and destination accounts have different currencies, perform currency conversion
                                     if (sourceAccount.Currency != destinationAccount.Currency)
                                     {
-                                        // For simplicity, assuming a fixed conversion rate (you may need to fetch actual rates)
-                                        decimal conversionRate = 0.85M; // 1USD = 0,85 EURO
-
-                                        // Convert the transfer amount to the destination account's currency
-                                        decimal convertedAmount = transferAmount * conversionRate;
+                                        // Use the CurrencyConverter to convert the amount to the destination currency
+                                        decimal convertedAmount = CurrencyConverter.Convert(sourceAccount.Currency, destinationAccount.Currency, transferAmount);
 
                                         // Update balances
                                         sourceAccount.Balance -= transferAmount;
@@ -261,6 +259,7 @@ namespace The_Bank
             Console.WriteLine("Press [Enter] to return to the main menu");
             Console.ReadLine();
         }
+
 
         // Withdraw money from an account
         static void WithdrawMoney(BankContext context, string userName)
