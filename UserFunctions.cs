@@ -217,77 +217,102 @@ namespace The_Bank
 
                 if (sourceAccount != null)
                 {
-                    // Select destination account (only user's own accounts)
-                    Console.WriteLine("Select the destination account to transfer money to:");
-                    foreach (var account in user.Accounts.Where(a => a.Id != sourceAccountId))
+                    // Select destination user
+                    Console.WriteLine("Select the destination user to transfer money to:");
+                    foreach (var otherUser in context.Users.Where(u => u.Id != user.Id))
                     {
-                        Console.WriteLine($"{account.Id}. {account.Name}: {account.Balance} {account.Currency}");
+                        Console.WriteLine($"{otherUser.Id}. {otherUser.Name}");
                     }
 
-                    Console.Write("Enter the destination account number: ");
-                    if (int.TryParse(Console.ReadLine(), out int destinationAccountId))
+                    Console.Write("Enter the destination user number: ");
+                    if (int.TryParse(Console.ReadLine(), out int destinationUserId))
                     {
-                        // Destination account
-                        Account destinationAccount = user.Accounts.SingleOrDefault(a => a.Id == destinationAccountId);
+                        // DESTINATION USER
+                        User destinationUser = context.Users.SingleOrDefault(u => u.Id == destinationUserId);
 
-                        if (destinationAccount != null)
+                        if (destinationUser != null)
                         {
-                            // Transfer amount
-                            Console.Write("Enter the transfer amount: ");
-                            if (double.TryParse(Console.ReadLine(), out double transferAmount) && transferAmount > 0)
+                            // Select destination account
+                            Console.WriteLine("Select the destination account to transfer money to:");
+                            foreach (var account in destinationUser.Accounts)
                             {
-                                // Check if the source account has sufficient funds
-                                if (sourceAccount.Balance >= transferAmount)
+                                Console.WriteLine($"{account.Id}. {account.Name}: {account.Balance} {account.Currency}");
+                            }
+
+                            Console.Write("Enter the destination account number: ");
+                            if (int.TryParse(Console.ReadLine(), out int destinationAccountId))
+                            {
+                                // DESTINATION ACCOUNT
+                                Account destinationAccount = destinationUser.Accounts.SingleOrDefault(a => a.Id == destinationAccountId);
+
+                                if (destinationAccount != null)
                                 {
-                                    // If source and destination accounts have different currencies, perform currency conversion
-                                    if (sourceAccount.Currency != destinationAccount.Currency)
+                                    // Transfer amount
+                                    Console.Write("Enter the transfer amount: ");
+                                    if (double.TryParse(Console.ReadLine(), out double transferAmount) && transferAmount > 0)
                                     {
-                                        // Use the CurrencyConverter to convert the amount to the destination currency
-                                        double convertedAmount = CurrencyConverter.Convert(sourceAccount.Currency, destinationAccount.Currency, transferAmount);
+                                        // Check if the source account has sufficient funds
+                                        if (sourceAccount.Balance >= transferAmount)
+                                        {
+                                            // If source and destination accounts have different currencies, perform currency conversion
+                                            if (sourceAccount.Currency != destinationAccount.Currency)
+                                            {
+                                                // Use the CurrencyConverter to convert the amount to the destination currency
+                                                double convertedAmount = CurrencyConverter.Convert(sourceAccount.Currency, destinationAccount.Currency, transferAmount);
 
-                                        // Update balances
-                                        sourceAccount.Balance -= transferAmount;
-                                        destinationAccount.Balance += convertedAmount;
+                                                // Update balances
+                                                sourceAccount.Balance -= transferAmount;
+                                                destinationAccount.Balance += convertedAmount;
 
-                                        // Save changes
-                                        context.SaveChanges();
+                                                // Save changes
+                                                context.SaveChanges();
 
-                                        // Display updated balances
-                                        Console.WriteLine($"Transfer successful! New balance for {sourceAccount.Name}: {sourceAccount.Balance} ({sourceAccount.Currency})");
-                                        Console.WriteLine($"New balance for {destinationAccount.Name}: {destinationAccount.Balance} ({destinationAccount.Currency})");
+                                                // Display updated balances
+                                                Console.WriteLine($"Transfer successful! New balance for {sourceAccount.Name}: {sourceAccount.Balance} ({sourceAccount.Currency})");
+                                                Console.WriteLine($"New balance for {destinationAccount.Name}: {destinationAccount.Balance} ({destinationAccount.Currency})");
+                                            }
+                                            else
+                                            {
+                                                // Same currency, no conversion needed
+                                                sourceAccount.Balance -= transferAmount;
+                                                destinationAccount.Balance += transferAmount;
+
+                                                // Save changes
+                                                context.SaveChanges();
+
+                                                // Display updated balances
+                                                Console.WriteLine($"Transfer successful! New balance for {sourceAccount.Name}: {sourceAccount.Balance} ({sourceAccount.Currency})");
+                                                Console.WriteLine($"New balance for {destinationAccount.Name}: {destinationAccount.Balance} ({destinationAccount.Currency})");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine("Insufficient funds in the source account. Transfer canceled.");
+                                        }
                                     }
                                     else
                                     {
-                                        // Same currency, no conversion needed
-                                        sourceAccount.Balance -= transferAmount;
-                                        destinationAccount.Balance += transferAmount;
-
-                                        // Save changes
-                                        context.SaveChanges();
-
-                                        // Display updated balances
-                                        Console.WriteLine($"Transfer successful! New balance for {sourceAccount.Name}: {sourceAccount.Balance} ({sourceAccount.Currency})");
-                                        Console.WriteLine($"New balance for {destinationAccount.Name}: {destinationAccount.Balance} ({destinationAccount.Currency})");
+                                        Console.WriteLine("Invalid transfer amount. Please enter a valid positive number.");
                                     }
                                 }
                                 else
                                 {
-                                    Console.WriteLine("Insufficient funds in the source account. Transfer canceled.");
+                                    Console.WriteLine("Invalid destination account number. Please select a valid account.");
                                 }
                             }
                             else
                             {
-                                Console.WriteLine("Invalid transfer amount. Please enter a valid positive number.");
+                                Console.WriteLine("Invalid input. Please enter a valid destination account number.");
                             }
                         }
                         else
                         {
-                            Console.WriteLine("Invalid destination account number. Please select a valid account.");
+                            Console.WriteLine("Invalid destination user number. Please select a valid user.");
                         }
                     }
                     else
                     {
-                        Console.WriteLine("Invalid input. Please enter a valid destination account number.");
+                        Console.WriteLine("Invalid input. Please enter a valid destination user number.");
                     }
                 }
                 else
@@ -304,6 +329,7 @@ namespace The_Bank
             Console.WriteLine("Press [Enter] to return to the main menu");
             Console.ReadLine();
         }
+
 
 
         // Withdraw money from an account
