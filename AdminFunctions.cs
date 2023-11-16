@@ -18,11 +18,12 @@ namespace The_Bank
                 Console.WriteLine($"\t\t\t{user.Name}");
             }
 
-            Console.WriteLine($"\t\t\tTotal number of users {users.Count()}");
-            MenuFunctions.footer();
-            Console.WriteLine("\t\t\t[C]: Create new user");
-            Console.WriteLine("\t\t\t[D]: Delete an existing user");
-            Console.WriteLine("\t\t\t[X]: Exit");
+                Console.WriteLine($"\t\t\tTotal number of users {users.Count()}");
+                MenuFunctions.footer();
+                Console.WriteLine("\t\t\t[C]: Create new user");
+                Console.WriteLine("\t\t\t[D]: Delete an existing user");
+                //Console.WriteLine("[U]: User Menu");
+                Console.WriteLine("\t\t\t[X]: Exit");
 
             while (true)
             {
@@ -30,23 +31,29 @@ namespace The_Bank
                 string command = Console.ReadLine();
                 MenuFunctions.footer();
 
-                switch (command.ToLower())
-                {
-                    case "c":
-                        CreateUser(context);
-                        break;
-                    case "d":
-                        DeleteUser(context);
-                        return;
-                    case "x":
-                        return;
-                    default:
-                        Console.WriteLine($"Unknown command: {command} ");
-                        break;
+                    switch (command.ToLower())
+                    {
+                        case "c":
+                            CreateUser(context);
+                            break;
+                        //case "u":
+                        //    // Ask for the username to pass to UserMenu
+                        //    Console.Write("Enter username: ");
+                        //    string username = Console.ReadLine();
+                        //    UserFunctions.UserMenu(context, username);
+                        //    break;
+                        case "d":
+                            DeleteUser(context);
+                            return;
+                        case "x":
+                            return;
+                        default:
+                            Console.WriteLine($"Unknown command: {command} ");
+                            break;
+                    }
                 }
             }
         }
-
 
         // Creates a new user with a chosen name and a random pin
         private static void CreateUser(BankContext context)

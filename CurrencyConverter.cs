@@ -8,21 +8,21 @@ namespace The_Bank
 {
     public static class CurrencyConverter
 {
-    public static double Convert(string sourceCurrency, string destinationCurrency, double amount)
+    public static decimal Convert(string sourceCurrency, string destinationCurrency, decimal amount)
     {
 
-            Dictionary<string, double> exchangeRates = new Dictionary<string, double>
+            Dictionary<string, decimal> exchangeRates = new Dictionary<string, decimal>
             {
                 { "SEK", 1 },
-                { "USD", 0.094 },  //M betyder att värdet är literal (Typ bokstavligen, utan detta blir det errors. THANKS GOOGLE
-                { "EUR", 0.087 },
-                { "GBP", 0.076},
-                { "CHF", 0.084},
-                { "CAD", 0.13 },
-                { "ZWD", 225.18},
+                { "USD", 0.094M },  //M betyder att värdet är literal (Typ bokstavligen, utan detta blir det errors. THANKS GOOGLE
+                { "EUR", 0.087M },
+                { "GBP", 0.076M},
+                { "CHF", 0.084M},
+                { "CAD", 0.13M },
+                { "ZWD", 225.18M},
             };
 
-            double convertedAmount = amount * exchangeRates[destinationCurrency];
+            decimal convertedAmount = amount * exchangeRates[destinationCurrency];
             return convertedAmount;
 
            

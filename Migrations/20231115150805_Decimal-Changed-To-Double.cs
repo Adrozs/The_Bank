@@ -4,7 +4,7 @@
 
 namespace The_Bank.Migrations
 {
-    public partial class doubleChangedToDouble : Migration
+    public partial class DecimalChangedToDouble : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -17,16 +17,16 @@ namespace The_Bank.Migrations
                 table: "Accounts",
                 type: "float",
                 nullable: false,
-                oldClrType: typeof(double),
-                oldType: "double(18,2)");
+                oldClrType: typeof(decimal),
+                oldType: "decimal(18,2)");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<double>(
+            migrationBuilder.AlterColumn<decimal>(
                 name: "Balance",
                 table: "Accounts",
-                type: "double(18,2)",
+                type: "decimal(18,2)",
                 nullable: false,
                 oldClrType: typeof(double),
                 oldType: "float");

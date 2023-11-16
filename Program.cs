@@ -97,7 +97,7 @@ namespace The_Bank
                         Thread.Sleep(2000);
 
                         // Checks if account can be unfrozen and unfreezes it if yes, does nothing if no
-                        //AccountFreezed.UnFreezeUser(customerName);
+                        AccountFreezed.UnFreezeUser(customerName);
                     }
 
 
