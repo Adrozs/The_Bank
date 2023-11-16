@@ -420,6 +420,9 @@ namespace The_Bank
         // Create a new account
         static void OpenNewAccount(BankContext context, string userName)
         {
+            // Clear window
+            Console.Clear();
+
             // Declare new account variable outside of loop
             string newAccountName;
 
@@ -428,67 +431,100 @@ namespace The_Bank
                 Console.WriteLine("Enter new account name: ");
                 newAccountName = Console.ReadLine();
 
+                // Checks if string is null or empty or if an account with that name already exist for current user
                 if (string.IsNullOrEmpty(newAccountName))
                 {
-                    Console.WriteLine("Error! Name cannot be empty \n");
+                    Console.WriteLine("Error! Name cannot be empty. \n");
+                }
+                else if (DbHelpers.AccountAlreadyExist(context, userName, newAccountName))
+                {
+                    Console.WriteLine("Error! You already have an account with that name. \n");
                 }
                 else
-                {
                     break;
+            }
+
+            // Set Swedish Krona (SEK) as the default currency
+            string selectedCurrency = "SEK";
+
+
+            // TODO make a menu option of yes and no like our other menus instead of a Y/N option
+
+            // Ask if the user wants to create a foreign currency account
+            Console.Write("Will this account be in a foreign currency? (Y/N): ");
+            bool isForeignAccount = Console.ReadLine().Trim().ToUpper() == "Y";
+
+            if (isForeignAccount)
+            {
+                while (true)
+                {
+                    Console.WriteLine("Available foreign currencies:");
+                    Console.WriteLine("1. US Dollar (USD)");
+                    Console.WriteLine("2. Euro (EUR)");
+                    Console.WriteLine("3. UK Sterling (GBP)");
+                    Console.WriteLine("4. Swiss Franc (CHF)");
+                    Console.WriteLine("5. Canadian Dollar (CAD)");
+                    Console.WriteLine("6. Zimbabwean Dollar (ZWD)");
+                    // ADD MORE CURRENCIES HERE
+
+                    // Create array of available currencies
+                    string[] currencies = { "SEK", "USD", "EUR", "GBP", "CHF", "CAD", "ZWD" };
+
+                    // Prompts user to choose currency and checks if input is a number
+                    Console.Write("Select which currency: ");
+
+                    // Takes input from user and checks if it's a number between 0 and the amount of currencies in the currencies array - this is scalable if we add more currencies in the future
+                    if (int.TryParse(Console.ReadLine(), out int currencyChoice) && (currencyChoice > 0 && currencyChoice <= currencies.Length))
+                    {
+                        // Changes currency from the default SEK to the chosen one and breaks out of the loop to continue with the rest of the code
+                        selectedCurrency = currencies[currencyChoice];
+                        break;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid input. Please enter a valid currency number.");
+                    }
                 }
             }
 
             // Creates new user object of the user that's logged in
             User user = DbHelpers.GetUser(context, userName);
 
-            // Ask if the user wants to create a "Vacation" account
-            Console.Write("Do you want to create a 'Vacation' account? (Y/N): ");
-            bool isVacationAccount = Console.ReadLine().Trim().ToUpper() == "Y";
-
+            // Creates a new account object on the logged in user with the chosen name and currency (SEK unless it's foreign account) with a starting balance of 0
             Account account = new Account()
             {
                 UserId = user.Id,
                 Name = newAccountName,
                 Balance = 0,
-                Currency = "SEK", // Default currency is Swedish Krona (SEK)
+                Currency = selectedCurrency
             };
 
-            if (isVacationAccount)
+
+            // TODO make a menu option of yes and no like our other menus instead of a Y/N option
+
+            // Ask if the user wants to make an initial deposit
+            Console.Write($"Do you wish make a deposit to {newAccountName}? (Y/N): ");
+            if(Console.ReadLine().Trim().ToUpper() == "Y")
             {
-                Console.WriteLine("Select the currency for the 'Vacation' account:");
-                Console.WriteLine("1. US Dollar (USD)");
-                Console.WriteLine("2. Euro (EUR)");
-                Console.WriteLine("3. UK Sterling (GBP)");
-                Console.WriteLine("4. Swiss Franc (CHF)");
-                Console.WriteLine("5. Canadian Dollar (CAD)");
-                Console.WriteLine("6. Zimbabwean Dollar (ZWD)");
-                // ADD MORE CURRENCIES HERE
-
-                Console.Write("Enter the currency number: ");
-                if (int.TryParse(Console.ReadLine(), out int currencyChoice))
+                // Prompts user intil a correct value is entered
+                while (true)
                 {
-                    string[] currencies = { "SEK", "USD", "EUR", "GBP", "CHF", "CAD", "ZWD" };
-                    string selectedCurrency = currencies[currencyChoice];
 
-                    Console.Write($"Enter the initial deposit in {selectedCurrency}: ");
+                    // Asks user for deposit amount and checks if value is correct. If yes changes account balance to chosen amount and breaks out of the loop to continue with the rest of the code.
+                    Console.Write($"Enter deposit amount in {selectedCurrency}: ");
                     if (double.TryParse(Console.ReadLine(), out double initialDeposit) && initialDeposit >= 0)
                     {
-                        account.Currency = selectedCurrency;
                         account.Balance = initialDeposit;
+                        break;
                     }
                     else
                     {
                         Console.WriteLine("Invalid deposit amount. Please enter a valid positive number.");
-                        return;
                     }
-                }
-                else
-                {
-                    Console.WriteLine("Invalid input. Please enter a valid currency number.");
-                    return;
                 }
             }
 
+            // Attempts to add account to database. Returns true or false if successful or not
             bool success = DbHelpers.AddAccount(context, account);
 
             if (success)
@@ -502,8 +538,8 @@ namespace The_Bank
                 return;
             }
 
-            Console.WriteLine("Press [Enter] to go to the main menu");
-            Console.ReadLine(); // This waits for Enter Key
+            // Promts user to press enter key to go back to menu - doesn't accept any other input
+            MenuFunctions.PressEnter("Press [Enter] to go back to the menu");
 
             Console.WriteLine(); // New line for text formatting
         }
