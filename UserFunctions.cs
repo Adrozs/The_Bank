@@ -117,10 +117,7 @@ namespace The_Bank
                     return "Log out";
                 default:
                     return "Unknown Option";
-            }
-
-
-            
+            }          
         }
         public static void WithdrawMoney(BankContext context)
         {
