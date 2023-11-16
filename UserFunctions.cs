@@ -1,5 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Drawing;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using The_Bank.Data;
 using The_Bank.Models;
@@ -114,10 +118,51 @@ namespace The_Bank
                 default:
                     return "Unknown Option";
             }
+
+
+            
+        }
+        public static void WithdrawMoney(BankContext context)
+        {
+            Console.WriteLine("From which account do you want to withdraw from?:");
+            string accountChoice = Console.ReadLine();
+            
+            Console.Write("How much would you like to withdraw? ");
+            if (double.TryParse(Console.ReadLine(), out double withdraw))
+            {
+                var account = context.Accounts
+                 .Where(a => a.Name == accountChoice)
+                 .SingleOrDefault();
+
+                if (account != null)
+                {
+
+                    var balance = account.Balance;
+
+                    double newBalance = balance - withdraw;
+
+                    //Errorchecks
+                    if (newBalance < 0)
+                    {
+                        Console.WriteLine($"Cannot withdraw more than {balance}");
+                        return;
+                    }
+                    if (withdraw == 0)
+                    {
+                        Console.WriteLine("Cannot withdraw 0");
+                        return;
+                    }
+                    
+                    account.Balance = newBalance;
+                    context.SaveChanges();
+                    Console.WriteLine($"You new balance is {newBalance}");
+
+                }
+            }
         }
 
-        //View user account and balance
-        static void ViewAccountInfo(BankContext context, string userName)
+        //private static void DisplayAccountBalances(BankContext context, string userName)
+        private static void ViewAccountInfo(BankContext context, string userName)
         {
             //Get info about user from database
             User user = context.Users
@@ -184,11 +229,11 @@ namespace The_Bank
                         // destination account find it
                         Account destinationAccount = user.Accounts.SingleOrDefault(a => a.Id == destinationAccountId);
 
-                        if (destinationAccount != null)
-                        {
-                            // HOW MUCH
-                            Console.Write("Enter the transfer amount: ");
-                            if (decimal.TryParse(Console.ReadLine(), out decimal transferAmount) && transferAmount > 0)
+                            if (destinationAccount != null)
+                            {
+                                // HOW MUCH
+                                Console.Write("Enter the transfer amount: ");
+                                if (double.TryParse(Console.ReadLine(), out double transferAmount) && transferAmount > 0)
 
                             {
                                 // you got the cash or u broke?
@@ -258,17 +303,17 @@ namespace The_Bank
                 // FIND account
                 Account selectedAccount = user.Accounts.SingleOrDefault(a => a.Id == selectedAccountId);
 
-                if (selectedAccount != null)
-                {
-                    // HOW MUCH DO U WANT TO WITHDRAW
-                    Console.Write("Enter the withdrawal amount: ");
-                    if (decimal.TryParse(Console.ReadLine(), out decimal withdrawalAmount) && withdrawalAmount > 0)
+                    if (selectedAccount != null)
                     {
-                        // U got enough cash? or you broke
-                        if (selectedAccount.Balance >= withdrawalAmount)
+                        // HOW MUCH DO U WANT TO WITHDRAW
+                        Console.Write("Enter the withdrawal amount: ");
+                        if (double.TryParse(Console.ReadLine(), out double withdrawalAmount) && withdrawalAmount > 0)
                         {
-                            // Update account balance (or not if u broke
-                            selectedAccount.Balance -= withdrawalAmount;
+                            // U got enough cash? or you broke
+                            if (selectedAccount.Balance >= withdrawalAmount)
+                            {
+                                // Update account balance (or not if u broke
+                                selectedAccount.Balance -= withdrawalAmount;
 
                             // SAVE IT
                             context.SaveChanges();
@@ -306,9 +351,9 @@ namespace The_Bank
             ViewAccountInfo(context, username);
 
             Console.WriteLine("How much do you wish to deposit?");
-            decimal depositAmount;
+            double depositAmount;
 
-            if (decimal.TryParse(Console.ReadLine(), out depositAmount))
+            if (double.TryParse(Console.ReadLine(), out depositAmount))
             {
                 Console.WriteLine("Which account?");
                 string accountChoice = Console.ReadLine();
