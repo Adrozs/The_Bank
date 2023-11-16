@@ -136,9 +136,10 @@ namespace The_Bank
             if (DbHelpers.IsCustomer(context, userName, customerPin))
             {
                 ViewAccountInfo(context, userName);
-                Console.WriteLine("\t\tFrom which account do you want to withdraw from?:");
-                Console.Write("\t\t");
+                Console.Write("\t\tChoose account to withdraw: ");
                 string accountChoice = Console.ReadLine();
+                Console.SetCursorPosition(0, Console.CursorTop - 1);
+                MenuFunctions.ClearCurrentConsoleLine();
                 if (string.IsNullOrEmpty(accountChoice)) //Checks that user have written anything
                 {
                     Console.WriteLine("\t\tYou have to put in a valid account name.");
@@ -150,6 +151,8 @@ namespace The_Bank
                     Console.Write("\t\tHow much would you like to withdraw? ");
                     if (double.TryParse(Console.ReadLine(), out double withdraw))
                     {
+                        Console.SetCursorPosition(0, Console.CursorTop - 1);
+                        MenuFunctions.ClearCurrentConsoleLine();
                         var account = context.Accounts
                          .Include(a => a.User)
                          .SingleOrDefault(a => a.Name == accountChoice && a.User.Name == userName);
