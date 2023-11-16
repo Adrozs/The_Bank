@@ -35,13 +35,21 @@ namespace The_Bank.Utilities
             return user;
         }
 
-        //public static User GetUserAccounts(BankContext context, string userName)
+        // Returns true or false depending on if a user already has an account of the existing name
+        public static bool AccountAlreadyExist(BankContext context, string username, string accountName)
+        {
+            return context.Accounts.Any(a => a.Name == accountName && a.User.Name == username);  
+        }
+
+
+        //public static List<User> GetUserAccounts(BankContext context, string userName)
         //{
-        //    User user = context.Users
+        //    var user = context.Users
         //       .Where(u => u.Name == userName)
         //       .Include(u => u.Accounts)
-        //       .Single();
-        //    return user;        
+        //       .ToList();
+
+        //    return user;
         //}
 
         // Adds and saves user to database
