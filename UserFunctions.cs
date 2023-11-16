@@ -234,7 +234,7 @@ namespace The_Bank
                         {
                             // Transfer amount
                             Console.Write("Enter the transfer amount: ");
-                            if (decimal.TryParse(Console.ReadLine(), out decimal transferAmount) && transferAmount > 0)
+                            if (double.TryParse(Console.ReadLine(), out double transferAmount) && transferAmount > 0)
                             {
                                 // Check if the source account has sufficient funds
                                 if (sourceAccount.Balance >= transferAmount)
@@ -243,7 +243,7 @@ namespace The_Bank
                                     if (sourceAccount.Currency != destinationAccount.Currency)
                                     {
                                         // Use the CurrencyConverter to convert the amount to the destination currency
-                                        decimal convertedAmount = CurrencyConverter.Convert(sourceAccount.Currency, destinationAccount.Currency, transferAmount);
+                                        double convertedAmount = CurrencyConverter.Convert(sourceAccount.Currency, destinationAccount.Currency, transferAmount);
 
                                         // Update balances
                                         sourceAccount.Balance -= transferAmount;
@@ -473,7 +473,7 @@ namespace The_Bank
                     string selectedCurrency = currencies[currencyChoice];
 
                     Console.Write($"Enter the initial deposit in {selectedCurrency}: ");
-                    if (decimal.TryParse(Console.ReadLine(), out decimal initialDeposit) && initialDeposit >= 0)
+                    if (double.TryParse(Console.ReadLine(), out double initialDeposit) && initialDeposit >= 0)
                     {
                         account.Currency = selectedCurrency;
                         account.Balance = initialDeposit;
@@ -495,7 +495,7 @@ namespace The_Bank
 
             if (success)
             {
-                Console.WriteLine($"Created new account '{newAccountName}' for user '{username}'");
+                Console.WriteLine($"Created new account '{newAccountName}' for user '{userName}'");
             }
             else
             {
