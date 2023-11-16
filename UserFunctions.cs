@@ -10,6 +10,7 @@ using The_Bank.Models;
 using The_Bank.Utilities;
 using The_Bank.Migrations;
 using System.Security.Principal;
+using System.Runtime.CompilerServices;
 
 namespace The_Bank
 {
@@ -124,8 +125,7 @@ namespace The_Bank
             
         }
         public static void WithdrawMoney(BankContext context, string userName)
-        {
-            
+        {   
             Console.Write("\t\t\tPIN: ");
             Console.ForegroundColor = ConsoleColor.DarkGray;
             string customerPin = Console.ReadLine();
@@ -137,47 +137,48 @@ namespace The_Bank
                 Console.WriteLine("\t\tFrom which account do you want to withdraw from?:");
                 Console.Write("\t\t");
                 string accountChoice = Console.ReadLine();
-                if (string.IsNullOrEmpty(accountChoice))
+                if (string.IsNullOrEmpty(accountChoice)) //Checks that user have written anything
                 {
                     Console.WriteLine("\t\tYou have to put in a valid account name.");
                     Console.ReadKey();
                     return;
                 }
-
-                Console.Write("\t\tHow much would you like to withdraw? ");
-                if (double.TryParse(Console.ReadLine(), out double withdraw))
+                if (DbHelpers.AccountAlreadyExist(context, userName, accountChoice)) //Checks that the user input matches existing account.
                 {
-                    var account = context.Accounts
-                     .Include(a => a.User)
-                     .SingleOrDefault(a => a.Name == accountChoice && a.User.Name == userName);
-
-                    if (account != null)
+                    Console.Write("\t\tHow much would you like to withdraw? ");
+                    if (double.TryParse(Console.ReadLine(), out double withdraw))
                     {
-                        double balance = account.Balance;
-                        //Errorchecks
-                        if (withdraw > balance)
+                        var account = context.Accounts
+                         .Include(a => a.User)
+                         .SingleOrDefault(a => a.Name == accountChoice && a.User.Name == userName);
+
+                        if (account != null) 
                         {
-                            Console.WriteLine($"\t\tCannot withdraw more than: {balance}");
+                            double balance = account.Balance;
+                            //Errorchecks
+                            if (withdraw > balance)
+                            {
+                                Console.WriteLine($"\t\tCannot withdraw more than: {balance}");
+                                Console.ReadKey(true);
+                                return;
+                            }
+                            if (withdraw <= 0)
+                            {
+                                Console.WriteLine("\t\tCannot withdraw 0 or less");
+                                Console.ReadKey(true);
+                                return;
+                            } 
+                            // Counts the new balance after withdrawal then saves it in DB
+                            double newBalance = balance - withdraw;
+                            account.Balance = newBalance;
+                            context.SaveChanges();
+                            Console.WriteLine($"\t\tYou new balance is: {newBalance}");
                             Console.ReadKey(true);
-                            return;
                         }
-                        if (withdraw <= 0)
-                        {
-                            Console.WriteLine("\t\tCannot withdraw 0 or less");
-                            Console.ReadKey(true);
-                            return;
-                        }
-
-
-                        double newBalance = balance - withdraw;
-                        account.Balance = newBalance;
-                        context.SaveChanges();
-                        Console.WriteLine($"\t\tYou new balance is: {newBalance}");
-                        Console.ReadKey(true);
-
                     }
+                    else { Console.WriteLine("\t\tPlease write a valid number."); Console.ReadKey(true); return; }
                 }
-                else { Console.WriteLine("\t\tPlease write a valid number."); Console.ReadKey(true); return; }
+                else { Console.WriteLine("\t\tThis account name does not exist. Please write an existing account name."); Console.ReadKey(true); return;}
             }
             else
             {

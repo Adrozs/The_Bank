@@ -27,6 +27,7 @@ namespace The_Bank.Utilities
             return user;
         }
 
+
         public static User GetUserByUsername(BankContext context, string username)
         {
             // Gets the user in the database that matches the username
