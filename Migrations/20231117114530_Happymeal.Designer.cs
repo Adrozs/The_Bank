@@ -12,8 +12,8 @@ using The_Bank.Data;
 namespace The_Bank.Migrations
 {
     [DbContext(typeof(BankContext))]
-    [Migration("20231109172454_AddFreezeProperties")]
-    partial class AddFreezeProperties
+    [Migration("20231117114530_Happymeal")]
+    partial class Happymeal
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -35,6 +35,10 @@ namespace The_Bank.Migrations
                     b.Property<double>("Balance")
                         .HasColumnType("float");
 
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -47,6 +51,27 @@ namespace The_Bank.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Accounts");
+                });
+
+            modelBuilder.Entity("The_Bank.Models.Admin", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Pin")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Admin");
                 });
 
             modelBuilder.Entity("The_Bank.Models.User", b =>
