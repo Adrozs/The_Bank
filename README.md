@@ -9,6 +9,7 @@ This C# console application simulates basic bank/atm functionalities. Users can 
 * User authentication
 * Account management (view, create, remove)
 * Money transactions (withdraw, deposit, transfer, currency convertion)
+* Menu navigation with keyboard arrows
 
 
 ## Table of contents
