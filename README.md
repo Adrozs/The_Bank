@@ -8,7 +8,7 @@ This C# console application simulates basic bank/atm functionalities. Users can 
 ## Features
 * User authentication
 * Account management (view, create, remove)
-* Money transactions (withdraw, deposit, transfer)
+* Money transactions (withdraw, deposit, transfer, currency convertion)
 
 
 ## Table of contents
@@ -48,7 +48,8 @@ Make sure you have the following installed:
   * EntityFrameworkCore.Tools (version 6.0.24)
 
 > [!NOTE]
-> _The project was developed using Visual Studio, but you can use your preferred IDE. Similarly, you can use your own SQL Server instance, ensuring compatibility with Entity Framework Core._
+> _The project was developed using Visual Studio, but you can use your preferred IDE.
+> Similarly, you can use your own SQL Server instance, ensuring compatibility with Entity Framework Core._
 
 
 ## Installing the project
@@ -76,7 +77,7 @@ dotnet build
 
 ## Configure database
 
-Ensure that you have A SQL Server instance running. Then update the database connection string located in DbContext inside the "Data" folder.
+Ensure that you have A SQL Server instance running. Then update the database connection string located in **DbContext** inside the **Data** folder.
 
 ```csharp
 protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -85,7 +86,7 @@ protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 }
 ```
 
-An example of the connection string format you can use is like this:
+An example of the connection string format you can use:
 
 ```csharp
 "Data Source=(localdb)\\.;Initial Catalog=Bank;Integrated Security=True;Pooling=False"
@@ -102,9 +103,9 @@ Update-Database
 The code is organized into the following main components:
 
 * Models: Contains the data models for the application.
-  * Consists of the 3 tables User, Account & Admin in the database
+  * Consists of the 3 tables User, Account & Admin in the database.
 * Data: Handles database interactions using Entity Framework.
-* Utilities: Contains all classes that help the main program with menues, logiq and calculations. 
+* Utilities: Contains all classes that help the main program with menues, logic and calculations. 
 * Program.cs: Entry point of the application and consists of the base of the program that calls all other methods 
 
 
@@ -119,6 +120,6 @@ The code is organized into the following main components:
 
 * **Adrian Rozsahegyi** - [Adrozs](https://github.com/Adrozs)
 * **Fady Hatta** - [Manhattaa](https://github.com/Manhattaa)
-* **Malin Nyberg** - [MalinNyberg](https://github.com/Adrozs](https://github.com/MalinNyberg))
-* **Fredrich Benedetti** - [Shakejelly](https://github.com/Adrozs](https://github.com/Shakejelly))
+* **Malin Nyberg** - [MalinNyberg](https://github.com/MalinNyberg)
+* **Fredrich Benedetti** - [Shakejelly](https://github.com/Shakejelly)
 * **Amanda Olving** - [Skokartong](https://github.com/Skokartong)
