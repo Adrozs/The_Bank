@@ -29,6 +29,7 @@ namespace The_Bank
 
                     //Option menu
                     MenuFunctions.header();
+                    Console.WriteLine("\t\t\t  ::Main Menu::");
                     Console.WriteLine("\t\tChoose one of the following options:");
                     MenuFunctions.divider();
 
@@ -45,8 +46,8 @@ namespace The_Bank
                     }
 
                     MenuFunctions.footer();
-                    
-                    
+
+
                     //"Listen" to keystrokes from the user
                     ConsoleKeyInfo key = Console.ReadKey(true);
 
@@ -124,68 +125,89 @@ namespace The_Bank
                     return "Log out";
                 default:
                     return "Unknown Option";
-            }          
+            }
         }
+
         public static void WithdrawMoney(BankContext context, string userName)
-        {   
+        {
+            // Prompt the user for their PIN
             Console.Write("\t\t\tPIN: ");
             Console.ForegroundColor = ConsoleColor.DarkGray;
             string customerPin = MenuFunctions.CursorReadLine();
             Console.ResetColor();
             Console.WriteLine();
+
+            // Check if the provided PIN is valid for the given user
             if (DbHelpers.IsCustomer(context, userName, customerPin))
             {
-                ViewAccountInfo(context, userName);
-                Console.Write("\t\tChoose account to withdraw: ");
-                string accountChoice = MenuFunctions.CursorReadLine();
-                Console.SetCursorPosition(0, Console.CursorTop - 1);
-                MenuFunctions.ClearCurrentConsoleLine();
-                if (string.IsNullOrEmpty(accountChoice)) //Checks that user have written anything
+                // Retrieve the user information, including accounts
+                User user = context.Users
+                    .Include(u => u.Accounts)
+                    .SingleOrDefault(u => u.Name == userName);
+
+                // Check if the user exists
+                if (user == null)
                 {
-                    Console.WriteLine("\t\tYou have to put in a valid account name.");
-                    Console.ReadKey();
+                    Console.WriteLine("\t\tUser not found. Withdrawal canceled.");
+                    Console.ReadKey(true);
                     return;
                 }
-                if (DbHelpers.AccountAlreadyExist(context, userName, accountChoice)) //Checks that the user input matches existing account.
-                {
-                    Console.Write("\t\tHow much would you like to withdraw? ");
-                    Console.CursorVisible = true;
-                    if (double.TryParse(Console.ReadLine(), out double withdraw))
-                    {
-                        Console.CursorVisible = false;
-                        Console.SetCursorPosition(0, Console.CursorTop - 1);
-                        MenuFunctions.ClearCurrentConsoleLine();
-                        var account = context.Accounts
-                         .Include(a => a.User)
-                         .SingleOrDefault(a => a.Name == accountChoice && a.User.Name == userName);
 
-                        if (account != null) 
-                        {
-                            double balance = account.Balance;
-                            //Errorchecks
-                            if (withdraw > balance)
-                            {
-                                Console.WriteLine($"\t\tCannot withdraw more than: {balance}");
-                                Console.ReadKey(true);
-                                return;
-                            }
-                            if (withdraw <= 0)
-                            {
-                                Console.WriteLine("\t\tCannot withdraw 0 or less");
-                                Console.ReadKey(true);
-                                return;
-                            } 
-                            // Counts the new balance after withdrawal then saves it in DB
-                            double newBalance = balance - withdraw;
-                            account.Balance = newBalance;
-                            context.SaveChanges();
-                            Console.WriteLine($"\t\tYou new balance is: {newBalance}");
-                            Console.ReadKey(true);
-                        }
-                    }
-                    else { Console.WriteLine("\t\tPlease write a valid number."); Console.ReadKey(true); return; }
+                // Allows the user to select an account using arrow keys and highlight the selection
+                int chosenAccountPosition = MenuFunctions.OptionsNavigation(user.Accounts.Select(a => $"\t\t{a.Name}: {a.Balance} {a.Currency}").ToArray(), "\t\tChoose account to withdraw:");
+                // Check if the selected account position is valid
+                if (chosenAccountPosition < 0 || chosenAccountPosition >= user.Accounts.Count)
+                {
+                    Console.WriteLine("\t\tInvalid account selection. Withdrawal canceled.");
+                    Console.ReadKey(true);
+                    return;
                 }
-                else { Console.WriteLine("\t\tThis account name does not exist. Please write an existing account name."); Console.ReadKey(true); return;}
+                //Retrieves the selected account
+                Account selectedAccount = user.Accounts.ElementAt(chosenAccountPosition);
+
+                // Prompt the user for the withdrawal amount
+                MenuFunctions.footer();
+                Console.Write("\t\tHow much would you like to withdraw? ");
+                Console.CursorVisible = true;
+
+                // Validates and processes the withdrawal amount
+                if (double.TryParse(Console.ReadLine(), out double withdraw))
+                {
+                    Console.CursorVisible = false;
+                    Console.SetCursorPosition(0, Console.CursorTop - 1);
+                    MenuFunctions.ClearCurrentConsoleLine();
+
+                    double balance = selectedAccount.Balance;
+
+                    // Check if the withdrawal amount is valid
+                    if (withdraw > balance)
+                    {
+                        Console.WriteLine($"\t\tCannot withdraw more than: {balance}");
+                        Console.ReadKey(true);
+                        return;
+                    }
+
+                    if (withdraw <= 0)
+                    {
+                        Console.WriteLine("\t\tCannot withdraw 0 or less");
+                        Console.ReadKey(true);
+                        return;
+                    }
+
+                    // Update the account balance after the withdrawal and save changes to the database                 
+                    double newBalance = balance - withdraw;
+                    selectedAccount.Balance = newBalance;
+                    context.SaveChanges();
+                    // Display the new account balance to the user
+                    Console.WriteLine($"\t\tYour new balance is: {newBalance}");
+                    Console.ReadKey(true);
+                }
+                else
+                {
+                    Console.WriteLine("\t\tPlease write a valid number.");
+                    Console.ReadKey(true);
+                    return;
+                }
             }
             else
             {
@@ -194,6 +216,7 @@ namespace The_Bank
                 return;
             }
         }
+
 
         //private static void DisplayAccountBalances(BankContext context, string userName)
         private static void ViewAccountInfo(BankContext context, string userName)
@@ -212,181 +235,158 @@ namespace The_Bank
                 Console.WriteLine("\t\tYour accounts and balance:");
                 MenuFunctions.footer();
 
-                    foreach (var account in user.Accounts)
-                    {
-                        Console.WriteLine($"\t\t{account.Name}: {account.Balance} {account.Currency}");
-                    }
-                }
-                else
+                foreach (var account in user.Accounts)
                 {
-                    Console.WriteLine("\t\tUser not found");
+                    Console.WriteLine($"\t\t{account.Name}: {account.Balance} {account.Currency}");
                 }
+            }
+            else
+            {
+                Console.WriteLine("\t\tUser not found");
+            }
         }
 
         // Transfer money between accounts
         static void TransferMoney(BankContext context, string userName)
         {
-            // Get user info from Database
+            // Retrieve the user information, including accounts
             User user = context.Users
-                .Include(u => u.Accounts)
-                .SingleOrDefault(u => u.Name == userName);
+             .Include(u => u.Accounts)
+             .Single(u => u.Name == userName);
 
-            // Check if user is null
+            //Checks if user exist
             if (user == null)
             {
-                Console.WriteLine("User not found. Transfer canceled.");
-                Console.WriteLine("Press [Enter] to return to the main menu");
+                Console.WriteLine("\t\tUser not found. Transfer canceled.");
+                Console.WriteLine("\t\tPress [Enter] to return to the main menu");
                 MenuFunctions.CursorReadLine();
                 return;
             }
 
-            // Display user accounts
-            Console.WriteLine("Select the source account to transfer money from:");
-            foreach (var account in user.Accounts)
+            //Allows the user to select an account using arrow keys and highlight the selection
+            MenuFunctions.header();
+            int sourceAccountPosition = MenuFunctions.OptionsNavigation(user.Accounts.Select(a => $"\t\t{a.Name}: {a.Balance} {a.Currency}").ToArray(),
+            "\t\tSelect the source account to transfer money from:");
+
+
+            // Check if the selected account position is valid
+            if (sourceAccountPosition < 0 || sourceAccountPosition >= user.Accounts.Count)
             {
-                Console.WriteLine($"{account.Id}. {account.Name}: {account.Balance} {account.Currency}");
+                Console.WriteLine("\t\tInvalid source account selection. Transfer canceled.");
+                Console.WriteLine("\t\tPress [Enter] to return to the main menu");
+                MenuFunctions.CursorReadLine();
+                return;
+            }
+            //Makes a list of User Accounts
+            List<Account> userAccountsList = user.Accounts.ToList();
+
+            Account sourceAccount = userAccountsList[sourceAccountPosition];
+            //Getting the user account info from database and turns it to a list
+            List<string> destinationOptions = userAccountsList
+               .Where(a => a.Id != sourceAccount.Id)
+               .Select(a => $"\t\t{a.Name}: {a.Balance} {a.Currency}")
+               .ToList();
+
+            //Allows the user to select an account using arrow keys and highlight the selection
+            int destinationAccountPosition = MenuFunctions.OptionsNavigation(destinationOptions.ToArray(),
+            "\t\tSelect the destination account to transfer money to:");
+            //Promts the user to select an account to transfer money to
+
+            //Checks if the chosen destination account is valid
+            if (destinationAccountPosition < 0 || destinationAccountPosition >= user.Accounts.Count)
+            {
+                Console.WriteLine("\t\tInvalid destination account selection. Transfer canceled.");
+                Console.WriteLine("\t\tPress [Enter] to return to the main menu");
+                MenuFunctions.CursorReadLine();
+                return;
             }
 
-            // Select source account number
-            Console.Write("Enter the source account number: ");
-            if (int.TryParse(Console.ReadLine(), out int sourceAccountId))
+            Account destinationAccount = userAccountsList[destinationAccountPosition];
+
+            //promts the user to enter the transfer amount
+            Console.Write("\t\tEnter the transfer amount: ");
+            if (double.TryParse(Console.ReadLine(), out double transferAmount) && transferAmount > 0)
             {
-                // SOURCE ACCOUNT
-                Account sourceAccount = user.Accounts?.SingleOrDefault(a => a.Id == sourceAccountId);
-
-                // Check if sourceAccount is null
-                if (sourceAccount == null)
+                if (sourceAccount.Balance >= transferAmount)
                 {
-                    Console.WriteLine("Invalid source account number. Please select a valid account.");
-                    Console.WriteLine("Press [Enter] to return to the main menu");
-                    MenuFunctions.CursorReadLine();
-                    return;
-                }
-
-                // Select destination account (only user's own accounts)
-                Console.WriteLine("Select the destination account to transfer money to:");
-                foreach (var account in user.Accounts.Where(a => a.Id != sourceAccountId))
-                {
-                    Console.WriteLine($"{account.Id}. {account.Name}: {account.Balance} {account.Currency}");
-                }
-
-                Console.Write("Enter the destination account number: ");
-                if (int.TryParse(Console.ReadLine(), out int destinationAccountId))
-                {
-                    // Destination account
-                    Account destinationAccount = user.Accounts?.SingleOrDefault(a => a.Id == destinationAccountId);
-
-                    // Check if destinationAccount is null
-                    if (destinationAccount == null)
+                    if (sourceAccount.Currency != destinationAccount.Currency)
                     {
-                        Console.WriteLine("Invalid destination account number. Please select a valid account.");
-                        Console.WriteLine("Press [Enter] to return to the main menu");
-                        MenuFunctions.CursorReadLine();
-                        return;
-                    }
-
-                    // Transfer amount
-                    Console.Write("Enter the transfer amount: ");
-                    if (double.TryParse(Console.ReadLine(), out double transferAmount) && transferAmount > 0)
-                    {
-                        // Check if the source account has sufficient funds
-                        if (sourceAccount.Balance >= transferAmount)
-                        {
-                            // If source and destination accounts have different currencies, perform currency conversion
-                            if (sourceAccount.Currency != destinationAccount.Currency)
-                            {
-                                // Use the CurrencyConverter to convert the amount to the destination currency
-                                double convertedAmount = CurrencyConverter.Convert(sourceAccount.Currency, destinationAccount.Currency, transferAmount);
-
-                                // Update balances
-                                sourceAccount.Balance -= transferAmount;
-                                destinationAccount.Balance += convertedAmount;
-
-                                // Save changes
-                                context.SaveChanges();
-
-                                // Display updated balances
-                                Console.WriteLine($"Transfer successful! New balance for {sourceAccount.Name}: {sourceAccount.Balance} ({sourceAccount.Currency})");
-                                Console.WriteLine($"New balance for {destinationAccount.Name}: {destinationAccount.Balance} ({destinationAccount.Currency})");
-                            }
-                            else
-                            {
-                                // Same currency, no conversion needed
-                                sourceAccount.Balance -= transferAmount;
-                                destinationAccount.Balance += transferAmount;
-
-                                // Save changes
-                                context.SaveChanges();
-
-                                // Display updated balances
-                                Console.WriteLine($"Transfer successful! New balance for {sourceAccount.Name}: {sourceAccount.Balance} ({sourceAccount.Currency})");
-                                Console.WriteLine($"New balance for {destinationAccount.Name}: {destinationAccount.Balance} ({destinationAccount.Currency})");
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine("Insufficient funds in the source account. Transfer canceled.");
-                        }
+                        double convertedAmount = CurrencyConverter.Convert(sourceAccount.Currency, destinationAccount.Currency, transferAmount);
+                        sourceAccount.Balance -= transferAmount;
+                        destinationAccount.Balance += convertedAmount;
+                        context.SaveChanges();
+                        DisplayBalances(sourceAccount, destinationAccount);
                     }
                     else
                     {
-                        Console.WriteLine("Invalid transfer amount. Please enter a valid positive number.");
+                        sourceAccount.Balance -= transferAmount;
+                        destinationAccount.Balance += transferAmount;
+                        context.SaveChanges();
+                        DisplayBalances(sourceAccount, destinationAccount);
                     }
                 }
                 else
                 {
-                    Console.WriteLine("Invalid input. Please enter a valid destination account number.");
+                    Console.WriteLine("\t\tInsufficient funds in the source account. Transfer canceled.");
                 }
             }
             else
             {
-                Console.WriteLine("Invalid input. Please enter a valid source account number.");
+                Console.WriteLine("\t\tInvalid transfer amount. Please enter a valid positive number.");
             }
+            //method to print out new balances
+            void DisplayBalances(Account source, Account destination)
+            {
+                MenuFunctions.footer();
+                Console.WriteLine($"\t\tTransfer successful! New balance for {source.Name}: {source.Balance} ({source.Currency})");
+                Console.WriteLine($"\t\tNew balance for {destination.Name}: {destination.Balance} ({destination.Currency})");
+            }
+
         }
 
 
         // Deposit money to account
         private static void DepositMoney(BankContext context, string username)
         {
-            ViewAccountInfo(context, username);
+            User user = context.Users
+            .Include(u => u.Accounts)
+            .SingleOrDefault(u => u.Name == username);
 
-            Console.WriteLine("How much do you wish to deposit?");
-            double depositAmount;
-
-            if (double.TryParse(Console.ReadLine(), out depositAmount))
+            if (user == null)
             {
-                Console.WriteLine("Which account?");
-                string accountChoice = MenuFunctions.CursorReadLine();
+                Console.WriteLine("\t\tUser not found. Deposit canceled.");
+                Console.ReadKey(true);
+                return;
+            }
 
-                var account = context.Accounts
-                    .FirstOrDefault(a => a.Name == accountChoice);
+            
+            string[] accountOptions = user.Accounts.Select(a => $"\t\t{a.Name}: {a.Balance} {a.Currency}").ToArray();
+            int chosenAccountPosition = MenuFunctions.OptionsNavigation(accountOptions, "\t\tChoose an account to deposit into:");
 
-                if (account != null)
-                {
-                    Console.WriteLine($"Depositing {depositAmount} into {accountChoice}");
+            if (chosenAccountPosition < 0 || chosenAccountPosition >= user.Accounts.Count)
+            {
+                Console.WriteLine("\t\tInvalid account selection. Deposit canceled.");
+                Console.ReadKey(true);
+                return;
+            }
 
-                    account.Balance += depositAmount;
-                    context.SaveChanges();
-                    Console.WriteLine($"New balance {account.Balance}");
-                }
-                else
-                {
-                    Console.WriteLine("Account not found. Do you want to open a new account? (Y/N)");
+            Account selectedAccount = user.Accounts.ElementAt(chosenAccountPosition);
 
-                    if (Console.ReadKey(true).Key == ConsoleKey.Y)
-                    {
-                        OpenNewAccount(context, username);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Deposit operation cancelled.");
-                    }
-                }
+            Console.Write("\t\tHow much do you wish to deposit?");
+            if (double.TryParse(Console.ReadLine(), out double depositAmount))
+            {
+                MenuFunctions.divider();
+                Console.WriteLine($"\t\tDepositing {depositAmount} into {selectedAccount.Name}");
+
+                selectedAccount.Balance += depositAmount;
+                context.SaveChanges();
+                Console.WriteLine($"\t\tNew balance: {selectedAccount.Balance}");
             }
             else
             {
-                Console.WriteLine("Invalid deposit amount entered.");
+                Console.WriteLine("\t\tInvalid deposit amount entered.");
             }
+
         }
 
         // Create a new account for logged in user
@@ -400,17 +400,18 @@ namespace The_Bank
 
             while (true)
             {
-                Console.WriteLine("Enter new account name: ");
+                MenuFunctions.header();
+                Console.Write("\t\tEnter new account name: ");
                 newAccountName = MenuFunctions.CursorReadLine();
 
                 // Checks if string is null or empty or if an account with that name already exist for current user
                 if (string.IsNullOrEmpty(newAccountName))
                 {
-                    Console.WriteLine("Error! Name cannot be empty. \n");
+                    Console.WriteLine("\t\tError! Name cannot be empty. \n");
                 }
                 else if (DbHelpers.AccountAlreadyExist(context, userName, newAccountName))
                 {
-                    Console.WriteLine("Error! You already have an account with that name. \n");
+                    Console.WriteLine("\t\tError! You already have an account with that name. \n");
                 }
                 else
                     break;
@@ -421,16 +422,16 @@ namespace The_Bank
 
 
             // Declare array navOptions as yes or no
-            string[] navOptions = { "Yes", "No" };
+            string[] navOptions = { "\t\tYes", "\t\tNo" };
 
             // Passes along the options yes and no as well as the phrase to the nav method
             // Checks if it returns 0 (which translates to yes in this case) and runs the code, otherwise skips.
-            if (MenuFunctions.OptionsNavigation(navOptions, "Will this account be in a foreign currency?") == 0)
+            if (MenuFunctions.OptionsNavigation(navOptions, "\t\tWill this account be in a foreign currency?") == 0)
             {
                 // Create array of all the currenies to choose from
                 string[] currencyOptions = {
-                "US Dollar (USD)", "Euro (EUR)", "UK Sterling (GBP)", "Swiss Franc (CHF)", 
-                "Canadian Dollar (CAD)", "Zimbabwean Dollar (ZWD)" 
+                "\t\tUS Dollar (USD)", "\t\tEuro (EUR)", "\t\tUK Sterling (GBP)", "\t\tSwiss Franc (CHF)",
+                "\t\tCanadian Dollar (CAD)", "\t\tZimbabwean Dollar (ZWD)" 
                 // ADD MORE CURRENCIES HERE
                 };
 
@@ -439,7 +440,7 @@ namespace The_Bank
 
 
                 // Prompts user to choose one of the foreign 
-                int chosenOption = MenuFunctions.OptionsNavigation(currencyOptions, "Available foreign currencies: ");
+                int chosenOption = MenuFunctions.OptionsNavigation(currencyOptions, "\t\tAvailable foreign currencies: ");
 
                 // Sets selectedCurrency to the chopsen one from the aboce OptionsNavigation 
                 selectedCurrency = currencies[chosenOption];
@@ -459,13 +460,15 @@ namespace The_Bank
 
             // Passes along the options yes and no as well as the phrase to the nav method
             // Checks if it returns 0 (which translates to yes in this case) and runs the code, otherwise skips.
-            if (MenuFunctions.OptionsNavigation(navOptions, $"Do you wish make a deposit to {newAccountName}?") == 0)
+            if (MenuFunctions.OptionsNavigation(navOptions, $"\t\tDo you wish make a deposit to {newAccountName}?") == 0)
             {
                 // Re-promts user until correct input is made
                 while (true)
                 {
+                    Console.Clear();
+                    MenuFunctions.header();
                     // Asks user for deposit amount and checks if value is correct. If yes changes account balance to chosen amount and breaks out of the loop to continue with the rest of the code.
-                    Console.Write($"Enter deposit amount in {selectedCurrency}: ");
+                    Console.Write($"\t\tEnter deposit amount in {selectedCurrency}: ");
                     if (double.TryParse(Console.ReadLine(), out double initialDeposit) && initialDeposit >= 0)
                     {
                         account.Balance = initialDeposit;
@@ -473,7 +476,7 @@ namespace The_Bank
                     }
                     else
                     {
-                        Console.WriteLine("Invalid deposit amount. Please enter a valid positive number.");
+                        Console.WriteLine("\t\tInvalid deposit amount. Please enter a valid positive number.");
                     }
                 }
             }
@@ -483,12 +486,12 @@ namespace The_Bank
 
             if (success)
             {
-                Console.WriteLine($"Created new account '{newAccountName}' for user '{userName}'");
+                Console.WriteLine($"\t\tCreated new account '{newAccountName}' for user '{userName}'");
             }
             else
             {
-                Console.WriteLine($"Failed to create account '{newAccountName}'");
-                Console.WriteLine("Returning to menu");
+                Console.WriteLine($"\t\tFailed to create account '{newAccountName}'");
+                Console.WriteLine("\t\tReturning to menu");
                 return;
             }
             Console.WriteLine(); // New line for text formatting
@@ -503,13 +506,13 @@ namespace The_Bank
             // Asks user for pin and checks if it matches login
             while (true)
             {
-                Console.WriteLine("Enter current PIN: ");
+                Console.WriteLine("\t\tEnter current PIN: ");
                 string currentPin = MenuFunctions.CursorReadLine();
 
                 // Re-promt user until string isn't empty
                 while (string.IsNullOrEmpty(currentPin))
                 {
-                    Console.WriteLine("Error! PIN can't be empty");
+                    Console.WriteLine("\t\tError! PIN can't be empty");
                     currentPin = MenuFunctions.CursorReadLine();
                 }
 
@@ -517,16 +520,16 @@ namespace The_Bank
                 if (DbHelpers.IsCustomer(context, username, currentPin))
                     break;
                 else
-                    Console.WriteLine("Error! Wrong PIN. Try again. \n");
+                    Console.WriteLine("\t\tError! Wrong PIN. Try again. \n");
             }
 
             // Re-promt user for pins until 2 consecutive pins match
             while (true)
             {
-                Console.WriteLine("Enter new PIN: ");
+                Console.WriteLine("\t\tEnter new PIN: ");
                 string newPin = MenuFunctions.CursorReadLine();
 
-                Console.WriteLine("Confirm new PIN: ");
+                Console.WriteLine("\t\tConfirm new PIN: ");
                 string newPinConfirm = MenuFunctions.CursorReadLine();
 
                 // If pins match save them to database and break out of loop - else write error message
@@ -535,19 +538,20 @@ namespace The_Bank
                     bool success = DbHelpers.EditPin(context, user, newPin);
                     if (success)
                     {
-                        Console.WriteLine($"Changed PIN to {newPin} for user {username}");
+                        Console.WriteLine($"\t\tChanged PIN to {newPin} for user {username}");
                     }
                     // If wasn't possible to save account to database, print error
                     else
                     {
-                        Console.WriteLine($"Failed to update PIN to {newPin} for {username}");
-                        Console.WriteLine("Returning to menu");
+                        Console.WriteLine($"\t\tFailed to update PIN to {newPin} for {username}");
+                        Console.WriteLine("\t\tReturning to menu");
                     }
                     break;
                 }
                 else
-                    Console.WriteLine("PIN codes doesn't match. Try again. \n");
+                    Console.WriteLine("\t\tPIN codes doesn't match. Try again. \n");
             }
         }
+
     }
 }

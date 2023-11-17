@@ -65,6 +65,7 @@ namespace The_Bank.Models
             {
                 // Clears window and re-prints the sent in phrase on each loop
                 Console.Clear();
+                header();
                 Console.WriteLine(phrase);
 
                 // Forloop to print all the options 
