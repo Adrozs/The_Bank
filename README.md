@@ -11,7 +11,28 @@ This C# console application simulates basic bank/atm functionalities. Users can 
 * Money transactions (withdraw, deposit, transfer)
 
 
-## Getting Started
+## Table of contents
+[Introduction](https://github.com/Adrozs/The_Bank/tree/master#the-bank-of-dreams)
+
+[Features](https://github.com/Adrozs/The_Bank/tree/master#features)
+
+[Getting started](https://github.com/Adrozs/The_Bank/tree/master#getting-started)
+
+[Prerequisites](https://github.com/Adrozs/The_Bank/tree/master#prerequisites)
+
+[Installation](https://github.com/Adrozs/The_Bank/tree/master#installing-the-project)
+
+[Configure database](https://github.com/Adrozs/The_Bank/tree/master#configure-database)
+
+[Structure](https://github.com/Adrozs/The_Bank/tree/master#structure)
+
+[Built with](https://github.com/Adrozs/The_Bank/tree/master#built-with)
+
+[Made by](https://github.com/Adrozs/The_Bank/tree/master#made-by-dreamteam)
+
+
+
+## Getting started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
@@ -30,7 +51,7 @@ Make sure you have the following installed:
 > _The project was developed using Visual Studio, but you can use your preferred IDE. Similarly, you can use your own SQL Server instance, ensuring compatibility with Entity Framework Core._
 
 
-## Installing project
+## Installing the project
 
 A step by step series of examples that tell you how to get the app upp and running.
 
@@ -53,7 +74,7 @@ cd The_Bank
 dotnet build
 ```
 
-## Configure Database
+## Configure database
 
 Ensure that you have A SQL Server instance running. Then update the database connection string located in DbContext inside the "Data" folder.
 
@@ -87,7 +108,7 @@ The code is organized into the following main components:
 * Program.cs: Entry point of the application and consists of the base of the program that calls all other methods 
 
 
-## Built With
+## Built with
 
 * [C#](http://www.dropwizard.io/1.0.2/docs/](https://learn.microsoft.com/en-us/dotnet/csharp/)) - Programming language
 * [MS SQL](https://maven.apache.org/](https://learn.microsoft.com/en-us/sql/?view=sql-server-ver16)) - Database
