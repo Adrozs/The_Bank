@@ -11,6 +11,7 @@ using The_Bank.Utilities;
 using The_Bank.Migrations;
 using System.Security.Principal;
 using System.Runtime.CompilerServices;
+using System.ComponentModel.Design;
 
 namespace The_Bank
 {
@@ -98,6 +99,9 @@ namespace The_Bank
                     ChangePin(context, userName);
                     break;
                 case 7:
+                    MenuFunctions.PrintFast("\t\tYou are now logging out.");
+                    Thread.Sleep(3000);
+                    System.Environment.Exit(0);
                     return;
                 default:
                     Console.WriteLine("Error! Please try again.");
@@ -517,7 +521,7 @@ namespace The_Bank
                 }
 
                 // If pin matches login info, break out of loop
-                if (DbHelpers.IsCustomer(context, username, currentPin))
+                if (DbHelpers.VerifyUserLogin(context, username, currentPin))
                     break;
                 else
                     Console.WriteLine("\t\tError! Wrong PIN. Try again. \n");
