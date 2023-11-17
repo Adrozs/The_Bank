@@ -142,7 +142,7 @@ namespace The_Bank
             Console.WriteLine();
 
             // Check if the provided PIN is valid for the given user
-            if (DbHelpers.IsCustomer(context, userName, customerPin))
+            if (DbHelpers.VerifyUserLogin(context, userName, customerPin))
             {
                 // Retrieve the user information, including accounts
                 User user = context.Users
