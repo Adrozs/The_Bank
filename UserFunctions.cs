@@ -98,7 +98,7 @@ namespace The_Bank
                     ChangePin(context, userName);
                     break;
                 case 7:
-                    Console.WriteLine("\t\tYou are now logging out.");
+                    MenuFunctions.Print("\t\tYou are now logging out.");
                     Thread.Sleep(3000);
                     System.Environment.Exit(0);
                     return;
@@ -146,14 +146,14 @@ namespace The_Bank
                 if (DbHelpers.VerifyUserLogin(context, userName, customerPin))
                 {
                     ViewAccountInfo(context, userName);
-                    Console.WriteLine("\t\t==================================");
+                    MenuFunctions.footer();
                     Console.Write("\t\tChoose account to withdraw: ");
                     string accountChoice = MenuFunctions.CursorReadLine();
                     Console.SetCursorPosition(0, Console.CursorTop - 1);
                     MenuFunctions.ClearCurrentConsoleLine();
                     if (string.IsNullOrEmpty(accountChoice)) //Checks that user have written anything
                     {
-                        Console.WriteLine("\t\tYou have to put in a valid account name.");
+                        Console.WriteLine("\t\tYou have to put in an invalid account name.");
                         Console.ReadKey();
                         continue;
                     }
@@ -190,7 +190,8 @@ namespace The_Bank
                                 double newBalance = balance - withdraw;
                                 account.Balance = newBalance;
                                 context.SaveChanges();
-                                Console.WriteLine($"\t\tYou new balance is: {newBalance}");
+                                Console.Write("\t\tYou new balance is:");
+                                MenuFunctions.Print($" {newBalance}");
                                 option = false;
                                 return;
                             }

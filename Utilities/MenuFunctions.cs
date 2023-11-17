@@ -56,10 +56,10 @@ namespace The_Bank.Models
         // Will return an int depending on which options you chose so if you have 10 options (10 things in the array)
         // And pressed [Enter] on option 4 it returns 4. So you can use an if or a switch to check which option was chosen.
         // Takes in a phrase that will be written at the top of the code.
-        public static int OptionsNavigation(string[] options, string phrase)         
+        public static int OptionsNavigation(string[] options, string phrase)
         {
             int menuSelection = 0;
-         
+
             // Loops until user presses enter on a choice
             while (true)
             {
@@ -68,19 +68,19 @@ namespace The_Bank.Models
                 Console.WriteLine(phrase);
 
                 // Forloop to print all the options 
-                for (int i = 0; i < options.Length; i++) 
+                for (int i = 0; i < options.Length; i++)
                 {
                     // Changes color of the option we've currently selected so when menuSelection is for exemple "2" the second option will turn darkgrey
-                    if (i == menuSelection) 
+                    if (i == menuSelection)
                     {
-                        Console.ForegroundColor = ConsoleColor.DarkGray; 
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
                     }
 
                     // Prints all the options in the array along with the pointer arrow if on the current selection
                     Console.Write($"{options[i]}{(menuSelection == i ? " <--" : "")}\n");
 
                     // Reset color to default
-                    Console.ResetColor(); 
+                    Console.ResetColor();
                 }
 
                 //"Listen" to keystrokes from the user
@@ -91,7 +91,7 @@ namespace The_Bank.Models
                 {
                     menuSelection--;
                 }
-                else if (key.Key == ConsoleKey.DownArrow && menuSelection < options.Length-1)
+                else if (key.Key == ConsoleKey.DownArrow && menuSelection < options.Length - 1)
                 {
                     menuSelection++;
                 }
@@ -99,7 +99,7 @@ namespace The_Bank.Models
                 {
                     return menuSelection;
                 }
-            }   
+            }
         }
 
         // Promts user to press enter key doesn't accept any other input
@@ -132,12 +132,21 @@ namespace The_Bank.Models
         }
         public static string CursorReadLine()
         {
-            string input;   
+            string input;
             Console.CursorVisible = true;
             input = Console.ReadLine();
             Console.CursorVisible = false;
             return input;
 
+        }
+        public static void Print(string text, int speed = 700)
+        {
+            foreach (char c in text)
+            {
+                Console.Write(c);
+                System.Threading.Thread.Sleep(speed);
+            }
+            Console.WriteLine();
         }
     }
 }
