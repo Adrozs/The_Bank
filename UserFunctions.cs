@@ -98,7 +98,7 @@ namespace The_Bank
                     ChangePin(context, userName);
                     break;
                 case 7:
-                    MenuFunctions.Print("\t\tYou are now logging out.");
+                    MenuFunctions.PrintFast("\t\tYou are now logging out.");
                     Thread.Sleep(3000);
                     System.Environment.Exit(0);
                     return;
@@ -191,7 +191,7 @@ namespace The_Bank
                                 account.Balance = newBalance;
                                 context.SaveChanges();
                                 Console.Write("\t\tYou new balance is:");
-                                MenuFunctions.Print($" {newBalance}");
+                                MenuFunctions.PrintSlow($" {newBalance}");
                                 option = false;
                                 return;
                             }

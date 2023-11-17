@@ -139,7 +139,16 @@ namespace The_Bank.Models
             return input;
 
         }
-        public static void Print(string text, int speed = 700)
+        public static void PrintSlow(string text, int speed = 700)
+        {
+            foreach (char c in text)
+            {
+                Console.Write(c);
+                System.Threading.Thread.Sleep(speed);
+            }
+            Console.WriteLine();
+        }
+        public static void PrintFast(string text, int speed = 70)
         {
             foreach (char c in text)
             {
