@@ -193,7 +193,6 @@ namespace The_Bank
         }
 
         // Transfer money between accounts
-        // Transfer money between accounts
         static void TransferMoney(BankContext context, string userName)
         {
             // Get user info from Database
@@ -328,7 +327,7 @@ namespace The_Bank
             // Display message and wait for Enter key press to return to the main menu
             Console.WriteLine("Press [Enter] to return to the main menu");
             Console.ReadLine();
-        }
+        }0
 
 
 
