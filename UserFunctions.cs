@@ -2,6 +2,7 @@
 using The_Bank.Data;
 using The_Bank.Models;
 using The_Bank.Utilities;
+using NAudio.Wave;
 
 namespace The_Bank
 {
@@ -346,6 +347,9 @@ namespace The_Bank
                         destinationAccount.Balance += convertedAmount;
                         context.SaveChanges();
                         DisplayBalances(sourceAccount, destinationAccount);
+
+                        // Play sound after a successful money transfer
+                        PlaySound("transferComplete.wav");
                     }
                     else
                     {
@@ -353,6 +357,9 @@ namespace The_Bank
                         destinationAccount.Balance += transferAmount;
                         context.SaveChanges();
                         DisplayBalances(sourceAccount, destinationAccount);
+
+                        // Play sound after a successful money transfer
+                        PlaySound(@"C:\Users\fadde\source\repos\The_Bank\swish.wav");
                     }
                 }
                 else
@@ -365,6 +372,7 @@ namespace The_Bank
                 Console.WriteLine("\t\tInvalid transfer amount. Please enter a valid positive number.");
             }
 
+
             // Method to print out new balances
             void DisplayBalances(Account source, Account destination)
             {
@@ -374,9 +382,6 @@ namespace The_Bank
                 Console.WriteLine($"\t\tNew balance for {destination.Name}: {Math.Round(destination.Balance, 2)} ({destination.Currency})");
             }
         }
-
-
-
 
 
 
@@ -393,7 +398,7 @@ namespace The_Bank
                 return;
             }
 
-            
+
             string[] accountOptions = user.Accounts.Select(a => $"\t\t{a.Name}: {a.Balance} {a.Currency}").ToArray();
             int chosenAccountPosition = MenuFunctions.OptionsNavigation(accountOptions, "\t\tChoose an account to deposit into:");
 
@@ -583,7 +588,7 @@ namespace The_Bank
 
                 Console.Write("\t\tConfirm new PIN: ");
                 string newPinConfirm = MenuFunctions.CursorReadLine();
-                
+
                 // Checks so either pin is not null or empty
                 if (!string.IsNullOrEmpty(newPin) || !string.IsNullOrEmpty(newPinConfirm))
                 {
@@ -621,6 +626,29 @@ namespace The_Bank
                 Thread.Sleep(1000);
             }
         }
+        private static WaveOutEvent waveOut = new WaveOutEvent();
+        private static void PlaySound(string soundFileName)
+        {
+            try
+            {
+                string fullPath = Path.Combine(Environment.CurrentDirectory, soundFileName);
 
+                using (var audioFile = new AudioFileReader(fullPath))
+                {
+                    waveOut.Init(audioFile);
+                    waveOut.Play();
+                    while (waveOut.PlaybackState == PlaybackState.Playing)
+                    {
+                        // Wait for playback to finish
+                        Thread.Sleep(100);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle the exception as needed
+                // Print or log additional information about the exception, if needed
+            }
+        }
     }
 }
