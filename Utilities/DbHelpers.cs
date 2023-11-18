@@ -27,15 +27,6 @@ namespace The_Bank.Utilities
             return user;
         }
 
-
-        public static User GetUserByUsername(BankContext context, string username)
-        {
-            // Gets the user in the database that matches the username
-            User user = context.Users.FirstOrDefault(u => u.Name == username);
-
-            return user;
-        }
-
         // Returns true or false depending on if a user already has an account of the existing name
         public static bool AccountAlreadyExist(BankContext context, string username, string accountName)
         {

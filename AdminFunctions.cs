@@ -84,7 +84,7 @@ namespace The_Bank
             string usernameToDelete = MenuFunctions.CursorReadLine();
 
             // Get the user from the database
-            User userToDelete = DbHelpers.GetUserByUsername(context, usernameToDelete);
+            User userToDelete = DbHelpers.GetUser(context, usernameToDelete);
 
             if (userToDelete != null)
             {
