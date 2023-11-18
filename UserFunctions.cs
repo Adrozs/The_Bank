@@ -138,9 +138,7 @@ namespace The_Bank
             if (DbHelpers.VerifyUserLogin(context, userName, customerPin))
             {
                 // Retrieve the user information, including accounts
-                User user = context.Users
-                    .Include(u => u.Accounts)
-                    .SingleOrDefault(u => u.Name == userName);
+                User user = DbHelpers.GetUserAndAccounts(context, userName);
 
                 // Check if the user exists
                 if (user == null)
@@ -219,9 +217,7 @@ namespace The_Bank
         private static void ViewAccountInfo(BankContext context, string userName)
         {
             //Get info about user from database
-            User user = context.Users
-                .Include(u => u.Accounts)
-                .Single(u => u.Name == userName);
+            User user = DbHelpers.GetUserAndAccounts(context, userName);
 
             //Display user accounts and balance
             if (user != null)
@@ -247,9 +243,7 @@ namespace The_Bank
         static void TransferMoney(BankContext context, string userName)
         {
             // Retrieve the user information, including accounts
-            User user = context.Users
-             .Include(u => u.Accounts)
-             .Single(u => u.Name == userName);
+            User user = DbHelpers.GetUserAndAccounts(context, userName);
 
             //Checks if user exist
             if (user == null)
@@ -345,9 +339,8 @@ namespace The_Bank
         // Deposit money to account
         private static void DepositMoney(BankContext context, string username)
         {
-            User user = context.Users
-            .Include(u => u.Accounts)
-            .SingleOrDefault(u => u.Name == username);
+            // Retrieve the user information, including accounts
+            User user = DbHelpers.GetUserAndAccounts(context, username);
 
             if (user == null)
             {
