@@ -359,7 +359,9 @@ namespace The_Bank
                         DisplayBalances(sourceAccount, destinationAccount);
 
                         // Play sound after a successful money transfer
-                        PlaySound("swish.wav");
+                        PlaySound("Sounds\\swish.wav");
+
+                        //Sound path is ~The_Bank\Bin\Debug\net6.0\Sounds\...
                     }
                 }
                 else
@@ -627,13 +629,12 @@ namespace The_Bank
             }
         }
         private static WaveOutEvent waveOut = new WaveOutEvent();
+
         private static void PlaySound(string soundFileName)
         {
             try
             {
-                string fullPath = Path.Combine(Environment.CurrentDirectory, soundFileName);
-
-                string relativePath = Path.GetRelativePath(Environment.CurrentDirectory, fullPath);
+                string fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, soundFileName);
 
                 using (var audioFile = new AudioFileReader(fullPath))
                 {
@@ -649,7 +650,7 @@ namespace The_Bank
             catch (Exception ex)
             {
                 // Handle the exception as needed
-                // Print or log additional information about the exception, if needed
+                Console.WriteLine($"Error playing sound: {ex.Message}");
             }
         }
     }
