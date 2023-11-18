@@ -27,6 +27,17 @@ namespace The_Bank.Utilities
             return user;
         }
 
+        // Get specific user and their accounts
+        public static User GetUserAndAccounts(BankContext context, string username)
+        {
+            // Gets the user in the database that matches username and includes their accounts
+            User user = context.Users
+             .Include(u => u.Accounts)
+             .Single(u => u.Name == username);
+
+            return user;
+        }
+
         // Returns true or false depending on if a user already has an account of the existing name
         public static bool AccountAlreadyExist(BankContext context, string username, string accountName)
         {
