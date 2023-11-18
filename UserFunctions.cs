@@ -230,7 +230,7 @@ namespace The_Bank
 
                 foreach (var account in user.Accounts)
                 {
-                    Console.WriteLine($"\t\t{account.Name}: {Math.Round(account.Balance,2)} {account.Currency}");
+                    Console.WriteLine($"\t\t{account.Name}: {Math.Round(account.Balance, 2)} {account.Currency}");
                 }
             }
             else
@@ -239,25 +239,23 @@ namespace The_Bank
             }
         }
 
-        // Transfer money between accounts
         static void TransferMoney(BankContext context, string userName)
         {
             // Retrieve the user information, including accounts
             User user = DbHelpers.GetUserAndAccounts(context, userName);
 
-            //Checks if user exist
+            // Checks if the user exists
             if (user == null)
             {
                 Console.WriteLine("\t\tUser not found. Transfer canceled.");
-                Thread.Sleep(1000); // Wait to allow user to read error msg
+                Thread.Sleep(1000); // Wait to allow the user to read the error message
                 return;
             }
 
-            //Allows the user to select an account using arrow keys and highlight the selection
+            // Allows the user to select an account using arrow keys and highlight the selection
             MenuFunctions.header();
-            int sourceAccountPosition = MenuFunctions.OptionsNavigation(user.Accounts.Select(a => $"\t\t{a.Name}: {Math.Round(a.Balance,2)} {a.Currency}").ToArray(),
-            "\t\tSelect the source account to transfer money from:");
-
+            int sourceAccountPosition = MenuFunctions.OptionsNavigation(user.Accounts.Select(a => $"\t\t{a.Name}: {Math.Round(a.Balance, 2)} {a.Currency}").ToArray(),
+                "\t\tSelect the source account to transfer money from:");
 
             // Check if the selected account position is valid
             if (sourceAccountPosition < 0 || sourceAccountPosition >= user.Accounts.Count)
@@ -267,23 +265,65 @@ namespace The_Bank
                 MenuFunctions.CursorReadLine();
                 return;
             }
-            //Makes a list of User Accounts
+
+            // Makes a list of user accounts
             List<Account> userAccountsList = user.Accounts.ToList();
 
             Account sourceAccount = userAccountsList[sourceAccountPosition];
-            //Getting the user account info from database and turns it to a list
-            List<string> destinationOptions = userAccountsList
-               .Where(a => a.Id != sourceAccount.Id)
-               .Select(a => $"\t\t{a.Name}: {Math.Round(a.Balance,2)} {a.Currency}")
-               .ToList();
 
-            //Allows the user to select an account using arrow keys and highlight the selection
-            int destinationAccountPosition = MenuFunctions.OptionsNavigation(destinationOptions.ToArray(),
-            "\t\tSelect the destination account to transfer money to:");
-            //Promts the user to select an account to transfer money to
+            // Retrieve all users except the current user
+            List<User> otherUsers = context.Users?.Where(u => u.Id != user.Id)?.ToList();
 
-            //Checks if the chosen destination account is valid
-            if (destinationAccountPosition < 0 || destinationAccountPosition >= user.Accounts.Count)
+            // Display a list of other users for the destination, including the current user
+            int destinationUserPosition = MenuFunctions.OptionsNavigation(
+                (otherUsers.Select(u => $"\t\t{u.Name}").ToList()
+                .Concat(new List<string> { $"\t\t{user.Name} (yourself)" })).ToArray(),
+                "\t\tSelect the user to transfer money to:");
+
+            // Check if the selected destination user position is valid
+            if (destinationUserPosition < 0 || destinationUserPosition >= otherUsers.Count + 1)
+            {
+                Console.WriteLine("\t\tInvalid destination user selection. Transfer canceled.");
+                Console.WriteLine("\t\tPress [Enter] to return to the main menu");
+                MenuFunctions.CursorReadLine();
+                return;
+            }
+
+            User destinationUser = destinationUserPosition < otherUsers.Count
+                ? otherUsers[destinationUserPosition]
+                : user;
+
+            List<Account> destinationAccounts;
+
+            // If the destination user is the same as the source user, allow transfer between own accounts (
+            if (destinationUser.Id == user.Id)
+            {
+                destinationAccounts = userAccountsList.Where(a => a.Id != sourceAccount.Id).ToList();
+            }
+            else
+            {
+                // Retrieve the destination user's accounts (receiver)
+                destinationAccounts = context.Accounts
+                    .Where(a => a.UserId == destinationUser.Id)
+                    .ToList();
+            }
+
+            // Check if the destination user actually has accounts
+            if (destinationAccounts == null || destinationAccounts.Count == 0)
+            {
+                Console.WriteLine("\t\tSelected destination user has no accounts. Transfer canceled.");
+                Console.WriteLine("\t\tPress [Enter] to return to the main menu");
+                MenuFunctions.CursorReadLine();
+                return;
+            }
+
+            // Display a list of destination accounts for the selected user
+            int destinationAccountPosition = MenuFunctions.OptionsNavigation(destinationAccounts
+                .Select(a => $"\t\t{a.Name}: {Math.Round(a.Balance, 2)} {a.Currency}").ToArray(),
+                "\t\tSelect the destination account to transfer money to:");
+
+            // Check if the selected destination account position is valid
+            if (destinationAccountPosition < 0 || destinationAccountPosition >= destinationAccounts.Count)
             {
                 Console.WriteLine("\t\tInvalid destination account selection. Transfer canceled.");
                 Console.WriteLine("\t\tPress [Enter] to return to the main menu");
@@ -291,9 +331,9 @@ namespace The_Bank
                 return;
             }
 
-            Account destinationAccount = userAccountsList[destinationAccountPosition];
+            Account destinationAccount = destinationAccounts[destinationAccountPosition];
 
-            //promts the user to enter the transfer amount
+            // Prompts the user to enter the amount they want to transfer
             Console.Write("\t\tEnter the transfer amount: ");
             if (double.TryParse(Console.ReadLine(), out double transferAmount) && transferAmount > 0)
             {
@@ -324,16 +364,20 @@ namespace The_Bank
             {
                 Console.WriteLine("\t\tInvalid transfer amount. Please enter a valid positive number.");
             }
-            //method to print out new balances
+
+            // Method to print out new balances
             void DisplayBalances(Account source, Account destination)
             {
                 MenuFunctions.footer();
                 Console.WriteLine($"\t\tTransfer successful!");
-                Console.WriteLine($"\t\tNew balance for {source.Name}: {Math.Round(source.Balance,2)} ({source.Currency})");
-                Console.WriteLine($"\t\tNew balance for {destination.Name}: {Math.Round(destination.Balance,2)} ({destination.Currency})");
+                Console.WriteLine($"\t\tNew balance for {source.Name}: {Math.Round(source.Balance, 2)} ({source.Currency})");
+                Console.WriteLine($"\t\tNew balance for {destination.Name}: {Math.Round(destination.Balance, 2)} ({destination.Currency})");
             }
-
         }
+
+
+
+
 
 
         // Deposit money to account
