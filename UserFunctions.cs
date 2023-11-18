@@ -359,7 +359,7 @@ namespace The_Bank
                         DisplayBalances(sourceAccount, destinationAccount);
 
                         // Play sound after a successful money transfer
-                        PlaySound(@"C:\Users\fadde\source\repos\The_Bank\swish.wav");
+                        PlaySound("swish.wav");
                     }
                 }
                 else
@@ -632,6 +632,8 @@ namespace The_Bank
             try
             {
                 string fullPath = Path.Combine(Environment.CurrentDirectory, soundFileName);
+
+                string relativePath = Path.GetRelativePath(Environment.CurrentDirectory, fullPath);
 
                 using (var audioFile = new AudioFileReader(fullPath))
                 {
