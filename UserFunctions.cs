@@ -1,17 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Drawing;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using The_Bank.Data;
 using The_Bank.Models;
 using The_Bank.Utilities;
-using The_Bank.Migrations;
-using System.Security.Principal;
-using System.Runtime.CompilerServices;
-using System.ComponentModel.Design;
 
 namespace The_Bank
 {
@@ -21,9 +11,11 @@ namespace The_Bank
         {
             int menuSelection = 1; // Start from the first option
 
+            bool isLoggedIn = true; // When user chooses "Log Out" this turns to false and exits loop to then go back to login screen
+
             using (BankContext context = new BankContext())
             {
-                while (true)
+                while (isLoggedIn)
                 {
                     Console.Clear(); //clears the console
                     //Console.ForegroundColor = ConsoleColor.Green; //commenting this out since i like the defualt color
@@ -64,7 +56,8 @@ namespace The_Bank
                     else if (key.Key == ConsoleKey.Enter)
                     {
                         // Method that calls a method to perform the action based on the selected option
-                        HandleMenuSelection(context, menuSelection, userName);
+                        // Returns false when user chooses option "Log out" this exits the menu loop and goes back to the login screen
+                        isLoggedIn = HandleMenuSelection(context, menuSelection, userName);
 
                         MenuFunctions.footer();
 
@@ -75,7 +68,7 @@ namespace The_Bank
             }
         }
 
-        public static void HandleMenuSelection(BankContext context, int selection, string userName)
+        public static bool HandleMenuSelection(BankContext context, int selection, string userName)
         {
             switch (selection)
             {
@@ -100,13 +93,13 @@ namespace The_Bank
                     break;
                 case 7:
                     MenuFunctions.PrintFast("\t\tYou are now logging out.");
-                    Thread.Sleep(3000);
-                    System.Environment.Exit(0);
-                    return;
+                    Thread.Sleep(2000);
+                    return false;
                 default:
                     Console.WriteLine("Error! Please try again.");
                     break;
             }
+            return true;
         }
 
         private static string ColorOptionText(int option)
@@ -269,7 +262,7 @@ namespace The_Bank
 
             //Allows the user to select an account using arrow keys and highlight the selection
             MenuFunctions.header();
-            int sourceAccountPosition = MenuFunctions.OptionsNavigation(user.Accounts.Select(a => $"\t\t{a.Name}: {a.Balance} {a.Currency}").ToArray(),
+            int sourceAccountPosition = MenuFunctions.OptionsNavigation(user.Accounts.Select(a => $"\t\t{a.Name}: {Math.Round(a.Balance,2)} {a.Currency}").ToArray(),
             "\t\tSelect the source account to transfer money from:");
 
 
@@ -288,7 +281,7 @@ namespace The_Bank
             //Getting the user account info from database and turns it to a list
             List<string> destinationOptions = userAccountsList
                .Where(a => a.Id != sourceAccount.Id)
-               .Select(a => $"\t\t{a.Name}: {a.Balance} {a.Currency}")
+               .Select(a => $"\t\t{a.Name}: {Math.Round(a.Balance,2)} {a.Currency}")
                .ToList();
 
             //Allows the user to select an account using arrow keys and highlight the selection
@@ -342,8 +335,9 @@ namespace The_Bank
             void DisplayBalances(Account source, Account destination)
             {
                 MenuFunctions.footer();
-                Console.WriteLine($"\t\tTransfer successful! New balance for {source.Name}: {source.Balance} ({source.Currency})");
-                Console.WriteLine($"\t\tNew balance for {destination.Name}: {destination.Balance} ({destination.Currency})");
+                Console.WriteLine($"\t\tTransfer successful!");
+                Console.WriteLine($"\t\tNew balance for {source.Name}: {Math.Round(source.Balance,2)} ({source.Currency})");
+                Console.WriteLine($"\t\tNew balance for {destination.Name}: {Math.Round(destination.Balance,2)} ({destination.Currency})");
             }
 
         }
@@ -510,13 +504,25 @@ namespace The_Bank
             // Asks user for pin and checks if it matches login
             while (true)
             {
-                Console.WriteLine("\t\tEnter current PIN: ");
+                // Clear screen and re-print header
+                Console.Clear();
+                MenuFunctions.header();
+
+                Console.Write("\t\tEnter current PIN: ");
                 string currentPin = MenuFunctions.CursorReadLine();
 
                 // Re-promt user until string isn't empty
                 while (string.IsNullOrEmpty(currentPin))
                 {
-                    Console.WriteLine("\t\tError! PIN can't be empty");
+                    Console.Write("\t\tError! PIN can't be empty");
+
+                    Thread.Sleep(1000);
+
+                    // Clear screen and re-print header
+                    Console.Clear();
+                    MenuFunctions.header();
+
+                    Console.Write("\t\tEnter current PIN: ");
                     currentPin = MenuFunctions.CursorReadLine();
                 }
 
@@ -525,35 +531,58 @@ namespace The_Bank
                     break;
                 else
                     Console.WriteLine("\t\tError! Wrong PIN. Try again. \n");
+
+                Thread.Sleep(1000);
             }
 
             // Re-promt user for pins until 2 consecutive pins match
             while (true)
             {
-                Console.WriteLine("\t\tEnter new PIN: ");
+                // Clear screen and re-print header
+                Console.Clear();
+                MenuFunctions.header();
+
+                Console.Write("\t\tEnter new 4 digit PIN: ");
                 string newPin = MenuFunctions.CursorReadLine();
 
-                Console.WriteLine("\t\tConfirm new PIN: ");
+                Console.Write("\t\tConfirm new PIN: ");
                 string newPinConfirm = MenuFunctions.CursorReadLine();
-
-                // If pins match save them to database and break out of loop - else write error message
-                if (newPin == newPinConfirm)
+                
+                // Checks so either pin is not null or empty
+                if (!string.IsNullOrEmpty(newPin) || !string.IsNullOrEmpty(newPinConfirm))
                 {
-                    bool success = DbHelpers.EditPin(context, user, newPin);
-                    if (success)
+                    // Chekcs if both pins are exactly 4 digits long
+                    if (newPin.Length == 4 && newPinConfirm.Length == 4)
                     {
-                        Console.WriteLine($"\t\tChanged PIN to {newPin} for user {username}");
+                        // If pins match save them to database and break out of loop - else write error message
+                        if (newPin == newPinConfirm)
+                        {
+                            bool success = DbHelpers.EditPin(context, user, newPin);
+                            if (success)
+                            {
+                                Console.WriteLine($"\t\tChanged PIN to {newPin} for user {username}");
+                                Thread.Sleep(1500);
+                            }
+                            // If wasn't possible to save account to database, print error
+                            else
+                            {
+                                Console.WriteLine($"\t\tFailed to update PIN to {newPin} for {username}");
+                                Console.WriteLine("\t\tReturning to menu");
+
+                                Thread.Sleep(1500);
+                            }
+                            break;
+                        }
+                        else
+                            Console.WriteLine("\t\tPIN codes doesn't match. Try again.");
                     }
-                    // If wasn't possible to save account to database, print error
                     else
-                    {
-                        Console.WriteLine($"\t\tFailed to update PIN to {newPin} for {username}");
-                        Console.WriteLine("\t\tReturning to menu");
-                    }
-                    break;
+                        Console.WriteLine("\t\tError! PIN must be exactly 4 digits. Try again.");
                 }
                 else
-                    Console.WriteLine("\t\tPIN codes doesn't match. Try again. \n");
+                    Console.WriteLine("\t\tError! PIN can't be empty. Try again.");
+
+                Thread.Sleep(1000);
             }
         }
 
