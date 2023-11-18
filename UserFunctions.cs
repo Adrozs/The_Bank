@@ -234,7 +234,7 @@ namespace The_Bank
 
                 foreach (var account in user.Accounts)
                 {
-                    Console.WriteLine($"\t\t{account.Name}: {account.Balance} {account.Currency}");
+                    Console.WriteLine($"\t\t{account.Name}: {Math.Round(account.Balance,2)} {account.Currency}");
                 }
             }
             else
@@ -255,8 +255,7 @@ namespace The_Bank
             if (user == null)
             {
                 Console.WriteLine("\t\tUser not found. Transfer canceled.");
-                Console.WriteLine("\t\tPress [Enter] to return to the main menu");
-                MenuFunctions.CursorReadLine();
+                Thread.Sleep(1000); // Wait to allow user to read error msg
                 return;
             }
 
