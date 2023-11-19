@@ -10,7 +10,7 @@ namespace The_Bank
     {
         public static void UserMenu(BankContext outerContext, string userName)
         {
-            int menuSelection = 1; // Start from the first option
+            int menuSelection = 0; // Start from the first option
 
             bool isLoggedIn = true; // When user chooses "Log Out" this turns to false and exits loop to then go back to login screen
 
@@ -24,14 +24,17 @@ namespace The_Bank
                     Console.WriteLine("\t\tChoose one of the following options:");
                     MenuFunctions.divider();
 
-                    for (int i = 1; i <= 7; i++) //Forloop to change color on the option the arrow "goes" to.
+                    // Puts all menu options into an array
+                    string[] MenuOptions = {"View all of your accounts and balance", "Transfer Balance", "Withdrawal", "Deposit", "Open new account", "Change PIN", "Log out" };
+
+                    for (int i = 0; i < 7; i++) //Forloop to change color on the option the arrow "goes" to.
                     {
                         if (i == menuSelection) // so when menuSelection is for exemple "2" the second option will turn darkgrey
                         {
                             Console.ForegroundColor = ConsoleColor.DarkGray; // Change to your preferred color
                         }
 
-                        Console.WriteLine($"\t\t{ColorOptionText(i)}{(menuSelection == i ? " <--" : "")}");
+                        Console.WriteLine($"\t\t{MenuOptions[i]}{(menuSelection == i ? " <--" : "")}");
 
                         Console.ResetColor(); // Reset color to default
                     }
@@ -43,11 +46,11 @@ namespace The_Bank
                     ConsoleKeyInfo key = Console.ReadKey(true);
 
                     //Handles the arrow keys to move up and down the menu
-                    if (key.Key == ConsoleKey.UpArrow && menuSelection > 1)
+                    if (key.Key == ConsoleKey.UpArrow && menuSelection > 0)
                     {
-                        menuSelection--;
+                        menuSelection--;                        
                     }
-                    else if (key.Key == ConsoleKey.DownArrow && menuSelection < 7)
+                    else if (key.Key == ConsoleKey.DownArrow && menuSelection < 6)
                     {
                         menuSelection++;
                     }
@@ -66,36 +69,38 @@ namespace The_Bank
             }
         }
 
-        public static bool HandleMenuSelection(BankContext context, int selection, string userName)
+        // Handles which method to go to depending on the chosen option
+        private static bool HandleMenuSelection(BankContext context, int selection, string userName)
         {
             switch (selection)
             {
-                case 1:
+                case 0:
                     Console.Clear();
                     ViewAccountInfo(context, userName);
                     break;
-                case 2:
+                case 1:
                     TransferMoney(context, userName);
                     break;
-                case 3:
+                case 2:
                     WithdrawMoney(context, userName);
                     break;
-                case 4:
+                case 3:
                     DepositMoney(context, userName);
                     break;
-                case 5:
+                case 4:
                     OpenNewAccount(context, userName);
                     break;
-                case 6:
+                case 5:
                     ChangePin(context, userName);
                     break;
-                case 7:
+                case 6:
                     MenuFunctions.PrintSuperFastNoNewLine("\t\tYou are now logging out.");
                     Thread.Sleep(500);
                     Console.Write(".");
                     Thread.Sleep(320);
                     Console.Write(".");
                     Thread.Sleep(700);
+                    Console.WriteLine();
                     return false;
                 default:
                     Console.WriteLine("Error! Please try again.");
@@ -104,29 +109,7 @@ namespace The_Bank
             return true;
         }
 
-        private static string ColorOptionText(int option)
-        {
-            switch (option)
-            {
-                case 1:
-                    return "View all of your accounts and balance";
-                case 2:
-                    return "Transfer Balance";
-                case 3:
-                    return "Withdrawal";
-                case 4:
-                    return "Deposit";
-                case 5:
-                    return "Open a new account";
-                case 6:
-                    return "Change PIN";
-                case 7:
-                    return "Log out";
-                default:
-                    return "Unknown Option";
-            }
-        }
-
+    // MENU METHODS
 
     // VIEW ACCOUNTS
 
