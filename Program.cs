@@ -14,7 +14,6 @@ namespace The_Bank
 
             using (BankContext context = new BankContext())
             {
-                AdminFunctions.CreateAdmin(context);
 
                 // Check if an admin exists in the system upon first launch.
                 // If none exists, create one. (We assume the first person to start the program is an admin).
