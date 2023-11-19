@@ -66,15 +66,37 @@ namespace The_Bank
         // Creates a new user with a chosen name and a random pin
         private static void CreateUser(BankContext context)
         {
-            MenuFunctions.header();
+            string username;
 
-            Console.WriteLine("\t\tCreate a new user");
+            // Ensures username is create correctly
+            while (true)
+            {
+                // Prints menu text 
+                MenuFunctions.header();
+                Console.WriteLine("\t\tCreate a new user");
+                MenuFunctions.divider();
 
-            MenuFunctions.divider();
-            
-            Console.Write("\t\tEnter username: ");
-            string username = MenuFunctions.CursorReadLine();
-            
+                Console.Write("\t\tEnter username: ");
+                username = MenuFunctions.CursorReadLine();
+
+                // Checks so string isn't empty and only contains letters
+                if (string.IsNullOrEmpty(username) || !username.All(char.IsLetter))
+                {
+                    Console.WriteLine("\t\tUsername can't be empty and can only consist of letters.");
+                    Thread.Sleep(1000);
+                }
+                // Checks if chosen username is already taken or not and re-prompts user.
+                else if (DbHelpers.DoesUserExist(context, username))
+                {
+                    Console.WriteLine($"\t\t Username {username} is already taken.");
+                    Thread.Sleep(1000);
+                }
+                // If username is unique break out of the loop and continue 
+                else
+                    break;
+
+            }
+
             // Generates a random pin between 1000-9999 and converts it to a string
             Random rnd = new Random();
             string pin = rnd.Next(1000, 10000).ToString();
@@ -196,7 +218,7 @@ namespace The_Bank
             Console.WriteLine();
             MenuFunctions.PrintSuperFast("\t\tTo start your journey, let's craft a \n\t\tmagical Admin username.");
 
-            // Wait 1 second then clear screen and re-print header
+            // Wait then clear screen and re-print header
             Thread.Sleep(1200);
             MenuFunctions.header();
 
@@ -205,17 +227,32 @@ namespace The_Bank
             Console.Write("\t\tUsername: ");
             string adminName = MenuFunctions.CursorReadLine();
 
-            // Re-promt user until string isn't empty and only contains letters
-            while (string.IsNullOrEmpty(adminName) || !adminName.All(char.IsLetter))
+            // Ensures username is create correctly
+            while (true)
             {
-                Console.WriteLine("\t\tError! Username can't be empty or contain a number.");
-                Thread.Sleep(1000);
-
                 MenuFunctions.header();
 
                 Console.WriteLine("\t\tPlease select your Admin username.");
                 Console.Write("\t\tUsername: ");
                 adminName = MenuFunctions.CursorReadLine();
+
+                // Re-promt user until string isn't empty and only contains letters
+                if (string.IsNullOrEmpty(adminName) || !adminName.All(char.IsLetter))
+                {
+                    Console.WriteLine("\t\tError! Username can't be empty and can only consist of letters.");
+                    Thread.Sleep(1000);
+
+                    MenuFunctions.header();
+                }
+                // Checks if chosen username is already taken or not and re-prompts user.
+                else if (DbHelpers.DoesUserExist(context, adminName))
+                {
+                    Console.WriteLine($"\t\t Username {adminName} is already taken.");
+                    Thread.Sleep(1000);
+                }
+                // If username is unique and isn't empty and is only letters break out of the loop and continue 
+                else
+                    break;
             }
 
             MenuFunctions.divider();
