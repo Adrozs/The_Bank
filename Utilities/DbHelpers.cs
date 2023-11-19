@@ -3,8 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using The_Bank.Data;
+using The_Bank.Migrations;
 using The_Bank.Models;
 
 namespace The_Bank.Utilities
@@ -143,97 +145,8 @@ namespace The_Bank.Utilities
             return context.Admin.Any();
         }
 
-
-        // Creates an admin 
-        public static void CreateAdmin(BankContext context)
-        {
-            Console.WriteLine("Welcome to the Bank of Dreams setup wizard!");
-            Console.Write("Please select your Admin username: ");
-            string adminName = MenuFunctions.CursorReadLine();
-
-            // Re-promt user until string isn't empty
-            while (string.IsNullOrEmpty(adminName))
-            {
-                Console.Clear();
-                Console.WriteLine("Error! Name can't be empty.");
-                adminName = MenuFunctions.CursorReadLine();
-            }
-
-            // Declare admin pin string outside the loop
-            string adminPin;
-
-            // Re-promt user for pins until 2 consecutive pins match
-            while (true)
-            {
-                // Ensure correct input
-                while (true)
-                {
-                    Console.Clear();
-
-                    Console.Write("Please enter a 4-digit PIN of your choosing: ");
-                    adminPin = MenuFunctions.CursorReadLine();
-                    
-                    // Re-promt user until string isn't empty
-                    if (string.IsNullOrEmpty(adminPin))
-                    {
-                        Console.WriteLine("Error! PIN can't be empty.");
-                        Thread.Sleep(1000);
-                    }
-                    else if (adminPin.Length != 4)
-                    {
-                        Console.WriteLine("Error! PIN must be exactly 4 digits.");
-                        Thread.Sleep(1000);
-                    }
-                    else
-                        break;
-                }
-
-                // Ensure user types the same PIN again
-                while (true)
-                {
-                    Console.Clear();
-                    Console.Write("Confirm PIN: ");
-                    string adminPinConfirm = MenuFunctions.CursorReadLine();
-
-                    // If pins match save them to database and break out of loop - else write error message
-                    if (adminPin == adminPinConfirm)
-                    {
-                        Admin admin = new Admin()
-                        {
-                            Name = adminName,
-                            Pin = adminPin,
-                        };
-
-                        // Returns true if save to the database was successful
-                        bool success = AddAdmin(context, admin);
-
-                        if (success)
-                        {
-                            Console.WriteLine($"Created Admin account \"{adminName}\" with PIN \"{adminPin}\"");
-                            Thread.Sleep(2000);
-                        }
-                        // If wasn't possible to save account to database, print error
-                        else
-                        {
-                            Console.WriteLine($"Failed to create Admin account");
-                            Console.WriteLine("Returning to menu");
-                            Thread.Sleep(2000);
-                        }
-                        return;
-                    }
-                    else
-                    {
-                        Console.WriteLine("PIN codes doesn't match. Try again. \n");
-                        Thread.Sleep(1000);
-                        break;
-                    }
-                }
-            }
-
-        }
-
         // Returns true or false depending on if saving admin to the database was successful or not
-        private static bool AddAdmin(BankContext context, Admin admin)
+        public static bool AddAdmin(BankContext context, Admin admin)
         {
             try
             {

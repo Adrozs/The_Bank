@@ -18,9 +18,6 @@ namespace The_Bank
             {
                 while (isLoggedIn)
                 {
-                    Console.Clear(); //clears the console
-                    //Console.ForegroundColor = ConsoleColor.Green; //commenting this out since i like the defualt color
-
                     //Option menu
                     MenuFunctions.header();
                     Console.WriteLine("\t\t\t  ::Main Menu::");
@@ -93,8 +90,12 @@ namespace The_Bank
                     ChangePin(context, userName);
                     break;
                 case 7:
-                    MenuFunctions.PrintFast("\t\tYou are now logging out.");
-                    Thread.Sleep(2000);
+                    MenuFunctions.PrintSuperFastNoNewLine("\t\tYou are now logging out.");
+                    Thread.Sleep(500);
+                    Console.Write(".");
+                    Thread.Sleep(320);
+                    Console.Write(".");
+                    Thread.Sleep(700);
                     return false;
                 default:
                     Console.WriteLine("Error! Please try again.");
@@ -240,7 +241,7 @@ namespace The_Bank
             }
         }
 
-        static void TransferMoney(BankContext context, string userName)
+        private static void TransferMoney(BankContext context, string userName)
         {
             // Retrieve the user information, including accounts
             User user = DbHelpers.GetUserAndAccounts(context, userName);
@@ -429,7 +430,7 @@ namespace The_Bank
         }
 
         // Create a new account for logged in user
-        static void OpenNewAccount(BankContext context, string userName)
+        private static void OpenNewAccount(BankContext context, string userName)
         {
             // Clear window
             Console.Clear();
@@ -538,7 +539,7 @@ namespace The_Bank
 
 
         // Changes current pin to a new pin for a user
-        static void ChangePin(BankContext context, string username)
+        private static void ChangePin(BankContext context, string username)
         {
             User user = DbHelpers.GetUser(context, username);
 
