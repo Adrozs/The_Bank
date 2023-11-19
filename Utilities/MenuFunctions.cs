@@ -134,9 +134,12 @@ namespace The_Bank.Models
         public static string CursorReadLine()
         {
             string input;
+            
             Console.CursorVisible = true;
+            Console.ForegroundColor = ConsoleColor.DarkGray;
             input = Console.ReadLine();
             Console.CursorVisible = false;
+            Console.ResetColor();
             return input;
 
         }
@@ -150,6 +153,15 @@ namespace The_Bank.Models
             Console.WriteLine();
         }
         public static void PrintFast(string text, int speed = 70)
+        {
+            foreach (char c in text)
+            {
+                Console.Write(c);
+                System.Threading.Thread.Sleep(speed);
+            }
+            Console.WriteLine();
+        }
+        public static void PrintSuperFast(string text, int speed = 45)
         {
             foreach (char c in text)
             {
