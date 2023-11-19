@@ -19,10 +19,10 @@ namespace The_Bank
                 // If none exists, create one. (We assume the first person to start the program is an admin).
                 if (!DbHelpers.IsAdminCreated(context))
                 {
-                    DbHelpers.CreateAdmin(context);
+                    AdminFunctions.CreateAdmin(context);
                 }
 
-                // Welcome phrase
+                // Welcome screen
                 MenuFunctions.header();
                 MenuFunctions.main_header();
                 MenuFunctions.footer();
