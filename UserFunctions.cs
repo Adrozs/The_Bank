@@ -349,7 +349,7 @@ namespace The_Bank
                         DisplayBalances(sourceAccount, destinationAccount);
 
                         // Play sound after a successful money transfer
-                        PlaySound("transferComplete.wav");
+                        PlaySound("swish.wav");
                     }
                     else
                     {
