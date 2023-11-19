@@ -104,5 +104,127 @@ namespace The_Bank
                 Console.WriteLine($"\t\t\tUser {usernameToDelete} not found.");
             }
         }
+
+        // Creates an admin 
+        public static void CreateAdmin(BankContext context)
+        {
+            MenuFunctions.header();
+
+            // Prints welcome setup wizard text
+            MenuFunctions.PrintSuperFast("\t\tDear Dreamer, welcome to *Bank of Dreams*!");
+            MenuFunctions.PrintSuperFast("\t\tGet ready to turn your financial dreams \n\t\tinto reality as we guide you through the \n\t\tenchanted setup process.");
+            Console.WriteLine();
+            MenuFunctions.PrintSuperFast("\t\tTo start your journey, craft a magical \n\t\tAdmin username.");
+
+            MenuFunctions.divider();
+
+            // Take username input
+            Console.WriteLine("\t\tPlease select your Admin username.");
+            Console.Write("\t\t Username: ");
+            string adminName = MenuFunctions.CursorReadLine();
+
+            // Re-promt user until string isn't empty and only contains letters
+            while (string.IsNullOrEmpty(adminName) || !adminName.All(char.IsLetter))
+            {
+                Console.WriteLine("\t\tError! Username can't be empty or contain a number.");
+                Thread.Sleep(1000);
+
+                MenuFunctions.header();
+
+                Console.WriteLine("\t\tPlease select your Admin username.");
+                Console.Write("\t\tUsername: ");
+                adminName = MenuFunctions.CursorReadLine();
+            }
+
+            MenuFunctions.divider();
+
+            // Continue with setup wizard text 
+            MenuFunctions.PrintSuperFast("\t\tFantastic! Now it's time to dream up PIN.");
+            MenuFunctions.PrintSuperFast("\t\tThis is the key to unlocking the \n\t\tdoor to your dreams.");
+            MenuFunctions.PrintSuperFast("\t\tChoose wisely, for your account's \n\t\tsafety rests in the realms of your imagination.");
+
+            Thread.Sleep(1000);
+
+            // Declare admin pin string outside the loop
+            string adminPin;
+
+            // Re-promt user to enter pin until both pin and confrim pin match to ensure no mistake was made
+            while (true)
+            {
+                // Ensure correct input
+                while (true)
+                {
+                    MenuFunctions.header();
+
+                    Console.Write("\t\tPlease enter a 4-digit PIN: ");
+                    adminPin = MenuFunctions.CursorReadLine();
+
+                    // Re-promt user until conditions are met
+                    // Checks so string isn't empty
+                    if (string.IsNullOrEmpty(adminPin))
+                    {
+                        Console.WriteLine("\t\tError! PIN can't be empty.");
+                        Thread.Sleep(1000);
+                    }
+                    else if (!adminPin.All(char.IsDigit))
+                    {
+                        Console.WriteLine("\t\tError! PIN can only contain digits.");
+                        Thread.Sleep(1000);
+                    }
+                    // Checks so pin i exactly 4 digits
+                    else if (adminPin.Length != 4)
+                    {
+                        Console.WriteLine("\t\tError! PIN must be exactly 4 digits.");
+                        Thread.Sleep(1000);
+                    }
+                    // Checks so pin is only digits
+                    else
+                        break;
+                }
+
+                // Ensure user types the same PIN again
+                while (true)
+                {
+                    MenuFunctions.header();
+
+                    Console.Write("\t\tConfirm PIN: ");
+                    string adminPinConfirm = MenuFunctions.CursorReadLine();
+
+                    // If pins match save them to database and break out of loop - else write error message
+                    if (adminPin == adminPinConfirm)
+                    {
+                        Admin admin = new Admin()
+                        {
+                            Name = adminName,
+                            Pin = adminPin,
+                        };
+
+                        // Returns true if save to the database was successful
+                        bool success = DbHelpers.AddAdmin(context, admin);
+
+                        if (success)
+                        {
+                            Console.WriteLine($"\t\tCreated Admin account \"{adminName}\" with PIN \"{adminPin}\"");
+                            Thread.Sleep(2000);
+                        }
+                        // If wasn't possible to save account to database, print error
+                        else
+                        {
+                            Console.WriteLine($"\t\tFailed to create Admin account");
+                            Console.WriteLine("\t\tReturning to menu");
+                            Thread.Sleep(2000);
+                        }
+                        return;
+                    }
+                    else
+                    {
+                        Console.WriteLine("\t\tPIN codes doesn't match. Try again. \n");
+                        Thread.Sleep(1000);
+                        break;
+                    }
+                }
+            }
+
+        }
     }
 }
