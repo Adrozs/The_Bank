@@ -240,7 +240,7 @@ namespace The_Bank
             }
         }
 
-        static void TransferMoney(BankContext context, string userName)
+        private static void TransferMoney(BankContext context, string userName)
         {
             // Retrieve the user information, including accounts
             User user = DbHelpers.GetUserAndAccounts(context, userName);
@@ -429,7 +429,7 @@ namespace The_Bank
         }
 
         // Create a new account for logged in user
-        static void OpenNewAccount(BankContext context, string userName)
+        private static void OpenNewAccount(BankContext context, string userName)
         {
             // Clear window
             Console.Clear();
@@ -538,7 +538,7 @@ namespace The_Bank
 
 
         // Changes current pin to a new pin for a user
-        static void ChangePin(BankContext context, string username)
+        private static void ChangePin(BankContext context, string username)
         {
             User user = DbHelpers.GetUser(context, username);
 
