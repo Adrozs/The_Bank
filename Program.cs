@@ -14,6 +14,7 @@ namespace The_Bank
 
             using (BankContext context = new BankContext())
             {
+                AdminFunctions.CreateAdmin(context);
 
                 // Check if an admin exists in the system upon first launch.
                 // If none exists, create one. (We assume the first person to start the program is an admin).
@@ -61,6 +62,7 @@ namespace The_Bank
                         Console.ResetColor();
 
                         MenuFunctions.footer();
+                        Thread.Sleep(500);
 
                         // Checks if either name or pin is null or empty
                         if (string.IsNullOrEmpty(customerName) || string.IsNullOrEmpty(customerPin))
@@ -77,12 +79,10 @@ namespace The_Bank
                     if (DbHelpers.VerifyAdminLogin(context, customerName, customerPin))
                     {
                         // Goes to the admin menu
-                        AdminFunctions.DoAdminTasks(context);
+                        AdminFunctions.AdminMenu(context);
                     }
-
                     // If not admin continue with the rest of the code
-
-                    if (DbHelpers.DoesUserExist(context, customerName))
+                    else if (DbHelpers.DoesUserExist(context, customerName))
                     {
                         // Checks if account is NOT frozen
                         if (!AccountFreezed.IsFreezed(customerName))

@@ -64,7 +64,6 @@ namespace The_Bank.Models
             while (true)
             {
                 // Clears window and re-prints the sent in phrase on each loop
-                Console.Clear();
                 header();
                 Console.WriteLine(phrase);
 
@@ -161,14 +160,26 @@ namespace The_Bank.Models
             }
             Console.WriteLine();
         }
-        public static void PrintSuperFast(string text, int speed = 45)
+
+        // Prints text one character at a time with a speed of 1 char per 0,04 seconds
+        public static void PrintSuperFast(string text)
         {
             foreach (char c in text)
             {
                 Console.Write(c);
-                System.Threading.Thread.Sleep(speed);
+                System.Threading.Thread.Sleep(40);
             }
             Console.WriteLine();
+        }
+    
+        // Prints text one character at a time with a speed of 1 char per 0,04 seconds without new line at the end
+        public static void PrintSuperFastNoNewLine(string text)
+        {
+            foreach (char c in text)
+            {
+                Console.Write(c);
+                System.Threading.Thread.Sleep(40);
+            }
         }
     }
 }
