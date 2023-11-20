@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using The_Bank.Data;
+using The_Bank.Utilities;
 
 namespace The_Bank.Models
 {
@@ -90,13 +91,17 @@ namespace The_Bank.Models
                 if (key.Key == ConsoleKey.UpArrow && menuSelection > 0)
                 {
                     menuSelection--;
+                    Sound.PlaySound("navSound.mp3");
                 }
                 else if (key.Key == ConsoleKey.DownArrow && menuSelection < options.Length - 1)
                 {
                     menuSelection++;
+                    Sound.PlaySound("navSound.mp3");
+
                 }
                 else if (key.Key == ConsoleKey.Enter)
                 {
+                    Sound.PlaySound("enterSound.mp3");
                     return menuSelection;
                 }
             }
@@ -110,6 +115,8 @@ namespace The_Bank.Models
             {
                 keyPressed = Console.ReadKey(true);
             }
+            Sound.PlaySound("enterSound.mp3");
+
         }
 
         // Promts user to press enter key doesn't accept any other input
@@ -122,6 +129,7 @@ namespace The_Bank.Models
             {
                 keyPressed = Console.ReadKey(true);
             }
+            Sound.PlaySound("enterSound.mp3");
         }
         public static void ClearCurrentConsoleLine()
         {
@@ -139,6 +147,9 @@ namespace The_Bank.Models
             input = Console.ReadLine();
             Console.CursorVisible = false;
             Console.ResetColor();
+
+            Sound.PlaySound("enterSound.mp3");
+
             return input;
 
         }

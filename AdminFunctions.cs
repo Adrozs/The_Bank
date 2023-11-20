@@ -42,6 +42,8 @@ namespace The_Bank
                         break;
                 }
                 MenuFunctions.PressEnter("\t\tPress [Enter] to return to the menu");
+                Sound.PlaySound("enterSound.mp3");
+
             }
         }
 
@@ -169,14 +171,18 @@ namespace The_Bank
                 if (key.Key == ConsoleKey.UpArrow && deleteChoice > 0)
                 {
                     deleteChoice--;
+                    Sound.PlaySound("navSound.mp3");
                 }
                 else if (key.Key == ConsoleKey.DownArrow && deleteChoice < userOptions.Length - 1)
                 {
                     deleteChoice++;
+                    Sound.PlaySound("navSound.mp3");
+
                 }
                 // If user presses enter they choose the currently selected option and we leave the loop and continue with the code
                 else if (key.Key == ConsoleKey.Enter)
                 {
+                    Sound.PlaySound("enterSound.mp3");
                     break;
                 }
             }
