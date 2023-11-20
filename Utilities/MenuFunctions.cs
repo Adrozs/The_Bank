@@ -91,17 +91,17 @@ namespace The_Bank.Models
                 if (key.Key == ConsoleKey.UpArrow && menuSelection > 0)
                 {
                     menuSelection--;
-                    Sound.PlaySound("navSound.mp3");
+                    Sound.PlaySound("navSound.wav");
                 }
                 else if (key.Key == ConsoleKey.DownArrow && menuSelection < options.Length - 1)
                 {
                     menuSelection++;
-                    Sound.PlaySound("navSound.mp3");
+                    Sound.PlaySound("navSound.wav");
 
                 }
                 else if (key.Key == ConsoleKey.Enter)
                 {
-                    Sound.PlaySound("enterSound.mp3");
+                    Sound.PlaySound("enterSound.wav");
                     return menuSelection;
                 }
             }
@@ -115,7 +115,7 @@ namespace The_Bank.Models
             {
                 keyPressed = Console.ReadKey(true);
             }
-            Sound.PlaySound("enterSound.mp3");
+            Sound.PlaySound("enterSound.wav");
 
         }
 
@@ -129,7 +129,7 @@ namespace The_Bank.Models
             {
                 keyPressed = Console.ReadKey(true);
             }
-            Sound.PlaySound("enterSound.mp3");
+            Sound.PlaySound("enterSound.wav");
         }
         public static void ClearCurrentConsoleLine()
         {
@@ -148,7 +148,7 @@ namespace The_Bank.Models
             Console.CursorVisible = false;
             Console.ResetColor();
 
-            Sound.PlaySound("enterSound.mp3");
+            Sound.PlaySound("enterSound.wav");
 
             return input;
 
