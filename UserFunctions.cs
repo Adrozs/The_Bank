@@ -293,9 +293,7 @@ namespace The_Bank
         {
             // Prompt the user for their PIN
             Console.Write("\t\t\tPIN: ");
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            string customerPin = MenuFunctions.CursorReadLine();
-            Console.ResetColor();
+            string customerPin = MenuFunctions.CursorReadLine();;
             Console.WriteLine();
             while (true)
             {
