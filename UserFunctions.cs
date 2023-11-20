@@ -48,11 +48,13 @@ namespace The_Bank
                     //Handles the arrow keys to move up and down the menu
                     if (key.Key == ConsoleKey.UpArrow && menuSelection > 0)
                     {
-                        menuSelection--;                        
+                        menuSelection--;
+                        Sound.PlaySound("navSound.wav");
                     }
                     else if (key.Key == ConsoleKey.DownArrow && menuSelection < 6)
                     {
                         menuSelection++;
+                        Sound.PlaySound("navSound.wav");
                     }
                     else if (key.Key == ConsoleKey.Enter)
                     {
@@ -62,8 +64,11 @@ namespace The_Bank
 
                         MenuFunctions.footer();
 
+                        Sound.PlaySound("enterSound.mp3");
+
                         // Promts user to press enter key to go back to menu - doesn't accept any other input
                         MenuFunctions.PressEnter("\t\tPress [Enter] to go to main menu");
+                        
                     }
                 }
             }
@@ -249,7 +254,7 @@ namespace The_Bank
                         DisplayBalances(sourceAccount, destinationAccount);
 
                         // Play sound after a successful money transfer
-                        PlaySound("swish.wav");
+                        Sound.PlaySound("swish.wav");
                     }
                     else
                     {
@@ -259,7 +264,7 @@ namespace The_Bank
                         DisplayBalances(sourceAccount, destinationAccount);
 
                         // Play sound after a successful money transfer
-                        PlaySound("swish.wav");
+                        Sound.PlaySound("swish.wav");
                     }
                 }
                 else
@@ -617,31 +622,6 @@ namespace The_Bank
                 Thread.Sleep(1000);
             }
         }
-        private static WaveOutEvent waveOut = new WaveOutEvent();
-
-
-        private static void PlaySound(string soundFileName)
-        {
-            string soundFilePath = Path.Combine("Sounds", soundFileName);
-
-            try
-            {
-                using (var audioFile = new AudioFileReader(soundFilePath))
-                {
-                    waveOut.Init(audioFile);
-                    waveOut.Play();
-                    while (waveOut.PlaybackState == PlaybackState.Playing)
-                    {
-                        // Wait for playback to finish
-                        Thread.Sleep(100);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                // Handle the exception as needed
-                Console.WriteLine($"Error playing sound: {ex.Message}");
-            }
-        }
+        
     }
 }
