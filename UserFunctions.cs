@@ -8,7 +8,7 @@ namespace The_Bank
 {
     public class UserFunctions
     {
-        public static void UserMenu(BankContext outerContext, string userName)
+        public static async Task UserMenu(BankContext outerContext, string userName)
         {
             int menuSelection = 0; // Start from the first option
 
@@ -48,7 +48,7 @@ namespace The_Bank
                     //Handles the arrow keys to move up and down the menu
                     if (key.Key == ConsoleKey.UpArrow && menuSelection > 0)
                     {
-                        menuSelection--;                        
+                        menuSelection--;
                     }
                     else if (key.Key == ConsoleKey.DownArrow && menuSelection < 6)
                     {
@@ -58,7 +58,7 @@ namespace The_Bank
                     {
                         // Method that calls a method to perform the action based on the selected option
                         // Returns false when user chooses option "Log out" this exits the menu loop and goes back to the login screen
-                        isLoggedIn = HandleMenuSelection(context, menuSelection, userName);
+                        isLoggedIn = await HandleMenuSelectionAsync(context, menuSelection, userName);
 
                         MenuFunctions.footer();
 
@@ -70,7 +70,7 @@ namespace The_Bank
         }
 
         // Handles which method to go to depending on the chosen option
-        private static bool HandleMenuSelection(BankContext context, int selection, string userName)
+        private static async Task<bool> HandleMenuSelectionAsync(BankContext context, int selection, string userName)
         {
             switch (selection)
             {
@@ -79,7 +79,7 @@ namespace The_Bank
                     ViewAccountInfo(context, userName);
                     break;
                 case 1:
-                    TransferMoney(context, userName);
+                    await TransferMoneyAsync(context, userName);
                     break;
                 case 2:
                     WithdrawMoney(context, userName);
@@ -109,9 +109,9 @@ namespace The_Bank
             return true;
         }
 
-    // MENU METHODS
+        // MENU METHODS
 
-    // VIEW ACCOUNTS
+        // VIEW ACCOUNTS
 
         //private static void DisplayAccountBalances(BankContext context, string userName)
         private static void ViewAccountInfo(BankContext context, string userName)
@@ -139,8 +139,8 @@ namespace The_Bank
             }
         }
 
-    // TRANSFER
-        private static void TransferMoney(BankContext context, string userName)
+        // TRANSFER
+        private static async Task TransferMoneyAsync(BankContext context, string userName)
         {
             // Retrieve the user information, including accounts
             User user = DbHelpers.GetUserAndAccounts(context, userName);
@@ -249,7 +249,7 @@ namespace The_Bank
                         DisplayBalances(sourceAccount, destinationAccount);
 
                         // Play sound after a successful money transfer
-                        PlaySound("swish.wav");
+                        PlaySoundAsync("swish.wav");
                     }
                     else
                     {
@@ -259,7 +259,7 @@ namespace The_Bank
                         DisplayBalances(sourceAccount, destinationAccount);
 
                         // Play sound after a successful money transfer
-                        PlaySound("swish.wav");
+                        await PlaySoundAsync("swish.wav");
                     }
                 }
                 else
@@ -618,7 +618,7 @@ namespace The_Bank
         private static WaveOutEvent waveOut = new WaveOutEvent();
 
 
-        private static void PlaySound(string soundFileName)
+        private static async Task PlaySoundAsync(string soundFileName)
         {
             string soundFilePath = Path.Combine("Sounds", soundFileName);
 
@@ -631,7 +631,7 @@ namespace The_Bank
                     while (waveOut.PlaybackState == PlaybackState.Playing)
                     {
                         // Wait for playback to finish
-                        Thread.Sleep(100);
+                        await Task.Delay(100);
                     }
                 }
             }
