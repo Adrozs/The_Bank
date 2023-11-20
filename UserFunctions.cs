@@ -64,10 +64,16 @@ namespace The_Bank
 
                         MenuFunctions.footer();
 
-                        Sound.PlaySound("enterSound.wav");
+                        // If logout is selected don't play the sound and don't prompt for enter
+                        // this is due to this sound playing after the logout message is written so it comes way to late. Enter sound is put directly in the logout code to avoid this 
+                        // And it looks better if user is automatically logged out instead of having to press enter
+                        if (menuSelection != 6)
+                        {
+                            Sound.PlaySound("enterSound.wav");
 
-                        // Promts user to press enter key to go back to menu - doesn't accept any other input
-                        MenuFunctions.PressEnter("\t\tPress [Enter] to go to main menu");
+                            // Promts user to press enter key to go back to menu - doesn't accept any other input
+                            MenuFunctions.PressEnter("\t\tPress [Enter] to go to main menu");
+                        }
                         
                     }
                 }
@@ -99,6 +105,8 @@ namespace The_Bank
                     ChangePin(context, userName);
                     break;
                 case 6:
+                    // LOGOUT
+                    Sound.PlaySound("enterSound.wav");
                     MenuFunctions.PrintSuperFastNoNewLine("\t\tYou are now logging out.");
                     Thread.Sleep(500);
                     Console.Write(".");
