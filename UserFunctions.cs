@@ -591,36 +591,43 @@ namespace The_Bank
                 // Checks so either pin is not null or empty
                 if (!string.IsNullOrEmpty(newPin) || !string.IsNullOrEmpty(newPinConfirm))
                 {
-                    // Chekcs if both pins are exactly 4 digits long
-                    if (newPin.Length == 4 && newPinConfirm.Length == 4)
+                    // Checks so both pins are only digits
+                    if (!newPin.All(char.IsDigit) || !newPinConfirm.All(char.IsDigit))
                     {
-                        // If pins match save them to database and break out of loop - else write error message
-                        if (newPin == newPinConfirm)
-                        {
-                            bool success = DbHelpers.EditPin(context, user, newPin);
-                            if (success)
-                            {
-                                Console.WriteLine($"\t\tChanged PIN to {newPin} for user {username}");
-                                Thread.Sleep(1500);
-                            }
-                            // If wasn't possible to save account to database, print error
-                            else
-                            {
-                                Console.WriteLine($"\t\tFailed to update PIN to {newPin} for {username}");
-                                Console.WriteLine("\t\tReturning to menu");
+                        // Checks if both pins are exactly 4 digits long
+                        if (newPin.Length == 4 && newPinConfirm.Length == 4)
+                        { 
 
-                                Thread.Sleep(1500);
+                            // If pins match save them to database and break out of loop - else write error message
+                            if (newPin == newPinConfirm)
+                            {
+                                bool success = DbHelpers.EditPin(context, user, newPin);
+                                if (success)
+                                {
+                                    Console.WriteLine($"\t\tChanged PIN to {newPin} for user {username}");
+                                    Thread.Sleep(1500);
+                                }
+                                // If wasn't possible to save account to database, print error
+                                else
+                                {
+                                    Console.WriteLine($"\t\tFailed to update PIN to {newPin} for {username}");
+                                    Console.WriteLine("\t\tReturning to menu");
+
+                                    Thread.Sleep(1500);
+                                }
+                                break;
                             }
-                            break;
+                            else
+                                Console.WriteLine("\t\tPIN codes doesn't match.");
                         }
                         else
-                            Console.WriteLine("\t\tPIN codes doesn't match. Try again.");
+                            Console.WriteLine("\t\tPIN must be exactly 4 digits.");
                     }
                     else
-                        Console.WriteLine("\t\tError! PIN must be exactly 4 digits. Try again.");
+                        Console.WriteLine("\t\tError! PIN can only contain digits.");
                 }
                 else
-                    Console.WriteLine("\t\tError! PIN can't be empty. Try again.");
+                    Console.WriteLine("\t\tError! PIN can't be empty.");
 
                 Thread.Sleep(1000);
             }
