@@ -3,6 +3,7 @@ using System;
 using The_Bank.Utilities;
 using The_Bank.Models;
 
+
 namespace The_Bank
 {
     internal class Program
@@ -57,8 +58,9 @@ namespace The_Bank
 
                         Console.Write("\t\t\tPIN: ");
                         Console.ForegroundColor = ConsoleColor.DarkGray;
-                        customerPin = MenuFunctions.CursorReadLine();
+                        customerPin = HidePin.EnterPin(); // Calling method 'EnterPin' to hide characters in pin
                         Console.ResetColor();
+
 
                         MenuFunctions.footer();
                         Thread.Sleep(500);
@@ -140,9 +142,8 @@ namespace The_Bank
                     // Newline for text formatting
                     Console.WriteLine();
                 }
-                
-
             }
-        }      
+        }
     }
 }
+
