@@ -287,7 +287,7 @@ namespace The_Bank
             }
         }
 
-    // WITHDRAW
+        // WITHDRAW
         public static void WithdrawMoney(BankContext context, string userName)
         {
             // Prompt the user for their PIN
@@ -296,80 +296,85 @@ namespace The_Bank
             string customerPin = MenuFunctions.CursorReadLine();
             Console.ResetColor();
             Console.WriteLine();
-
-            // Check if the provided PIN is valid for the given user
-            if (DbHelpers.VerifyUserLogin(context, userName, customerPin))
+            while (true)
             {
-                // Retrieve the user information, including accounts
-                User user = DbHelpers.GetUserAndAccounts(context, userName);
 
-                // Check if the user exists
-                if (user == null)
+
+                // Check if the provided PIN is valid for the given user
+                if (DbHelpers.VerifyUserLogin(context, userName, customerPin))
                 {
-                    Console.WriteLine("\t\tUser not found. Withdrawal canceled.");
-                    Console.ReadKey(true);
-                    return;
-                }
+                    // Retrieve the user information, including accounts
+                    User user = DbHelpers.GetUserAndAccounts(context, userName);
 
-                // Allows the user to select an account using arrow keys and highlight the selection
-                int chosenAccountPosition = MenuFunctions.OptionsNavigation(user.Accounts.Select(a => $"\t\t{a.Name}: {a.Balance} {a.Currency}").ToArray(), "\t\tChoose account to withdraw:");
-                // Check if the selected account position is valid
-                if (chosenAccountPosition < 0 || chosenAccountPosition >= user.Accounts.Count)
-                {
-                    Console.WriteLine("\t\tInvalid account selection. Withdrawal canceled.");
-                    Console.ReadKey(true);
-                    return;
-                }
-                //Retrieves the selected account
-                Account selectedAccount = user.Accounts.ElementAt(chosenAccountPosition);
-
-                // Prompt the user for the withdrawal amount
-                MenuFunctions.footer();
-                Console.Write("\t\tHow much would you like to withdraw? ");
-                
-                // Validates and processes the withdrawal amount
-                if (double.TryParse(MenuFunctions.CursorReadLine(), out double withdraw))
-                {
-                    Console.SetCursorPosition(0, Console.CursorTop - 1);
-                    MenuFunctions.ClearCurrentConsoleLine();
-
-                    double balance = selectedAccount.Balance;
-
-                    // Check if the withdrawal amount is valid
-                    if (withdraw > balance)
+                    // Check if the user exists
+                    if (user == null)
                     {
-                        Console.WriteLine($"\t\tCannot withdraw more than: {balance}");
+                        Console.WriteLine("\t\tUser not found. Withdraw canceled.");
                         Console.ReadKey(true);
                         return;
                     }
 
-                    if (withdraw <= 0)
+                    // Allows the user to select an account using arrow keys and highlight the selection
+                    int chosenAccountPosition = MenuFunctions.OptionsNavigation(user.Accounts.Select(a => $"\t\t{a.Name}: {a.Balance} {a.Currency}").ToArray(), "\t\tChoose account to withdraw:");
+                    // Check if the selected account position is valid
+                    if (chosenAccountPosition < 0 || chosenAccountPosition >= user.Accounts.Count)
                     {
-                        Console.WriteLine("\t\tCannot withdraw 0 or less");
+                        Console.WriteLine("\t\tInvalid account selection. Withdrawal canceled.");
                         Console.ReadKey(true);
                         return;
                     }
+                    //Retrieves the selected account
+                    Account selectedAccount = user.Accounts.ElementAt(chosenAccountPosition);
 
-                    // Update the account balance after the withdrawal and save changes to the database                 
-                    double newBalance = balance - withdraw;
-                    selectedAccount.Balance = newBalance;
-                    context.SaveChanges();
-                    // Display the new account balance to the user
-                    Console.WriteLine($"\t\tYour new balance is: {newBalance}");
-                    Console.ReadKey(true);
+                    // Prompt the user for the withdrawal amount
+                    MenuFunctions.footer();
+                    Console.Write("\t\tHow much would you like to withdraw? ");
+
+                    // Validates and processes the withdrawal amount
+                    if (double.TryParse(MenuFunctions.CursorReadLine(), out double withdraw))
+                    {
+                        Console.SetCursorPosition(0, Console.CursorTop - 1);
+                        MenuFunctions.ClearCurrentConsoleLine();
+
+                        double balance = selectedAccount.Balance;
+
+                        // Check if the withdrawal amount is valid
+                        if (withdraw > balance)
+                        {
+                            Console.WriteLine($"\t\tCannot withdraw more than: {balance}");
+                            Console.ReadKey(true);
+                            
+                        }
+
+                        if (withdraw <= 0)
+                        {
+                            Console.WriteLine("\t\tCannot withdraw 0 or less");
+                            Console.ReadKey(true);
+                            
+                        }
+
+                        // Update the account balance after the withdrawal and save changes to the database                 
+                        double newBalance = balance - withdraw;
+                        selectedAccount.Balance = newBalance;
+                        context.SaveChanges();
+                        // Display the new account balance to the user
+                        Console.WriteLine($"\t\tYour new balance is: {newBalance}");
+                        Console.ReadKey(true);
+                        return;
+                    }
+                    else
+                    {
+                        Console.WriteLine("\t\tPlease write a valid number.");
+                        Console.ReadKey(true);
+                        
+                    }
                 }
                 else
                 {
-                    Console.WriteLine("\t\tPlease write a valid number.");
+                    Console.WriteLine("\t\tInvalid PIN. Try again.");
                     Console.ReadKey(true);
                     return;
-                }
-            }
-            else
-            {
-                Console.WriteLine("\t\tInvalid PIN. Try again.");
-                Console.ReadKey(true);
-                return;
+                } 
             }
         }
 
