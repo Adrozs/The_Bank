@@ -31,9 +31,9 @@ namespace The_Bank
                     {
                         if (i == menuSelection) // so when menuSelection is for exemple "2" the second option will turn darkgrey
                         {
-                            Console.ForegroundColor = ConsoleColor.DarkGray; // Change to your preferred color
+                            Console.ForegroundColor = ConsoleColor.DarkGray; 
                         }
-
+                        //// Prints all the options in the array along with the pointer arrow if on the current selection
                         Console.WriteLine($"\t\t{MenuOptions[i]}{(menuSelection == i ? " <--" : "")}");
 
                         Console.ResetColor(); // Reset color to default
@@ -134,7 +134,8 @@ namespace The_Bank
                 MenuFunctions.footer();
 
                 foreach (var account in user.Accounts)
-                {
+                {  
+                    //for every account of the user this displays the account name, balance and currency
                     Console.WriteLine($"\t\t{account.Name}: {Math.Round(account.Balance, 2)} {account.Currency}");
                 }
             }
@@ -385,7 +386,7 @@ namespace The_Bank
         {
             // Retrieve the user information, including accounts
             User user = DbHelpers.GetUserAndAccounts(context, username);
-
+            // Check if the user exists
             if (user == null)
             {
                 Console.WriteLine("\t\tUser not found. Deposit canceled.");
@@ -393,22 +394,25 @@ namespace The_Bank
                 return;
             }
 
-
+            // Display the user's accounts and prompt for a selection
             string[] accountOptions = user.Accounts.Select(a => $"\t\t{a.Name}: {a.Balance} {a.Currency}").ToArray();
             int chosenAccountPosition = MenuFunctions.OptionsNavigation(accountOptions, "\t\tChoose an account to deposit into:");
 
+            // Validates the selected account
             if (chosenAccountPosition < 0 || chosenAccountPosition >= user.Accounts.Count)
             {
                 Console.WriteLine("\t\tInvalid account selection. Deposit canceled.");
                 Console.ReadKey(true);
                 return;
             }
-
+            // Retrieve the selected account
             Account selectedAccount = user.Accounts.ElementAt(chosenAccountPosition);
 
+            // Prompt the user for the deposit amount
             Console.Write("\t\tHow much do you wish to deposit?");
             if (double.TryParse(Console.ReadLine(), out double depositAmount))
             {
+                // Perform the deposit operation
                 MenuFunctions.divider();
                 Console.WriteLine($"\t\tDepositing {depositAmount} into {selectedAccount.Name}");
 
@@ -418,6 +422,7 @@ namespace The_Bank
             }
             else
             {
+                // Handle invalid deposit amount input
                 Console.WriteLine("\t\tInvalid deposit amount entered.");
             }
 

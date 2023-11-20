@@ -30,9 +30,6 @@
     <None Update="Sounds\navSound.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Sounds\xxnavSound.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="Sounds\swish.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
