@@ -42,7 +42,7 @@ namespace The_Bank
                         break;
                 }
                 MenuFunctions.PressEnter("\t\tPress [Enter] to return to the menu");
-                Sound.PlaySound("enterSound.mp3");
+                Sound.PlaySound("enterSound.wav");
 
             }
         }
@@ -171,18 +171,18 @@ namespace The_Bank
                 if (key.Key == ConsoleKey.UpArrow && deleteChoice > 0)
                 {
                     deleteChoice--;
-                    Sound.PlaySound("navSound.mp3");
+                    Sound.PlaySound("navSound.wav");
                 }
                 else if (key.Key == ConsoleKey.DownArrow && deleteChoice < userOptions.Length - 1)
                 {
                     deleteChoice++;
-                    Sound.PlaySound("navSound.mp3");
+                    Sound.PlaySound("navSound.wav");
 
                 }
                 // If user presses enter they choose the currently selected option and we leave the loop and continue with the code
                 else if (key.Key == ConsoleKey.Enter)
                 {
-                    Sound.PlaySound("enterSound.mp3");
+                    Sound.PlaySound("enterSound.wav");
                     break;
                 }
             }
@@ -228,10 +228,8 @@ namespace The_Bank
             Thread.Sleep(1200);
             MenuFunctions.header();
 
-            // Take username input
-            Console.WriteLine("\t\tPlease select your Admin username.");
-            Console.Write("\t\tUsername: ");
-            string adminName = MenuFunctions.CursorReadLine();
+            // Declare variable outside loop
+            string adminName;
 
             // Ensures username is create correctly
             while (true)

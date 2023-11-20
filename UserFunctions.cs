@@ -64,7 +64,7 @@ namespace The_Bank
 
                         MenuFunctions.footer();
 
-                        Sound.PlaySound("enterSound.mp3");
+                        Sound.PlaySound("enterSound.wav");
 
                         // Promts user to press enter key to go back to menu - doesn't accept any other input
                         MenuFunctions.PressEnter("\t\tPress [Enter] to go to main menu");
