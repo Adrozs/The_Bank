@@ -326,12 +326,10 @@ namespace The_Bank
                 // Prompt the user for the withdrawal amount
                 MenuFunctions.footer();
                 Console.Write("\t\tHow much would you like to withdraw? ");
-                Console.CursorVisible = true;
-
+                
                 // Validates and processes the withdrawal amount
-                if (double.TryParse(Console.ReadLine(), out double withdraw))
+                if (double.TryParse(MenuFunctions.CursorReadLine(), out double withdraw))
                 {
-                    Console.CursorVisible = false;
                     Console.SetCursorPosition(0, Console.CursorTop - 1);
                     MenuFunctions.ClearCurrentConsoleLine();
 
