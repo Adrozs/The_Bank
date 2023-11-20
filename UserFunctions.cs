@@ -316,7 +316,7 @@ namespace The_Bank
                     }
 
                     // Allows the user to select an account using arrow keys and highlight the selection
-                    int chosenAccountPosition = MenuFunctions.OptionsNavigation(user.Accounts.Select(a => $"\t\t{a.Name}: {a.Balance} {a.Currency}").ToArray(), "\t\tChoose account to withdraw:");
+                    int chosenAccountPosition = MenuFunctions.OptionsNavigation(user.Accounts.Select(a => $"\t\t{a.Name}: {Math.Round(a.Balance,2)} {a.Currency}").ToArray(), "\t\tChoose account to withdraw:");
                     // Check if the selected account position is valid
                     if (chosenAccountPosition < 0 || chosenAccountPosition >= user.Accounts.Count)
                     {
