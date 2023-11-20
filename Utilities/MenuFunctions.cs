@@ -36,9 +36,7 @@ namespace The_Bank.Models
             Console.WriteLine("\t\t\t  Bank of Dreams");
             Console.WriteLine("\t\t==================================");
             footer();
-            Console.Write("\t\t  Press <any> key to continue:");
-            Console.ReadKey();
-
+            MenuFunctions.PressEnter("\t\t    Press [Enter] to continue");
 
         }
 
