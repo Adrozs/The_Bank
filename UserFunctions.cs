@@ -385,56 +385,55 @@ namespace The_Bank
             }
         }
 
-    // DEPOSIT
-
         // Deposit money to account
         private static void DepositMoney(BankContext context, string username)
         {
             // Retrieve the user information, including accounts
             User user = DbHelpers.GetUserAndAccounts(context, username);
+
             // Check if the user exists
             if (user == null)
             {
-                Console.WriteLine("\t\tUser not found. Deposit canceled.");
-                Console.ReadKey(true);
-                return;
-            }
-
-            // Display the user's accounts and prompt for a selection
-            string[] accountOptions = user.Accounts.Select(a => $"\t\t{a.Name}: {a.Balance} {a.Currency}").ToArray();
-            int chosenAccountPosition = MenuFunctions.OptionsNavigation(accountOptions, "\t\tChoose an account to deposit into:");
-
-            // Validates the selected account
-            if (chosenAccountPosition < 0 || chosenAccountPosition >= user.Accounts.Count)
-            {
-                Console.WriteLine("\t\tInvalid account selection. Deposit canceled.");
-                Console.ReadKey(true);
-                return;
-            }
-            // Retrieve the selected account
-            Account selectedAccount = user.Accounts.ElementAt(chosenAccountPosition);
-
-            // Prompt the user for the deposit amount
-            Console.Write("\t\tHow much do you wish to deposit?");
-            if (double.TryParse(Console.ReadLine(), out double depositAmount))
-            {
-                // Perform the deposit operation
-                MenuFunctions.divider();
-                Console.WriteLine($"\t\tDepositing {depositAmount} into {selectedAccount.Name}");
-
-                selectedAccount.Balance += depositAmount;
-                context.SaveChanges();
-                Console.WriteLine($"\t\tNew balance: {selectedAccount.Balance}");
+                Console.WriteLine("\t\tUser not found. Creating user and opening new account.");
+                OpenNewAccount();
             }
             else
             {
-                // Handle invalid deposit amount input
-                Console.WriteLine("\t\tInvalid deposit amount entered.");
-            }
+                // Display the user's accounts and prompt for a selection
+                string[] accountOptions = user.Accounts.Select(a => $"\t\t{a.Name}: {a.Balance} {a.Currency}").ToArray();
+                int chosenAccountPosition = MenuFunctions.OptionsNavigation(accountOptions, "\t\tChoose an account to deposit into:");
 
+                // Validates the selected account
+                if (chosenAccountPosition < 0 || chosenAccountPosition >= user.Accounts.Count)
+                {
+                    Console.WriteLine("\t\tInvalid account selection. Deposit canceled.");
+                    Console.ReadKey(true);
+                    return;
+                }
+                // Retrieve the selected account
+                Account selectedAccount = user.Accounts.ElementAt(chosenAccountPosition);
+
+                // Prompt the user for the deposit amount
+                Console.Write("\t\tHow much do you wish to deposit?");
+                if (double.TryParse(Console.ReadLine(), out double depositAmount))
+                {
+                    // Perform the deposit operation
+                    MenuFunctions.divider();
+                    Console.WriteLine($"\t\tDepositing {depositAmount} into {selectedAccount.Name}");
+
+                    selectedAccount.Balance += depositAmount;
+                    context.SaveChanges();
+                    Console.WriteLine($"\t\tNew balance: {selectedAccount.Balance}");
+                }
+                else
+                {
+                    // Handle invalid deposit amount input
+                    Console.WriteLine("\t\tInvalid deposit amount entered.");
+                }
+            }
         }
 
-    // OPEN NEW ACCOUNT
+        // OPEN NEW ACCOUNT
 
         // Create a new account for logged in user
         private static void OpenNewAccount(BankContext context, string userName)
