@@ -395,7 +395,7 @@ namespace The_Bank
             if (user == null)
             {
                 Console.WriteLine("\t\tUser not found. Creating user and opening new account.");
-                OpenNewAccount();
+                OpenNewAccount(context, username);
             }
             else
             {
