@@ -20,8 +20,10 @@ namespace The_Bank.Utilities
                 // If user doesn't press enter, backspace or esc -> PIN gets entered in console with '*'
                 if (key.Key != ConsoleKey.Enter && key.Key != ConsoleKey.Backspace && key.Key != ConsoleKey.Escape)
                 {
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
                     password += key.KeyChar; // Every character in PIN gets hidden with help of '*'
                     Console.Write("*");
+                    Console.ResetColor();
                 }
 
                 // If user clicks backspace, it erases a character in password
@@ -34,6 +36,7 @@ namespace The_Bank.Utilities
             } while (key.Key != ConsoleKey.Enter);
 
             Console.WriteLine();
+            Sound.PlaySound("enterSound.wav");
             return password;
         }
     }
