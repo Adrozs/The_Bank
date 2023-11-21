@@ -109,7 +109,7 @@ namespace The_Bank
                             else
                             {
                                 // Waits to allow text to be shown before proceeding
-                                Console.WriteLine("\t\tToo many invalid attemtps. \nPlease try again in a few minutes.");
+                                Console.WriteLine("\t\tToo many invalid attemtps. \n\t\tPlease try again in a few minutes.");
 
                                 MenuFunctions.PressEnter("\t\tPress [Enter] to try again");
 
@@ -121,7 +121,7 @@ namespace The_Bank
                         // If account IS frozen
                         else
                         {
-                            Console.WriteLine("Too many invalid attemtps. Please try again in a few minutes.");
+                            Console.WriteLine("\t\tToo many invalid attemtps. \n\t\tPlease try again in a few minutes.");
 
                             // Checks if account can be unfrozen and unfreezes it if yes, does nothing if no
                             AccountFreezed.UnFreezeUser(customerName);
