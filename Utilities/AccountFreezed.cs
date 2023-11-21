@@ -19,11 +19,11 @@ namespace The_Bank.Utilities
                 // Get user
                 var user = DbHelpers.GetUser(context, username);
 
-                // Returns if user us frozen or not
-                //if (user.IsFreezed)
-                //    return true;
-                //else
-                return false;
+                //Returns if user us frozen or not
+                if (user.IsFreezed)
+                    return true;
+                else
+                    return false;
             }
         }
 
@@ -36,8 +36,8 @@ namespace The_Bank.Utilities
                 var user = DbHelpers.GetUser(context, username);
 
                 // Freeze user and add the time that they can be unfrozen
-                //user.IsFreezed = true;
-                //user.UnfreezeTime = UnFreezeTime;
+                user.IsFreezed = true;
+                user.UnfreezeTime = UnFreezeTime;
 
                 // Try to save changes to database
                 try
