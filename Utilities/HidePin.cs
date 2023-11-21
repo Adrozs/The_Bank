@@ -13,8 +13,6 @@ namespace The_Bank.Utilities
             string password = "";
             ConsoleKeyInfo key;
 
-            Console.Write("Enter password: ");
-
             do
             {
                 key = Console.ReadKey(intercept: true);
