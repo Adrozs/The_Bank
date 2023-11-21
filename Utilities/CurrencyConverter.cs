@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace The_Bank
+namespace The_Bank.Utilities
 {
     public static class CurrencyConverter
     {

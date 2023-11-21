@@ -4,9 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using The_Bank.Data;
-using The_Bank.Utilities;
 
-namespace The_Bank
+namespace The_Bank.Utilities
 {
     // Contains all methods regarding freezing and unfreezing accounts
     public static class AccountFreezed

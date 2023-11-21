@@ -392,9 +392,9 @@ namespace The_Bank
             User user = DbHelpers.GetUserAndAccounts(context, username);
 
             // Check if the user exists
-            if (user == null)
+            if (user.Accounts == null)
             {
-                Console.WriteLine("\t\tUser not found. Creating user and opening new account.");
+                Console.WriteLine("\t\tAccount not found. Creating new account.");
                 OpenNewAccount(context, username);
             }
             else
