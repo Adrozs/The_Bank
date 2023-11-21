@@ -23,6 +23,8 @@ namespace The_Bank.Utilities
                     password += key.KeyChar; // Every character in PIN gets hidden with help of '*'
                     Console.Write("*");
                 }
+
+                // If user clicks backspace, it erases a character in password
                 else if (key.Key == ConsoleKey.Backspace && password.Length > 0)
                 {
                     password = password.Remove(password.Length - 1);
