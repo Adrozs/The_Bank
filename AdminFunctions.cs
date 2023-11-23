@@ -42,7 +42,6 @@ namespace The_Bank
                         break;
                 }
                 MenuFunctions.PressEnter("\t\tPress [Enter] to return to the menu");
-                Sound.PlaySound("enterSound.wav");
 
             }
         }
@@ -216,19 +215,7 @@ namespace The_Bank
         // Creates a new admin user
         public static void CreateAdmin(BankContext context)
         {
-            MenuFunctions.header();
-
-            // Prints welcome setup wizard text
-            MenuFunctions.PrintSuperFast("\t\tDear Dreamer, welcome to *Bank of Dreams*!");
-            MenuFunctions.PrintSuperFast("\t\tGet ready to turn your financial dreams \n\t\tinto reality as we guide you through the \n\t\tenchanted setup process.");
-            Console.WriteLine();
-            MenuFunctions.PrintSuperFast("\t\tTo start your journey, let's craft a \n\t\tmagical Admin username.");
-
-            // Wait then clear screen and re-print header
-            Thread.Sleep(1200);
-            MenuFunctions.header();
-
-            // Declare variable outside loop
+             // Declare variable outside loop
             string adminName;
 
             // Ensures username is create correctly
@@ -243,7 +230,7 @@ namespace The_Bank
                 // Re-promt user until string isn't empty and only contains letters
                 if (string.IsNullOrEmpty(adminName) || !adminName.All(char.IsLetter))
                 {
-                    Console.WriteLine("\t\tError! Username can't be empty and can only consist of letters.");
+                    Console.WriteLine("\t\tUsername can't be empty and can only consist of letters.");
                     Thread.Sleep(1000);
 
                     MenuFunctions.header();
@@ -259,14 +246,6 @@ namespace The_Bank
                     break;
             }
 
-            MenuFunctions.divider();
-
-            // Continue with setup wizard text 
-            MenuFunctions.PrintSuperFast($"\t\tWow, {adminName} is a fantastic choice! \n\t\tNow it's time to dream up a PIN-code.");
-            MenuFunctions.PrintSuperFast("\n\t\tThis is the key to unlocking the \n\t\tdoor to your dreams.\n");
-            MenuFunctions.PrintSuperFast("\t\tChoose wisely, for your account's \n\t\tsafety rests in the realms of \n\t\tyour imagination.");
-
-            Thread.Sleep(1000);
 
             // Declare admin pin string outside the loop
             string adminPin;
@@ -280,24 +259,24 @@ namespace The_Bank
                     MenuFunctions.header();
 
                     Console.Write("\t\tPlease enter a 4-digit PIN: ");
-                    adminPin = MenuFunctions.CursorReadLine();
+                    adminPin = HidePin.EnterPin();
 
                     // Re-promt user until conditions are met
                     // Checks so string isn't empty
                     if (string.IsNullOrEmpty(adminPin))
                     {
-                        Console.WriteLine("\t\tError! PIN can't be empty.");
+                        Console.WriteLine("\t\tPIN can't be empty.");
                         Thread.Sleep(1000);
                     }
                     else if (!adminPin.All(char.IsDigit))
                     {
-                        Console.WriteLine("\t\tError! PIN can only contain digits.");
+                        Console.WriteLine("\t\tPIN can only contain digits.");
                         Thread.Sleep(1000);
                     }
                     // Checks so pin i exactly 4 digits
                     else if (adminPin.Length != 4)
                     {
-                        Console.WriteLine("\t\tError! PIN must be exactly 4 digits.");
+                        Console.WriteLine("\t\tPIN must be exactly 4 digits.");
                         Thread.Sleep(1000);
                     }
                     // Checks so pin is only digits
@@ -311,7 +290,7 @@ namespace The_Bank
                     MenuFunctions.header();
 
                     Console.Write("\t\tConfirm PIN: ");
-                    string adminPinConfirm = MenuFunctions.CursorReadLine();
+                    string adminPinConfirm = HidePin.EnterPin();
 
                     MenuFunctions.divider();
 
@@ -328,10 +307,10 @@ namespace The_Bank
                         bool success = DbHelpers.AddAdmin(context, admin);
                         if (success)
                         {
-                            Console.WriteLine($"\t\tSuccessfully created Admin account \n\t\t\"{adminName}\" with PIN \"{adminPin}\"");
+                            Console.WriteLine($"\t\tSuccessfully created Admin account \n\t\t\"{adminName}\"");
 
                             MenuFunctions.footer();
-                            MenuFunctions.PrintSuperFast("\t\tCongratulations, Dream Explorer! \n\t\tYou've successfully unlocked the \n\t\tgates to Bank of Dreams. \n\n\t\tYour admin account is now infused with  \n\t\tthe magic needed for fantastical transactions.");
+                            MenuFunctions.PrintSuperFast("\t\tWelcome to the Bank of Dreams.");
                             Thread.Sleep(2000);
                         }
                         // If wasn't possible to save account to database, print error

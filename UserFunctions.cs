@@ -58,18 +58,26 @@ namespace The_Bank
                     }
                     else if (key.Key == ConsoleKey.Enter)
                     {
+
+                        // If logout is selected don't play the enter sound 
+                        // this is due to this sound playing after the logout message is written so it comes way to late. Enter sound is put directly in the logout code to avoid this 
+                        // And it looks better if user is automatically logged out instead of having to press enter
+                        if (menuSelection != 6)
+                        {
+                            Sound.PlaySound("enterSound.wav");
+                        }
+
+
                         // Method that calls a method to perform the action based on the selected option
                         // Returns false when user chooses option "Log out" this exits the menu loop and goes back to the login screen
                         isLoggedIn = HandleMenuSelection(context, menuSelection, userName);
 
                         MenuFunctions.footer();
 
-                        // If logout is selected don't play the sound and don't prompt for enter
-                        // this is due to this sound playing after the logout message is written so it comes way to late. Enter sound is put directly in the logout code to avoid this 
-                        // And it looks better if user is automatically logged out instead of having to press enter
+                        // Same as above if-statement but doesn't prompt for enter after the method and logs out directly if logout was selected
                         if (menuSelection != 6)
                         {
-                            Sound.PlaySound("enterSound.wav");
+                            //Sound.PlaySound("enterSound.wav");
 
                             // Promts user to press enter key to go back to menu - doesn't accept any other input
                             MenuFunctions.PressEnter("\t\tPress [Enter] to go to main menu");
@@ -250,7 +258,7 @@ namespace The_Bank
 
             // Prompts the user to enter the amount they want to transfer
             Console.Write("\t\tEnter the transfer amount: ");
-            if (double.TryParse(Console.ReadLine(), out double transferAmount) && transferAmount > 0)
+            if (double.TryParse(MenuFunctions.CursorReadLine(), out double transferAmount) && transferAmount > 0)
             {
                 if (sourceAccount.Balance >= transferAmount)
                 {
@@ -297,11 +305,11 @@ namespace The_Bank
         }
 
         // WITHDRAW
-        public static void WithdrawMoney(BankContext context, string userName)
+        private static void WithdrawMoney(BankContext context, string userName)
         {
             // Prompt the user for their PIN
             Console.Write("\t\t\tPIN: ");
-            string customerPin = MenuFunctions.CursorReadLine();;
+            string customerPin = HidePin.EnterPin();;
             Console.WriteLine();
             while (true)
             {
@@ -348,15 +356,13 @@ namespace The_Bank
                         // Check if the withdrawal amount is valid
                         if (withdraw > balance)
                         {
-                            Console.WriteLine($"\t\tCannot withdraw more than: {balance}");
-                            Console.ReadKey(true);
+                            Console.WriteLine($"\t\tCannot withdraw more than: {Math.Round(balance,2)} {selectedAccount.Currency}");
                             
                         }
 
                         if (withdraw <= 0)
                         {
                             Console.WriteLine("\t\tCannot withdraw 0 or less");
-                            Console.ReadKey(true);
                             
                         }
 
@@ -365,21 +371,18 @@ namespace The_Bank
                         selectedAccount.Balance = newBalance;
                         context.SaveChanges();
                         // Display the new account balance to the user
-                        Console.WriteLine($"\t\tYour new balance is: {newBalance}");
-                        Console.ReadKey(true);
+                        Console.WriteLine($"\t\tYour new balance is: {Math.Round(newBalance,2)} {selectedAccount.Currency}");
                         return;
                     }
                     else
                     {
                         Console.WriteLine("\t\tPlease write a valid number.");
-                        Console.ReadKey(true);
                         
                     }
                 }
                 else
                 {
                     Console.WriteLine("\t\tInvalid PIN. Try again.");
-                    Console.ReadKey(true);
                     return;
                 } 
             }
@@ -400,7 +403,7 @@ namespace The_Bank
             else
             {
                 // Display the user's accounts and prompt for a selection
-                string[] accountOptions = user.Accounts.Select(a => $"\t\t{a.Name}: {a.Balance} {a.Currency}").ToArray();
+                string[] accountOptions = user.Accounts.Select(a => $"\t\t{a.Name}: {Math.Round(a.Balance,2)} {a.Currency}").ToArray();
                 int chosenAccountPosition = MenuFunctions.OptionsNavigation(accountOptions, "\t\tChoose an account to deposit into:");
 
                 // Validates the selected account
@@ -413,9 +416,11 @@ namespace The_Bank
                 // Retrieve the selected account
                 Account selectedAccount = user.Accounts.ElementAt(chosenAccountPosition);
 
+                MenuFunctions.divider();
+
                 // Prompt the user for the deposit amount
-                Console.Write("\t\tHow much do you wish to deposit?");
-                if (double.TryParse(Console.ReadLine(), out double depositAmount))
+                Console.Write("\t\tHow much do you wish to deposit? ");
+                if (double.TryParse(MenuFunctions.CursorReadLine(), out double depositAmount))
                 {
                     if (depositAmount > 0)
                     {
@@ -523,7 +528,7 @@ namespace The_Bank
                     MenuFunctions.header();
                     // Asks user for deposit amount and checks if value is correct. If yes changes account balance to chosen amount and breaks out of the loop to continue with the rest of the code.
                     Console.Write($"\t\tEnter deposit amount in {selectedCurrency}: ");
-                    if (double.TryParse(Console.ReadLine(), out double initialDeposit) && initialDeposit >= 0)
+                    if (double.TryParse(MenuFunctions.CursorReadLine(), out double initialDeposit) && initialDeposit >= 0)
                     {
                         account.Balance = initialDeposit;
                         break;
@@ -567,7 +572,7 @@ namespace The_Bank
                 MenuFunctions.header();
 
                 Console.Write("\t\tEnter current PIN: ");
-                string currentPin = MenuFunctions.CursorReadLine();
+                string currentPin = HidePin.EnterPin();
 
                 // Re-promt user until string isn't empty
                 while (string.IsNullOrEmpty(currentPin))
@@ -581,7 +586,7 @@ namespace The_Bank
                     MenuFunctions.header();
 
                     Console.Write("\t\tEnter current PIN: ");
-                    currentPin = MenuFunctions.CursorReadLine();
+                    currentPin = HidePin.EnterPin();
                 }
 
                 // If pin matches login info, break out of loop
@@ -601,34 +606,33 @@ namespace The_Bank
                 MenuFunctions.header();
 
                 Console.Write("\t\tEnter new 4 digit PIN: ");
-                string newPin = MenuFunctions.CursorReadLine();
+                string newPin = HidePin.EnterPin();
 
                 Console.Write("\t\tConfirm new PIN: ");
-                string newPinConfirm = MenuFunctions.CursorReadLine();
+                string newPinConfirm = HidePin.EnterPin();
 
                 // Checks so either pin is not null or empty
                 if (!string.IsNullOrEmpty(newPin) || !string.IsNullOrEmpty(newPinConfirm))
                 {
                     // Checks so both pins are only digits
-                    if (!newPin.All(char.IsDigit) || !newPinConfirm.All(char.IsDigit))
+                    if (newPin.All(char.IsDigit) || newPinConfirm.All(char.IsDigit))
                     {
                         // Checks if both pins are exactly 4 digits long
                         if (newPin.Length == 4 && newPinConfirm.Length == 4)
                         { 
-
                             // If pins match save them to database and break out of loop - else write error message
                             if (newPin == newPinConfirm)
                             {
                                 bool success = DbHelpers.EditPin(context, user, newPin);
                                 if (success)
                                 {
-                                    Console.WriteLine($"\t\tChanged PIN to {newPin} for user {username}");
+                                    Console.WriteLine($"\t\tChanged PIN for user {username}");
                                     Thread.Sleep(1500);
                                 }
                                 // If wasn't possible to save account to database, print error
                                 else
                                 {
-                                    Console.WriteLine($"\t\tFailed to update PIN to {newPin} for {username}");
+                                    Console.WriteLine($"\t\tFailed to update PIN for {username}");
                                     Console.WriteLine("\t\tReturning to menu");
 
                                     Thread.Sleep(1500);
