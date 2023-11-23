@@ -417,18 +417,26 @@ namespace The_Bank
                 Console.Write("\t\tHow much do you wish to deposit?");
                 if (double.TryParse(Console.ReadLine(), out double depositAmount))
                 {
-                    // Perform the deposit operation
-                    MenuFunctions.divider();
-                    Console.WriteLine($"\t\tDepositing {depositAmount} into {selectedAccount.Name}");
+                    if (depositAmount > 0)
+                    {
+                        // Perform the deposit operation
+                        MenuFunctions.divider();
+                        Console.WriteLine($"\t\tDepositing {depositAmount} into {selectedAccount.Name}");
 
-                    selectedAccount.Balance += depositAmount;
-                    context.SaveChanges();
-                    Console.WriteLine($"\t\tNew balance: {selectedAccount.Balance}");
-                }
-                else
-                {
-                    // Handle invalid deposit amount input
-                    Console.WriteLine("\t\tInvalid deposit amount entered.");
+                        selectedAccount.Balance += depositAmount;
+                        context.SaveChanges();
+                        Console.WriteLine($"\t\tNew balance: {selectedAccount.Balance}");
+                    }
+
+                    else if (depositAmount < 0)
+                    {
+                        // Handle invalid negative amount input
+                        Console.WriteLine("\t\tCan't deposit a negative amount.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("\t\tInvalid amount entered!");
+                    }
                 }
             }
         }
